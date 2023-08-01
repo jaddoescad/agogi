@@ -31,7 +31,7 @@ export default function Generate() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState(models[0]);
-  const [difficulty, setDifficulty] = useState(difficulties[0]);
+  const [difficulty, setDifficulty] = useState(difficulties[2]);
   const [type, setType] = useState(types[0]);
   const [questions, setQuestions] = useState(numberOfQuestions[0]);
   const [descriptionError, setDescriptionError] = useState('');
