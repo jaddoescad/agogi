@@ -76,7 +76,6 @@ export default function WithSubnavigation() {
           >
             Generate
           </Button>
-
           {user ? (
             <AccountDropdown />
           ) : (
