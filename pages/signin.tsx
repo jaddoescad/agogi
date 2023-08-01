@@ -28,23 +28,22 @@ const SignIn = () => {
             redirectTo={getURL()}
             magicLink={false}
             appearance={{
-              theme: ThemeSupa,
               style: {
                 button: { background: 'black', color: 'white',borderColor:'green.500', borderRadius: '8px' ,borderWidth:'2px'},
-                container:{width: '50%', minWidth:'280px',  },
+                container:{minWidth:'280px'},
                 input : { borderRadius: '8px'}
               },
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'green.500',
-                    brandAccent: 'lightgreen'
-                  }
-                }
-              }
+              // variables: {
+              //   default: {
+              //     colors: {
+              //       brand: 'green.500',
+              //       brandAccent: 'lightgreen'
+              //     }
+              //   }
+              // }
             }}
           />
-      // </Box>
+       </Box>
     );
 
   return (
