@@ -8,7 +8,11 @@ import {
   useToast,
   Spinner,
   Flex,
-  Center
+  Center,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody
 } from '@chakra-ui/react';
 import { Select } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
@@ -19,7 +23,6 @@ import { withPageAuth } from '@supabase/auth-helpers-nextjs';
 import va from '@vercel/analytics';
 
 export default function Generate() {
-  // Mock data for options
   const models = ['GPT 3.5'];
   const difficulties = ['Easy', 'Medium', 'Hard'];
   const types = ['True/False'];
@@ -32,21 +35,17 @@ export default function Generate() {
   const [type, setType] = useState(types[0]);
   const [questions, setQuestions] = useState(numberOfQuestions[0]);
   const [descriptionError, setDescriptionError] = useState('');
-  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false); // New state for Overlay visibility
+
   const { user, isLoading, subscription } = useUser();
 
   const router = useRouter();
-
   const toast = useToast();
+
   const handleGenerate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isLoading) return;
-
-    //track
-
-
-    setIsOverlayVisible(true);
 
     if (description.trim() === '') {
       setDescriptionError('Description is required.');
@@ -58,6 +57,7 @@ export default function Generate() {
     console.log('triggered');
 
     setLoading(true);
+    setIsOverlayVisible(true); // Show overlay when loading
 
     try {
       const response = await postData({
@@ -72,11 +72,11 @@ export default function Generate() {
       });
 
       if (response.quizId) {
-        va.track('generate-quiz',{
-          model:model,
-          difficulty:difficulty,
-          type:type,
-          numberOfQuestions:questions
+        va.track('generate-quiz', {
+          model: model,
+          difficulty: difficulty,
+          type: type
+          //
         });
         router.push(`/quiz/${response.quizId}`);
       } else if (response.error) {
@@ -93,114 +93,127 @@ export default function Generate() {
       });
     } finally {
       setLoading(false);
-      setIsOverlayVisible(false);
+      setIsOverlayVisible(false); // Hide overlay when done loading
     }
   };
 
   return (
-    <Flex
-      // height="100vh"
-      justifyContent="center"
-      // alignItems="center"
-    >
-      {isOverlayVisible && (
-        <Center
-          position="fixed"
-          w="100%"
-          h="100%"
-          bg="rgba(0,0,0,0.5)"
-          zIndex="modal"
+    <>
+      <Flex justifyContent="center">
+        <Box
+          textAlign="center"
+          rounded="lg"
+          w="full"
+          maxW="md"
+          px={10}
+          py={5}
+          borderColor={'purple.600'}
+          borderWidth={2}
+          mt={10}
+          m={2}
         >
-          <Spinner size="xl" color="white" />
-          <Text color="white" mt="5">
-            Generating Quiz...
-          </Text>
-        </Center>
-      )}
+          <form onSubmit={handleGenerate}>
+            <Text
+              as="h1"
+              fontSize="3xl"
+              fontWeight="bold"
+              color="purple.600"
+              mb={6}
+            >
+              Generate Your Quiz
+            </Text>
+            <Flex justifyContent="space-between" my={4}>
+              <Select value={model} onChange={(e) => setModel(e.target.value)}>
+                {models.map((model) => (
+                  <option key={model}>{model}</option>
+                ))}
+              </Select>
 
-      <Box
-        textAlign="center"
-        rounded="lg"
-        w="full"
-        maxW="md"
-        px={10}
-        py={5}
-        borderColor={'purple.600'}
-        borderWidth={2}
-        mt={10}
-        m={2}
+              <Select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+              >
+                {difficulties.map((difficulty) => (
+                  <option key={difficulty}>{difficulty}</option>
+                ))}
+              </Select>
+            </Flex>
+            <Flex justifyContent="space-between" my={4}>
+              <Select value={type} onChange={(e) => setType(e.target.value)}>
+                {types.map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
+              </Select>
+
+              <Select
+                value={questions}
+                onChange={(e) => setQuestions(e.target.value)}
+              >
+                {numberOfQuestions.map((questions) => (
+                  <option key={questions}>{questions}</option>
+                ))}
+              </Select>
+            </Flex>
+            <FormControl isInvalid={!!descriptionError} my={4}>
+              <FormLabel>Description:</FormLabel>
+              <Textarea
+                name="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                isInvalid={!!descriptionError}
+                errorBorderColor="red.300"
+                focusBorderColor="purple.600"
+                maxLength={1000}
+              />
+              {descriptionError && (
+                <Text color="red.300" fontSize="sm" fontStyle="italic">
+                  {descriptionError}
+                </Text>
+              )}
+            </FormControl>
+            <Button
+              type="submit"
+              width="full"
+              colorScheme="purple"
+              my={4}
+              isLoading={loading}
+            >
+              Generate
+            </Button>
+          </form>
+        </Box>
+      </Flex>
+
+      {/* Overlay */}
+      <Modal
+        isOpen={isOverlayVisible}
+        onClose={() => {}}
+        isCentered
+        size="xl"
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
       >
-        <form onSubmit={handleGenerate}>
-          <Text
-            as="h1"
-            fontSize="3xl"
-            fontWeight="bold"
-            color="purple.600"
-            mb={6}
-          >
-            Generate Your Quiz
-          </Text>
-          <Flex justifyContent="space-between" my={4}>
-            <Select value={model} onChange={(e) => setModel(e.target.value)}>
-              {models.map((model) => (
-                <option key={model}>{model}</option>
-              ))}
-            </Select>
-
-            <Select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-            >
-              {difficulties.map((difficulty) => (
-                <option key={difficulty}>{difficulty}</option>
-              ))}
-            </Select>
-          </Flex>
-          <Flex justifyContent="space-between" my={4}>
-            <Select value={type} onChange={(e) => setType(e.target.value)}>
-              {types.map((type) => (
-                <option key={type}>{type}</option>
-              ))}
-            </Select>
-
-            <Select
-              value={questions}
-              onChange={(e) => setQuestions(e.target.value)}
-            >
-              {numberOfQuestions.map((questions) => (
-                <option key={questions}>{questions}</option>
-              ))}
-            </Select>
-          </Flex>
-          <FormControl isInvalid={!!descriptionError} my={4}>
-            <FormLabel>Description:</FormLabel>
-            <Textarea
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              isInvalid={!!descriptionError}
-              errorBorderColor="red.300"
-              focusBorderColor="purple.600"
-              maxLength={1000}
-            />
-            {descriptionError && (
-              <Text color="red.300" fontSize="sm" fontStyle="italic">
-                {descriptionError}
-              </Text>
-            )}
-          </FormControl>
-          <Button
-            type="submit"
-            width="full"
-            colorScheme="purple"
-            my={4}
-            isLoading={loading}
-          >
-            Generate
-          </Button>
-        </form>
-      </Box>
-    </Flex>
+        <ModalOverlay />
+        <ModalContent bg="transparent" boxShadow="none">
+          <ModalBody>
+            <Center>
+              <Box
+                borderWidth="1px"
+                borderRadius="lg"
+                padding={5}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                bg={'white'}
+              >
+                <Spinner size="xl" />
+                <Text mt={3}>Generating a quiz...</Text>
+              </Box>
+            </Center>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 
