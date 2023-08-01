@@ -40,8 +40,8 @@ const Home: React.FC = () => {
             pos="relative"
           >
             <Box pos="absolute" w="full" h="full" bg="blackAlpha.500" />
-            <Center pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)">
-              <VStack spacing={4} align="center" color="white">
+            <Center pos="absolute" w="100%" top="50%" left="50%" transform="translate(-50%, -50%)">
+              <VStack spacing={4} align="center" color="white" w={"100%"}>
                 <Text fontSize={["3xl", "5xl"]}>
                   Unlimited Quizzes
                 </Text>

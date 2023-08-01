@@ -38,8 +38,8 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: 'pricing',
-    href: '/pricing'
+    label: 'generate',
+    href: '/generate'
     //like below you can add sub-menus
     // children: [
     //   {
@@ -53,10 +53,6 @@ const NAV_ITEMS: Array<NavItem> = [
     //     href: '#',
     //   },
     // ],
-  },
-  {
-    label: 'account',
-    href: '/account'
   }
 ];
 
@@ -126,6 +122,7 @@ export default function WithSubnavigation() {
             fontSize="sm"
             color={'white'}
             onClick={() => router.push('/generate')}
+            display={{ sm: 'none', md: 'inline-flex' }}
           >
             Generate
           </Button>

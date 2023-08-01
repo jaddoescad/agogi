@@ -99,11 +99,13 @@ export default function QuizPage() {
     <Box
       w="100%"
       display="flex"
-    //   justifyContent="center"
+      //   justifyContent="center"
       alignItems="center"
       color="gray.700"
     >
-      <Box margin={"auto"}>
+      <Box margin={'auto'} maxW={
+        '800px'
+      }>
         <Heading as="h1" size="2xl" textAlign="center" color="gray.800" my={4}>
           {quiz.title}
         </Heading>
@@ -112,7 +114,6 @@ export default function QuizPage() {
           <Box
             key={`${resetKey}-${index}`}
             border="1px"
-
             p={4}
             m={2}
             w="100%"
@@ -142,31 +143,34 @@ export default function QuizPage() {
             </RadioGroup>
           </Box>
         ))}
-
-        {!submitted ? (
-          <Button
-            mt={4}
-            bg="blue.500"
-            color="white"
-            rounded={"true"}
-
-            onClick={handleSubmit}
-          >
-            See How You Did
-          </Button>
-        ) : (
-          <Button
-            mt={4}
-            bg="blue.500"
-            color="white"
-            rounded={"true"}
-            onClick={handleReset}
-          >
-            Try Again
-          </Button>
-        )}
+        <Box w={'100%'} >
+          {!submitted ? (
+            <Button
+              mt={4}
+              mx={'auto'}
+              display={'block'}
+              bg="blue.500"
+              color="white"
+              rounded={'true'}
+              onClick={handleSubmit}
+            >
+              See How You Did
+            </Button>
+          ) : (
+            <Button
+              mt={4}
+              mx={'auto'}
+              display={'block'}
+              bg="blue.500"
+              color="white"
+              rounded={'true'}
+              onClick={handleReset}
+            >
+              Try Again
+            </Button>
+          )}
+        </Box>
       </Box>
     </Box>
   );
-
 }
