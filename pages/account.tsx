@@ -67,7 +67,7 @@ export default function Account({ user }: { user: User }) {
   return (
     <Box w="100%" paddingX={['2%','10%','25%']}>
       <Text mb="3rem" fontSize="3rem" fontWeight="bold" color="white">account</Text>
-      <Card
+      {/* <Card
           title="Your Plan"
           description={
             subscription
@@ -110,7 +110,7 @@ export default function Account({ user }: { user: User }) {
               </Link>
             )}
           </div>
-        </Card>
+        </Card> */}
         <Card
           title="Your Email"
           description=""

@@ -61,8 +61,8 @@ export default function SmallWithLogoLeft() {
         justify={{ base: 'center', md: 'space-between' }}
         align={{ base: 'center', md: 'center' }}>
         <Logo />
-        <Text>© 2023 app name. all rights reserved</Text>
-        <Stack direction={'row'} spacing={6}>
+        <Text>© 2023 Agogi. all rights reserved</Text>
+        {/* <Stack direction={'row'} spacing={6}>
           <SocialButton label={'Twitter'} href={'#'}>
             <FaTwitter />
           </SocialButton>
@@ -72,7 +72,7 @@ export default function SmallWithLogoLeft() {
           <SocialButton label={'Instagram'} href={'#'}>
             <FaInstagram />
           </SocialButton>
-        </Stack>
+        </Stack> */}
       </Container>
     </Box>
   );
