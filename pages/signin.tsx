@@ -28,11 +28,12 @@ const SignIn = () => {
             redirectTo={getURL()}
             magicLink={false}
             appearance={{
-              style: {
-                button: { background: 'black', color: 'white',borderColor:'green.500', borderRadius: '8px' ,borderWidth:'2px'},
-                container:{minWidth:'280px'},
-                input : { borderRadius: '8px'}
-              },
+              theme: ThemeSupa,
+              // style: {
+              //   button: { background: 'black', color: 'white',borderColor:'green.500', borderRadius: '8px' ,borderWidth:'2px'},
+              //   container:{minWidth:'280px'},
+              //   input : { borderRadius: '8px'}
+              // },
               // variables: {
               //   default: {
               //     colors: {
@@ -40,7 +41,7 @@ const SignIn = () => {
               //       brandAccent: 'lightgreen'
               //     }
               //   }
-              // }
+              }
             }}
           />
        </Box>
