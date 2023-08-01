@@ -50,7 +50,6 @@ export default function SmallWithLogoLeft() {
     <Box
       w="100%"
       bottom={0}
-      position={'fixed'}
       bg={useColorModeValue('gray.50', 'gray.900')}
       color={useColorModeValue('gray.700', 'gray.200')}>
       <Container

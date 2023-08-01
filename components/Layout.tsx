@@ -21,7 +21,16 @@ export default function Layout({ children, meta: pageMeta }: Props) {
   };
 
   return (
-    <>
+    <div
+      style={
+        {
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          justifyContent: 'space-between'
+        }
+      }
+    >
       <Head>
         <title>{meta.title}</title>
         <meta name="robots" content="follow, index" />
@@ -42,6 +51,6 @@ export default function Layout({ children, meta: pageMeta }: Props) {
       <Navbar />
       <main id="skip" className={styles.main}>{children}</main>
       <Footer />
-    </>
+    </div>
   );
 }
