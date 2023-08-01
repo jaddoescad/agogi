@@ -115,6 +115,7 @@ export default function Generate() {
         borderColor={'purple.600'}
         borderWidth={2}
         mt={10}
+        m={2}
 
       >
         <form onSubmit={handleGenerate}>
