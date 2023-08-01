@@ -94,7 +94,7 @@ export default function WithSubnavigation() {
         </Flex> */}
         <Flex
           flex={{ base: 1 }}
-          justify={{ base: 'center', md: 'start' }}
+          justify={{ md: 'start' }}
           align="center"
         >
           <Link href="/" className="s.logo" aria-label="Logo">
