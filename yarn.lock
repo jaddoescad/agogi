@@ -1371,6 +1371,11 @@
   "resolved" "https://registry.npmjs.org/@types/scheduler/-/scheduler-0.16.2.tgz"
   "version" "0.16.2"
 
+"@vercel/analytics@^1.0.1":
+  "integrity" "sha512-Ux0c9qUfkcPqng3vrR0GTrlQdqNJ2JREn/2ydrVuKwM3RtMfF2mWX31Ijqo1opSjNAq6rK76PwtANw6kl6TAow=="
+  "resolved" "https://registry.npmjs.org/@vercel/analytics/-/analytics-1.0.1.tgz"
+  "version" "1.0.1"
+
 "@zag-js/element-size@0.1.0":
   "integrity" "sha512-QF8wp0+V8++z+FHXiIw93+zudtubYszOtYbNgK39fg3pi+nCZtuSm4L1jC5QZMatNZ83MfOzyNCfgUubapagJQ=="
   "resolved" "https://registry.npmjs.org/@zag-js/element-size/-/element-size-0.1.0.tgz"

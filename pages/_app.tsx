@@ -10,6 +10,7 @@ import { AppProps } from 'next/app';
 import { MyUserContextProvider } from 'utils/useUser';
 import type { Database } from 'types_db';
 import { ChakraProvider } from '@chakra-ui/react';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() =>
@@ -20,16 +21,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <ChakraProvider>
-    <div className="bg-black">
-      <SessionContextProvider supabaseClient={supabaseClient}>
-        <MyUserContextProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </MyUserContextProvider>
-      </SessionContextProvider>
-    </div>
-    </ChakraProvider>
+    <>
+      <ChakraProvider>
+        <div className="bg-black">
+          <SessionContextProvider supabaseClient={supabaseClient}>
+            <MyUserContextProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </MyUserContextProvider>
+          </SessionContextProvider>
+        </div>
+      </ChakraProvider>
+      <Analytics />
+    </>
   );
 }
