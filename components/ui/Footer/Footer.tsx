@@ -29,6 +29,7 @@ const SocialButton = ({
       w={8}
       h={8}
       cursor={'pointer'}
+      
       as={'a'}
       href={href}
       display={'inline-flex'}
@@ -49,7 +50,7 @@ export default function SmallWithLogoLeft() {
     <Box
       w="100%"
       bottom={0}
-      mt={10}
+      position={'fixed'}
       bg={useColorModeValue('gray.50', 'gray.900')}
       color={useColorModeValue('gray.700', 'gray.200')}>
       <Container
@@ -58,21 +59,10 @@ export default function SmallWithLogoLeft() {
         py={4}
         direction={{ base: 'column', md: 'row' }}
         spacing={4}
-        justify={{ base: 'center', md: 'space-between' }}
+        justify={{ base: 'center', md: 'center' }}
         align={{ base: 'center', md: 'center' }}>
         <Logo />
         <Text>© 2023 Agogi. all rights reserved</Text>
-        {/* <Stack direction={'row'} spacing={6}>
-          <SocialButton label={'Twitter'} href={'#'}>
-            <FaTwitter />
-          </SocialButton>
-          <SocialButton label={'YouTube'} href={'#'}>
-            <FaYoutube />
-          </SocialButton>
-          <SocialButton label={'Instagram'} href={'#'}>
-            <FaInstagram />
-          </SocialButton>
-        </Stack> */}
       </Container>
     </Box>
   );

@@ -86,10 +86,9 @@ export default function Generate() {
 
   return (
     <Flex
-      height="100vh"
+      // height="100vh"
       justifyContent="center"
-      alignItems="center"
-      bgGradient="linear(to-r, purple.400, purple.600)"
+      // alignItems="center"
     >
       {isOverlayVisible && (
         <Center
@@ -113,7 +112,10 @@ export default function Generate() {
         maxW="md"
         px={10}
         py={5}
-        bg="white"
+        borderColor={'purple.600'}
+        borderWidth={2}
+        mt={10}
+
       >
         <form onSubmit={handleGenerate}>
           <Text
