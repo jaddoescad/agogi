@@ -19,6 +19,7 @@ import {
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import { Link as ChakraLink } from '@chakra-ui/react';
 import { QuizCard } from 'components/QuizCards/QuizCard';
+import { withPageAuth } from '@supabase/auth-helpers-nextjs';
 
 type Quiz = {
   id: number;
@@ -72,3 +73,5 @@ const MyQuizzes: React.FC = () => {
 };
 
 export default MyQuizzes;
+
+export const getServerSideProps = withPageAuth({ redirectTo: '/signin' });

@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { postData } from '@/utils/helpers';
 import React, { useState } from 'react';
 import { useUser } from 'utils/useUser';
+import { withPageAuth } from '@supabase/auth-helpers-nextjs';
 
 export default function Generate() {
   // Mock data for options
@@ -191,3 +192,6 @@ export default function Generate() {
     </Flex>
   );
 }
+
+
+export const getServerSideProps = withPageAuth({ redirectTo: '/signin' });
