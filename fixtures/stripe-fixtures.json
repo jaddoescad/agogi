@@ -1,0 +1,63 @@
+
+
+{
+    "_meta": {
+        "template_version": 0
+    },
+    "fixtures": [
+        {
+            "name": "prod_month",
+            "path": "/v1/products",
+            "method": "post",
+            "params": {
+                "name": "The Book",
+                "description": "This is a beautiful book"
+            }
+        },
+        {
+            "name": "prod_month_free",
+            "path": "/v1/prices",
+            "method": "post",
+            "params": {
+                "product": "${prod_month:id}",
+                "currency": "usd",
+                "billing_scheme": "per_unit",
+                "unit_amount": 0,
+                "recurring": {
+                    "interval": "month",
+                    "interval_count": 1
+                }
+            }
+        },
+        {
+            "name": "prod_month_pro",
+            "path": "/v1/prices",
+            "method": "post",
+            "params": {
+                "product": "${prod_month:id}",
+                "currency": "usd",
+                "billing_scheme": "per_unit",
+                "unit_amount": 1000,
+                "recurring": {
+                    "interval": "month",
+                    "interval_count": 1
+                }
+            }
+        },
+        {
+            "name": "prod_month_super",
+            "path": "/v1/prices",
+            "method": "post",
+            "params": {
+                "product": "${prod_month:id}",
+                "currency": "usd",
+                "billing_scheme": "per_unit",
+                "unit_amount": 2000,
+                "recurring": {
+                    "interval": "month",
+                    "interval_count": 1
+                }
+            }
+        }
+    ]
+}
