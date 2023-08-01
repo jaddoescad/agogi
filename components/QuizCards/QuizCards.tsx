@@ -40,8 +40,7 @@ const QuizCards = ({
       alignItems="center"
       justifyContent="center"
     >
-      {' '}
-      <SimpleGrid columns={[1, 2, 3]}>
+      <SimpleGrid columns={[1, 1, 2, 3, 3]}>
         {quizzes.map((quiz) => (
           <QuizCard quiz={quiz} key={quiz.id} />
         ))}

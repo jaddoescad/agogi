@@ -17,18 +17,7 @@ export const QuizCard = ({
 }: {
   quiz: { id: number; title: string; difficulty: string | null };
 }) => (
-  // <Flex background={"red"} direction="column" h="16rem" w="16rem" justify="space-between">
-  //     <Box bg="tomato" height="4rem">
-  //       Box 1 (Top)
-  //     </Box>
-  //     <Box bg="skyblue" height="4rem">
-  //       Box 2 (Middle)
-  //     </Box>
-  //     <Box bg="green" height="4rem">
-  //       Box 3 (Bottom)
-  //     </Box>
-  //   </Flex>
-  //
+
   <LinkBox as="div" m={2} h="16rem" w="16rem">
     <LinkOverlay
       href={`/quiz/${quiz.id}`}
@@ -38,6 +27,7 @@ export const QuizCard = ({
       justifyContent="space-between"
       borderRadius="3xl"
       p={5}
+      m={2}
       bg="#162457"
       h={'100%'}
       w={'100%'}
