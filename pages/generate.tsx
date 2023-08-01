@@ -16,6 +16,7 @@ import { postData } from '@/utils/helpers';
 import React, { useState } from 'react';
 import { useUser } from 'utils/useUser';
 import { withPageAuth } from '@supabase/auth-helpers-nextjs';
+import va from '@vercel/analytics';
 
 export default function Generate() {
   // Mock data for options
@@ -39,6 +40,12 @@ export default function Generate() {
   const toast = useToast();
   const handleGenerate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isLoading) return;
+
+    //track
+
+
     setIsOverlayVisible(true);
 
     if (description.trim() === '') {
@@ -48,8 +55,7 @@ export default function Generate() {
       setDescriptionError('');
     }
 
-    console.log("triggered")
-    
+    console.log('triggered');
 
     setLoading(true);
 
@@ -66,6 +72,12 @@ export default function Generate() {
       });
 
       if (response.quizId) {
+        va.track('generate-quiz',{
+          model:model,
+          difficulty:difficulty,
+          type:type,
+          numberOfQuestions:questions
+        });
         router.push(`/quiz/${response.quizId}`);
       } else if (response.error) {
         console.log(response.error);
@@ -117,7 +129,6 @@ export default function Generate() {
         borderWidth={2}
         mt={10}
         m={2}
-
       >
         <form onSubmit={handleGenerate}>
           <Text
@@ -192,6 +203,5 @@ export default function Generate() {
     </Flex>
   );
 }
-
 
 export const getServerSideProps = withPageAuth({ redirectTo: '/signin' });

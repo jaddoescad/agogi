@@ -27,7 +27,7 @@ const Home: React.FC = () => {
     <Box pb={10}>
       <Box minH="screen" alignItems="center">
         <Head>
-          <title>Quiz App</title>
+          <title>Agogi</title>
         </Head>
 
         <Box alignItems="center" justifyContent="center" w="full">

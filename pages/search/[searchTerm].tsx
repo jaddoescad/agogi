@@ -1,6 +1,9 @@
 'use client';
 
-import { searchQuizzes, paginateSearchQuizzes } from '../../utils/supabase-client';
+import {
+  searchQuizzes,
+  paginateSearchQuizzes
+} from '../../utils/supabase-client';
 import { QuizCard } from 'components/QuizCards/QuizCard';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
@@ -16,6 +19,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
+import va from '@vercel/analytics';
 
 type Quiz = { id: number; title: string; difficulty: string | null };
 
@@ -66,6 +70,16 @@ const Search: React.FC = () => {
     initLoad();
   }, []);
 
+  //track search
+
+  useEffect(() => {
+    if (searchTerm === undefined || searchTerm === null) {
+      return;
+    }
+
+    va.track('search');
+  }, [searchTerm]);
+
   return (
     <Box minHeight="100vh" pb="10">
       <VStack alignItems="center">
@@ -78,7 +92,6 @@ const Search: React.FC = () => {
           justifyContent="center"
           width={['full', 'full', 'full', 'xl']}
         >
-
           <Box
             mt="10"
             display="flex"

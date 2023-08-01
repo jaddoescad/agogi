@@ -9,6 +9,7 @@ import {
   Button,
   Text
 } from '@chakra-ui/react';
+import va from '@vercel/analytics';
 
 type QuestionData = {
   question: string;
@@ -86,6 +87,13 @@ export default function QuizPage() {
   useEffect(() => {
     if (quizid) {
       getQuiz_(quizid as string);
+    }
+  }, [quizid]);
+
+  //track quiz views
+  useEffect(() => {
+    if (quizid) {
+      va.track('quiz-view');
     }
   }, [quizid]);
 
