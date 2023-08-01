@@ -20,8 +20,8 @@ const SignIn = () => {
 
   if (!user)
     return (
-      // <Box paddingX={{sm:'2%', md:'10%', lg:'20%'}} pt={"10"} w="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-      //   <Logo width="64px" height="64px" />
+      <Box pt={"10"} w="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+         <Logo width="64px" height="64px" />
         <Auth
             supabaseClient={supabaseClient}
             providers={['google']}
