@@ -34,14 +34,14 @@ const SignIn = () => {
               //   container:{minWidth:'280px'},
               //   input : { borderRadius: '8px'}
               // },
-              // variables: {
-              //   default: {
-              //     colors: {
-              //       brand: 'green.500',
-              //       brandAccent: 'lightgreen'
-              //     }
-              //   }
-              // }
+              variables: {
+                default: {
+                  colors: {
+                    brand: 'green.500',
+                    brandAccent: 'lightgreen'
+                  }
+                }
+              }
             }}
           />
        </Box>
