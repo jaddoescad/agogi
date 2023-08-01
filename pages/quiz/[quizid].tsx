@@ -104,8 +104,10 @@ export default function QuizPage() {
       color="gray.700"
     >
       <Box margin={'auto'} maxW={
-        '800px'
-      }>
+        '600px'
+      }
+      w={'100%'}
+      >
         <Heading as="h1" size="2xl" textAlign="center" color="gray.800" my={4}>
           {quiz.title}
         </Heading>
@@ -138,7 +140,7 @@ export default function QuizPage() {
               onChange={(value) => handleChange(index, value)}
               isDisabled={submitted}
             >
-              <Radio value="true">True</Radio>
+              <Radio  mr={"2"} value="true">True</Radio>
               <Radio value="false">False</Radio>
             </RadioGroup>
           </Box>
