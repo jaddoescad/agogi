@@ -30,7 +30,7 @@ const SignIn = () => {
             appearance={{
               theme: ThemeSupa,
               style: {
-                button: { background: 'black', color: 'white',borderColor:'green.500', borderRadius: '8px' ,borderWidth:'2px'},
+                button: { background: 'black', color: 'white',borderRadius: '8px' ,borderWidth:'2px'},
                 // container:{minWidth:'280px'},
                 // input : { borderRadius: '8px'}
               },
