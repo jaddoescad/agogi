@@ -117,7 +117,12 @@ export const getHomePageQuizzes = async () => {
   return data ?? [];
 };
 
-export const getMyQuizzes = async (userId: string) => {
+export const getMyQuizzes = async () => {
+  const userId = (await supabase.auth.getUser()).data.user?.id;
+  if (!userId) {
+    throw new Error('User not logged in');
+  }
+
   const { data, error } = await supabase
     .from('quizzes')
     .select(
@@ -128,7 +133,9 @@ export const getMyQuizzes = async (userId: string) => {
     `
     )
     .eq('creator_id', userId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(50)
+    ;
 
   if (error) {
     console.log(error.message);

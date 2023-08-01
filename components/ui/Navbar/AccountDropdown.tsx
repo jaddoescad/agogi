@@ -1,4 +1,11 @@
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList
+} from '@chakra-ui/react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,15 +14,16 @@ import { BiChevronDown } from 'react-icons/bi';
 import { FaEdit, FaArchive } from 'react-icons/fa';
 
 const CustomMenuItem = ({
-    icon: Icon,
-    href,
-    children,
-    ...props
-  }: {
-    icon: IconType;
-    href: string;
-    children: React.ReactNode;
-  }) => (
+  icon: Icon,
+  href,
+  children,
+  ...props
+}: {
+  icon: IconType;
+  href: string;
+  children: React.ReactNode;
+}) => (
+  <Link href={href}>
     <MenuItem
       {...props}
       transition="background 0.2s, color 0.2s"
@@ -23,22 +31,20 @@ const CustomMenuItem = ({
       rounded="md"
       _hover={{
         backgroundColor: 'violet.500',
-        color: 'white',
+        color: 'white'
       }}
       _activeLink={{
         backgroundColor: 'violet.500',
-        color: 'white',
+        color: 'white'
       }}
     >
-      <Link href={href}>
-        <Box>
-          <Icon className="mr-2 h-5 w-5 text-violet-200" aria-hidden="true" />
-          {children}
-        </Box>
-      </Link>
+      <Box>
+        <Icon className="mr-2 h-5 w-5 text-violet-200" aria-hidden="true" />
+        {children}
+      </Box>
     </MenuItem>
-  );
-  
+  </Link>
+);
 
 export default function Account() {
   return (
@@ -46,7 +52,12 @@ export default function Account() {
       <Menu>
         <MenuButton
           as={Button}
-          rightIcon={<BiChevronDown className="ml-2 -mr-1 h-5 w-5 text-violet-400 hover:text-violet-100" aria-hidden="true" />}
+          rightIcon={
+            <BiChevronDown
+              className="ml-2 -mr-1 h-5 w-5 text-violet-400 hover:text-violet-100"
+              aria-hidden="true"
+            />
+          }
           rounded="md"
           bg="black"
           px="4"
@@ -66,7 +77,7 @@ export default function Account() {
           borderColor="gray.200"
           zIndex="dropdown"
         >
-          <CustomMenuItem icon={FaEdit} href="/generated">
+          <CustomMenuItem icon={FaEdit} href="/myquizzes">
             My Quizzes
           </CustomMenuItem>
           <SignOutButton />
@@ -91,11 +102,11 @@ const SignOutButton = () => {
       rounded="md"
       _hover={{
         backgroundColor: 'violet.500',
-        color: 'white',
+        color: 'white'
       }}
       _activeLink={{
         backgroundColor: 'violet.500',
-        color: 'white',
+        color: 'white'
       }}
     >
       <FaArchive className="mr-2 h-5 w-5 text-violet-200" aria-hidden="true" />
