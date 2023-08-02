@@ -137,7 +137,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
               key={`${resetKey}-${index}`}
               border="1px"
               p={4}
-              // m={2}
+              mb={2}
               w="100%"
               borderRadius="lg"
             >
