@@ -79,7 +79,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
     <Text>Loading...</Text>
   ) : (
     <>
-      <Head>
+      {/* <Head>
         <title>{quiz.title} - Quiz</title>
         <meta name="robots" content="follow, index" />
         <link href="/favicon.ico" rel="shortcut icon" />
@@ -107,7 +107,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
           name="twitter:description"
           content={`AI Generated Quiz about ${quiz.title}`}
         />
-      </Head>
+      </Head> */}
       <Box
         w="100%"
         display="flex"
@@ -116,6 +116,8 @@ export default function QuizPage(props: { quiz: QuizRow }) {
         color="gray.700"
       >
         <Box margin={'auto'} maxW={'600px'} w={'100%'}>
+         <Box m={4}>
+
           <Heading
             as="h1"
             size="2xl"
@@ -137,7 +139,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
               key={`${resetKey}-${index}`}
               border="1px"
               p={4}
-              m={2}
+              // m={2}
               w="100%"
               borderRadius="lg"
             >
@@ -195,6 +197,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
             )}
           </Box>
         </Box>
+        </Box> 
       </Box>
     </>
   );
