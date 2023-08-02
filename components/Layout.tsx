@@ -19,8 +19,7 @@ export default function Layout({ children, meta: pageMeta }: Props) {
   const router = useRouter();
   const meta = {
     title: 'Agogi',
-    description: 'AI powered quiz platform',
-    cardImage: '/og.png',
+    description: 'AI powered quiz platform'
     ...pageMeta
   };
 
