@@ -10,6 +10,7 @@ import {
   Text
 } from '@chakra-ui/react';
 import va from '@vercel/analytics';
+import Head from 'next/head';
 
 type QuestionData = {
   question: string;
@@ -62,36 +63,6 @@ export default function QuizPage(props: { quiz: QuizRow }) {
     setResetKey((prevKey) => prevKey + 1); // increment key to force re-render
   };
 
-  // const getQuiz_ = async (quizid: string) => {
-  //   try {
-  //     const quiz = await getQuiz(quizid);
-
-  //     if (Array.isArray(quiz.questions)) {
-  //       if (!quiz || !quiz.questions || quiz.questions.length === 0) {
-  //         throw new Error('Quiz not found');
-  //       }
-  //       setQuiz({
-  //         ...quiz,
-  //         questions: quiz.questions.map((question) => ({
-  //           ...question,
-  //           question_data: question.question_data as QuestionData
-  //         }))
-  //       });
-  //       setAnswers(Array(quiz.questions.length).fill(null));
-  //     } else {
-  //       throw new Error('Quiz questions are not in the expected format');
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (quizid) {
-  //     getQuiz_(quizid as string);
-  //   }
-  // }, [quizid]);
-
   //track quiz views
   useEffect(() => {
     if (quizid) {
@@ -106,91 +77,130 @@ export default function QuizPage(props: { quiz: QuizRow }) {
   return !quiz ? (
     <Text>Loading...</Text>
   ) : (
-    <Box
-      w="100%"
-      display="flex"
-      //   justifyContent="center"
-      alignItems="center"
-      color="gray.700"
-    >
-      <Box margin={'auto'} maxW={'600px'} w={'100%'}>
-        <Heading as="h1" size="2xl" textAlign="center" color="gray.800" my={4}>
-          {quiz.title}
-        </Heading>
-        <Text fontSize="lg" textAlign="center" color="gray.800" my={4}>
-          Generated with:{' '}
-          <span style={{ fontWeight: 'bold', color: '#3A3A3A' }}>
-            {quiz.model}
-          </span>
-        </Text>
-
-        {quiz.questions.map((item, index) => (
-          <Box
-            key={`${resetKey}-${index}`}
-            border="1px"
-            p={4}
-            m={2}
-            w="100%"
-            borderRadius="lg"
+    <>
+      <Head>
+        <title>{quiz.title} - Quiz</title>
+        <meta name="robots" content="follow, index" />
+        <link href="/favicon.ico" rel="shortcut icon" />
+        <meta
+          content={`${quiz.title} - A quiz about ${quiz.model}`}
+          name="description"
+        />
+        <meta
+          property="og:url"
+          content={`https://subscription-starter.vercel.app${router.asPath}`}
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={`${quiz.title} - Quiz`} />
+        <meta
+          property="og:description"
+          content={`
+          AI Generated Quiz about ${quiz.model}
+          `}
+        />
+        <meta property="og:title" content={`${quiz.title} - Quiz`} />
+        <meta property="og:image" content="URL_TO_IMAGE_HERE" />{' '}
+        {/* Replace with your image URL */}
+        <meta name="twitter:card" content="" />
+        <meta name="twitter:site" content="" />{' '}
+        {/* Replace with your Twitter handle */}
+        <meta name="twitter:title" content={`${quiz.title} - Quiz`} />
+        <meta
+          name="twitter:description"
+          content={`${quiz.title} - A quiz about ${quiz.model}`}
+        />
+      </Head>
+      <Box
+        w="100%"
+        display="flex"
+        //   justifyContent="center"
+        alignItems="center"
+        color="gray.700"
+      >
+        <Box margin={'auto'} maxW={'600px'} w={'100%'}>
+          <Heading
+            as="h1"
+            size="2xl"
+            textAlign="center"
+            color="gray.800"
+            my={4}
           >
-            <Text fontSize="lg">{item.question_data.question}</Text>
-            {submitted && (
-              <Text
-                color={
-                  item.question_data.correctAnswer === answers[index]
-                    ? 'green.500'
-                    : 'red.500'
-                }
+            {quiz.title}
+          </Heading>
+          <Text fontSize="lg" textAlign="center" color="gray.800" my={4}>
+            Generated with:{' '}
+            <span style={{ fontWeight: 'bold', color: '#3A3A3A' }}>
+              {quiz.model}
+            </span>
+          </Text>
+
+          {quiz.questions.map((item, index) => (
+            <Box
+              key={`${resetKey}-${index}`}
+              border="1px"
+              p={4}
+              m={2}
+              w="100%"
+              borderRadius="lg"
+            >
+              <Text fontSize="lg">{item.question_data.question}</Text>
+              {submitted && (
+                <Text
+                  color={
+                    item.question_data.correctAnswer === answers[index]
+                      ? 'green.500'
+                      : 'red.500'
+                  }
+                >
+                  {item.question_data.correctAnswer
+                    ? 'Correct answer: True'
+                    : 'Correct answer: False'}
+                </Text>
+              )}
+              <RadioGroup
+                mt={4}
+                onChange={(value) => handleChange(index, value)}
+                isDisabled={submitted}
               >
-                {item.question_data.correctAnswer
-                  ? 'Correct answer: True'
-                  : 'Correct answer: False'}
-              </Text>
+                <Radio mr={'2'} value="true">
+                  True
+                </Radio>
+                <Radio value="false">False</Radio>
+              </RadioGroup>
+            </Box>
+          ))}
+          <Box w={'100%'}>
+            {!submitted ? (
+              <Button
+                mt={4}
+                mx={'auto'}
+                display={'block'}
+                bg="blue.500"
+                color="white"
+                rounded={'true'}
+                onClick={handleSubmit}
+              >
+                See How You Did
+              </Button>
+            ) : (
+              <Button
+                mt={4}
+                mx={'auto'}
+                display={'block'}
+                bg="blue.500"
+                color="white"
+                rounded={'true'}
+                onClick={handleReset}
+              >
+                Try Again
+              </Button>
             )}
-            <RadioGroup
-              mt={4}
-              onChange={(value) => handleChange(index, value)}
-              isDisabled={submitted}
-            >
-              <Radio mr={'2'} value="true">
-                True
-              </Radio>
-              <Radio value="false">False</Radio>
-            </RadioGroup>
           </Box>
-        ))}
-        <Box w={'100%'}>
-          {!submitted ? (
-            <Button
-              mt={4}
-              mx={'auto'}
-              display={'block'}
-              bg="blue.500"
-              color="white"
-              rounded={'true'}
-              onClick={handleSubmit}
-            >
-              See How You Did
-            </Button>
-          ) : (
-            <Button
-              mt={4}
-              mx={'auto'}
-              display={'block'}
-              bg="blue.500"
-              color="white"
-              rounded={'true'}
-              onClick={handleReset}
-            >
-              Try Again
-            </Button>
-          )}
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }
-
 
 // This will run at request time on the server.
 export async function getServerSideProps(context: any) {
@@ -199,7 +209,12 @@ export async function getServerSideProps(context: any) {
   try {
     const quiz = await getQuiz(quizid);
 
-    if (!Array.isArray(quiz.questions) || !quiz || !quiz.questions || quiz.questions.length === 0) {
+    if (
+      !Array.isArray(quiz.questions) ||
+      !quiz ||
+      !quiz.questions ||
+      quiz.questions.length === 0
+    ) {
       throw new Error('Quiz not found');
     }
 
@@ -209,10 +224,10 @@ export async function getServerSideProps(context: any) {
           ...quiz,
           questions: quiz.questions.map((question) => ({
             ...question,
-            question_data: question.question_data as QuestionData,
-          })),
-        },
-      },
+            question_data: question.question_data as QuestionData
+          }))
+        }
+      }
     };
   } catch (error) {
     console.log(error);
