@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import va from '@vercel/analytics';
 import Head from 'next/head';
+import { getURL } from '@/utils/helpers';
 
 type QuestionData = {
   question: string;
@@ -83,31 +84,33 @@ export default function QuizPage(props: { quiz: QuizRow }) {
         <meta name="robots" content="follow, index" />
         <link href="/favicon.ico" rel="shortcut icon" />
         <meta
-          content={`${quiz.title} - A quiz about ${quiz.model}`}
+          content={`
+          AI Generated Quiz about ${quiz.title}
+          `}
           name="description"
         />
         <meta
           property="og:url"
-          content={`https://subscription-starter.vercel.app${router.asPath}`}
+          content={`
+          ${getURL()}
+          ${router.asPath}`}
         />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={`${quiz.title} - Quiz`} />
         <meta
           property="og:description"
           content={`
-          AI Generated Quiz about ${quiz.model}
+          AI Generated Quiz about ${quiz.title}
           `}
         />
         <meta property="og:title" content={`${quiz.title} - Quiz`} />
-        <meta property="og:image" content="URL_TO_IMAGE_HERE" />{' '}
-        {/* Replace with your image URL */}
         <meta name="twitter:card" content="" />
-        <meta name="twitter:site" content="" />{' '}
-        {/* Replace with your Twitter handle */}
+        <meta name="twitter:site" content="" />
         <meta name="twitter:title" content={`${quiz.title} - Quiz`} />
         <meta
           name="twitter:description"
-          content={`${quiz.title} - A quiz about ${quiz.title}`}
+          content={`
+          AI Generated Quiz about ${quiz.model}`}
         />
       </Head>
       <Box
