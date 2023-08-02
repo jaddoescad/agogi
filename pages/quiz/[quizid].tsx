@@ -99,9 +99,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
         <meta property="og:site_name" content={`${quiz.title} - Quiz`} />
         <meta
           property="og:description"
-          content={`
-          AI Generated Quiz about ${quiz.title}
-          `}
+          content={`AI Generated Quiz about ${quiz.title}`}
         />
         <meta property="og:title" content={`${quiz.title} - Quiz`} />
         <meta name="twitter:card" content="" />
@@ -109,8 +107,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
         <meta name="twitter:title" content={`${quiz.title} - Quiz`} />
         <meta
           name="twitter:description"
-          content={`
-          AI Generated Quiz about ${quiz.model}`}
+          content={`AI Generated Quiz about ${quiz.title}`}
         />
       </Head>
       <Box
