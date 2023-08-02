@@ -5,8 +5,9 @@ import Navbar from 'components/ui/Navbar';
 import Footer from 'components/ui/Footer';
 import { ReactNode } from 'react';
 import { PageMeta } from '../types';
-import { Link, Button, Icon } from '@chakra-ui/react';
+import { Button, Icon } from '@chakra-ui/react';
 import { FaDiscord } from 'react-icons/fa';
+import Link from 'next/link';
 
 interface Props {
   children: ReactNode;
@@ -53,7 +54,7 @@ export default function Layout({ children, meta: pageMeta }: Props) {
       <Navbar />
       <main id="skip" className={styles.main}>{children}</main>
       <Footer />
-      <Link href="https://discord.gg/crKZGpnz" isExternal>
+      <Link href="https://discord.gg/crKZGpnz">
         <Button
           position="fixed"
           bottom={4}

@@ -6,9 +6,9 @@ import {
   Flex,
   Button,
   Stack,
-  Link,
   useColorModeValue,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 
 import SearchBar from './SearchBar';
 import AccountDropdown from './AccountDropdown';

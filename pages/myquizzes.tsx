@@ -1,6 +1,5 @@
 import { getMyQuizzes } from '../utils/supabase-client';
 import Head from 'next/head';
-import Link from 'next/link';
 import React from 'react';
 import { IoMdCheckmarkCircleOutline } from 'react-icons/io';
 import { useState, useEffect } from 'react';
@@ -17,7 +16,6 @@ import {
   SimpleGrid
 } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
-import { Link as ChakraLink } from '@chakra-ui/react';
 import { QuizCard } from 'components/QuizCards/QuizCard';
 import { withPageAuth } from '@supabase/auth-helpers-nextjs';
 

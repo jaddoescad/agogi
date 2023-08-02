@@ -1,9 +1,10 @@
 import QuizCards  from 'components/QuizCards/QuizCards';
 import { getHomePageQuizzes } from 'utils/supabase-client';
 import Head from 'next/head';
-import { Link as ChakraLink } from "@chakra-ui/react";
 import { Box, VStack, HStack, Text, Button, Image, Center } from '@chakra-ui/react';
 import React, { useState, useEffect} from 'react';
+import Link from 'next/link';
+
 
 type Quiz = {
   id: number;
@@ -45,11 +46,11 @@ const Home: React.FC = () => {
                 <Text fontSize={["3xl", "5xl"]}>
                   AI Generated Quizzes
                 </Text>
-                <ChakraLink href="/generate">
+                <Link href="/generate">
                   <Button colorScheme="blue" px={4}>
                     Generate
                   </Button>
-                </ChakraLink>
+                </Link>
               </VStack>
             </Center>
 

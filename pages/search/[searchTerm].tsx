@@ -11,7 +11,6 @@ import { useRouter } from 'next/router';
 import {
   Box,
   Heading,
-  Link,
   Button,
   Flex,
   Image,
