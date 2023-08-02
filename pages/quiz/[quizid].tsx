@@ -31,16 +31,18 @@ type QuizRow = {
   id: number;
   title: string;
   questions: QuestionRow[];
+  model: string | null;
 };
 
-export default function QuizPage() {
-  const [quiz, setQuiz] = useState<QuizRow | null>(null);
+export default function QuizPage(props: { quiz: QuizRow }) {
+  // const [quiz, setQuiz] = useState<QuizRow | null>(null);
 
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const router = useRouter();
   const { quizid } = router.query;
+  const quiz = props.quiz;
 
   const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -60,35 +62,35 @@ export default function QuizPage() {
     setResetKey((prevKey) => prevKey + 1); // increment key to force re-render
   };
 
-  const getQuiz_ = async (quizid: string) => {
-    try {
-      const quiz = await getQuiz(quizid);
+  // const getQuiz_ = async (quizid: string) => {
+  //   try {
+  //     const quiz = await getQuiz(quizid);
 
-      if (Array.isArray(quiz.questions)) {
-        if (!quiz || !quiz.questions || quiz.questions.length === 0) {
-          throw new Error('Quiz not found');
-        }
-        setQuiz({
-          ...quiz,
-          questions: quiz.questions.map((question) => ({
-            ...question,
-            question_data: question.question_data as QuestionData
-          }))
-        });
-        setAnswers(Array(quiz.questions.length).fill(null));
-      } else {
-        throw new Error('Quiz questions are not in the expected format');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     if (Array.isArray(quiz.questions)) {
+  //       if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+  //         throw new Error('Quiz not found');
+  //       }
+  //       setQuiz({
+  //         ...quiz,
+  //         questions: quiz.questions.map((question) => ({
+  //           ...question,
+  //           question_data: question.question_data as QuestionData
+  //         }))
+  //       });
+  //       setAnswers(Array(quiz.questions.length).fill(null));
+  //     } else {
+  //       throw new Error('Quiz questions are not in the expected format');
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (quizid) {
-      getQuiz_(quizid as string);
-    }
-  }, [quizid]);
+  // useEffect(() => {
+  //   if (quizid) {
+  //     getQuiz_(quizid as string);
+  //   }
+  // }, [quizid]);
 
   //track quiz views
   useEffect(() => {
@@ -111,14 +113,16 @@ export default function QuizPage() {
       alignItems="center"
       color="gray.700"
     >
-      <Box margin={'auto'} maxW={
-        '600px'
-      }
-      w={'100%'}
-      >
+      <Box margin={'auto'} maxW={'600px'} w={'100%'}>
         <Heading as="h1" size="2xl" textAlign="center" color="gray.800" my={4}>
           {quiz.title}
         </Heading>
+        <Text fontSize="lg" textAlign="center" color="gray.800" my={4}>
+          Generated with:{' '}
+          <span style={{ fontWeight: 'bold', color: '#3A3A3A' }}>
+            {quiz.model}
+          </span>
+        </Text>
 
         {quiz.questions.map((item, index) => (
           <Box
@@ -148,12 +152,14 @@ export default function QuizPage() {
               onChange={(value) => handleChange(index, value)}
               isDisabled={submitted}
             >
-              <Radio  mr={"2"} value="true">True</Radio>
+              <Radio mr={'2'} value="true">
+                True
+              </Radio>
               <Radio value="false">False</Radio>
             </RadioGroup>
           </Box>
         ))}
-        <Box w={'100%'} >
+        <Box w={'100%'}>
           {!submitted ? (
             <Button
               mt={4}
@@ -183,4 +189,33 @@ export default function QuizPage() {
       </Box>
     </Box>
   );
+}
+
+
+// This will run at request time on the server.
+export async function getServerSideProps(context: any) {
+  const quizid = context.params.quizid;
+
+  try {
+    const quiz = await getQuiz(quizid);
+
+    if (!Array.isArray(quiz.questions) || !quiz || !quiz.questions || quiz.questions.length === 0) {
+      throw new Error('Quiz not found');
+    }
+
+    return {
+      props: {
+        quiz: {
+          ...quiz,
+          questions: quiz.questions.map((question) => ({
+            ...question,
+            question_data: question.question_data as QuestionData,
+          })),
+        },
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return { notFound: true }; // This will result in a 404 error page
+  }
 }

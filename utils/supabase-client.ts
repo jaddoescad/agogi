@@ -222,6 +222,7 @@ export const getQuiz = async (quizId: string) => {
         difficulty,
         created_at,
         creator_id,
+        model,
         questions (
           id,
           quiz_id,
