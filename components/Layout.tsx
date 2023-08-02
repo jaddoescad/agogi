@@ -53,7 +53,7 @@ export default function Layout({ children, meta: pageMeta }: Props) {
       <Navbar />
       <main id="skip" className={styles.main}>{children}</main>
       <Footer />
-      <Link href="https://discord.com/channels/1136279939944030219/1136279940535431270" isExternal>
+      <Link href="https://discord.gg/crKZGpnz" isExternal>
         <Button
           position="fixed"
           bottom={4}
