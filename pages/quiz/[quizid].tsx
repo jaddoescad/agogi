@@ -107,7 +107,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
         <meta name="twitter:title" content={`${quiz.title} - Quiz`} />
         <meta
           name="twitter:description"
-          content={`${quiz.title} - A quiz about ${quiz.model}`}
+          content={`${quiz.title} - A quiz about ${quiz.title}`}
         />
       </Head>
       <Box
