@@ -37,8 +37,6 @@ type QuizRow = {
 };
 
 export default function QuizPage(props: { quiz: QuizRow }) {
-  // const [quiz, setQuiz] = useState<QuizRow | null>(null);
-
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -79,7 +77,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
     <Text>Loading...</Text>
   ) : (
     <>
-      {/* <Head>
+      <Head>
         <title>{quiz.title} - Quiz</title>
         <meta name="robots" content="follow, index" />
         <link href="/favicon.ico" rel="shortcut icon" />
@@ -107,7 +105,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
           name="twitter:description"
           content={`AI Generated Quiz about ${quiz.title}`}
         />
-      </Head> */}
+      </Head>
       <Box
         w="100%"
         display="flex"
