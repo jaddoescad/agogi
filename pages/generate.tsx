@@ -163,7 +163,7 @@ export default function Generate() {
                 isInvalid={!!descriptionError}
                 errorBorderColor="red.300"
                 focusBorderColor="purple.600"
-                maxLength={1000}
+                maxLength={10000}
               />
               {descriptionError && (
                 <Text color="red.300" fontSize="sm" fontStyle="italic">
