@@ -51,6 +51,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
   };
 
   const handleSubmit = () => {
+    va.track('see how you did');
     setSubmitted(true);
   };
 

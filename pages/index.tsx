@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { Box, VStack, HStack, Text, Button, Image, Center } from '@chakra-ui/react';
 import React, { useState, useEffect} from 'react';
 import Link from 'next/link';
+import va from '@vercel/analytics';
 
 
 type Quiz = {
@@ -46,7 +47,9 @@ const Home: React.FC = () => {
                 <Text fontSize={["3xl", "5xl"]}>
                   AI Generated Quizzes
                 </Text>
-                <Link href="/generate">
+                <Link href="/generate" onClick={()=> {
+                  va.track('generate-quiz-clicked');
+                }}>
                   <Button colorScheme="blue" px={4}>
                     Generate
                   </Button>

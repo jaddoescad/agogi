@@ -1,14 +1,9 @@
 import Logo from 'components/icons/Logo';
 import { useRouter } from 'next/router';
 import { useUser } from 'utils/useUser';
-import {
-  Box,
-  Flex,
-  Button,
-  Stack,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Box, Flex, Button, Stack, useColorModeValue } from '@chakra-ui/react';
 import Link from 'next/link';
+import va from '@vercel/analytics';
 
 import SearchBar from './SearchBar';
 import AccountDropdown from './AccountDropdown';
@@ -19,7 +14,6 @@ interface NavItem {
   children?: Array<NavItem>;
   href?: string;
 }
-
 
 export default function WithSubnavigation() {
   const { user } = useUser();
@@ -41,19 +35,20 @@ export default function WithSubnavigation() {
         justify="center"
         mx="auto"
       >
-
-        <Flex
-          flex={{ base: 1 }}
-          justify={{ md: 'start' }}
-          align="center"
-        >
+        <Flex flex={{ base: 1 }} justify={{ md: 'start' }} align="center">
           <Link href="/" className="s.logo" aria-label="Logo">
             <Logo />
           </Link>
 
-          <Flex flex={'1'} mx={'auto'} maxW={'2xl'} alignItems="center" justifyContent={"center"}>
-          <SearchBar />
-        </Flex>
+          <Flex
+            flex={'1'}
+            mx={'auto'}
+            maxW={'2xl'}
+            alignItems="center"
+            justifyContent={'center'}
+          >
+            <SearchBar />
+          </Flex>
         </Flex>
 
         <Stack
@@ -71,7 +66,10 @@ export default function WithSubnavigation() {
             size="sm"
             fontSize="sm"
             color={'white'}
-            onClick={() => router.push('/generate')}
+            onClick={() => {
+              router.push('/generate');
+              va.track('generate-quiz-clicked');
+            }}
             display={{ base: 'none', md: 'inline-flex' }}
           >
             Generate
