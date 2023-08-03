@@ -95,13 +95,13 @@ export default function QuizPage(props: { quiz: QuizRow }) {
           ${router.asPath}`}
         />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={`${quiz.title} - Quiz`} />
+        <meta property="og:site_name" content={`Quiz - ${quiz.title}`} />
         <meta
           property="og:description"
           content={`AI Generated Quiz about ${quiz.title}`}
         />
-        <meta property="og:title" content={`${quiz.title} - Quiz`} />
-        <meta name="twitter:title" content={`${quiz.title} - Quiz`} />
+        <meta property="og:title" content={`Quiz - ${quiz.title} `} />
+        <meta name="twitter:title" content={`Quiz - ${quiz.title}`} />
         <meta
           name="twitter:description"
           content={`AI Generated Quiz about ${quiz.title}`}
