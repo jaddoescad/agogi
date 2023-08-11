@@ -64,6 +64,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           ]
         };`;
 
+
     const systemMessages = {
       Easy: `You are a True or False quiz generator. Generate a list of true or false questions. The questions should be relatively easy.`,
       Medium: `You are a True or False quiz generator. Generate a list of true or false questions. The questions should be of medium difficulty. It should challenge the user to think, but not be too difficult.`,

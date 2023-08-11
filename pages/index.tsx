@@ -4,13 +4,11 @@ import Head from 'next/head';
 import { Box, VStack, HStack, Text, Button, Image, Center } from '@chakra-ui/react';
 import React, { useState, useEffect} from 'react';
 import Link from 'next/link';
-import va from '@vercel/analytics';
-
+import {generateQuizID} from '../utils/generate-quiz-id';
 
 type Quiz = {
-  id: number;
-  title: string;
-  difficulty: string | null;
+  id: string;
+  title: string | null;
 };
 
 const Home: React.FC = () => {
@@ -24,6 +22,8 @@ const Home: React.FC = () => {
 
     fetchData();
   }, []);
+
+
 
   return (
     <Box pb={10}>
@@ -47,9 +47,7 @@ const Home: React.FC = () => {
                 <Text fontSize={["3xl", "5xl"]}>
                   AI Generated Quizzes
                 </Text>
-                <Link href="/generate" onClick={()=> {
-                  va.track('generate-quiz-clicked');
-                }}>
+                <Link href={generateQuizID()}>
                   <Button colorScheme="blue" px={4}>
                     Generate
                   </Button>

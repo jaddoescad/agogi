@@ -3,12 +3,14 @@ import { paginateQuizzes } from 'utils/supabase-client';
 import { QuizCard } from '@/components/QuizCards/QuizCard';
 import React, { useEffect } from 'react';
 
-const QuizCards = ({
-  quizzes: initialQuizzes
-}: {
-  quizzes: { id: number; title: string; difficulty: string | null }[];
-}) => {
-  const [quizzes, setQuizzes] = React.useState(initialQuizzes);
+type Quiz = {
+  id: string;
+  title: string | null;
+};
+
+const QuizCards = ({ quizzes: initialQuizzes }: { quizzes: Quiz[] }) => {
+  const [quizzes, setQuizzes] = React.useState<Quiz[]>(initialQuizzes);
+
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(initialQuizzes.length >= 10);
@@ -16,6 +18,7 @@ const QuizCards = ({
   const loadMore = async () => {
     setLoading(true);
     const newQuizzes = await paginateQuizzes(page + 1);
+
     if (newQuizzes.length === 0) {
       setHasMore(false);
     } else {
@@ -24,10 +27,6 @@ const QuizCards = ({
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    console.log('quizzes', quizzes);
-  }, [quizzes]);
 
   return (
     <Box

@@ -29,7 +29,6 @@ type QuestionRow = {
 type QuizRow = {
   created_at: string | null;
   creator_id: string;
-  difficulty: string | null;
   id: number;
   title: string;
   questions: QuestionRow[];
@@ -128,9 +127,6 @@ export default function QuizPage(props: { quiz: QuizRow }) {
           </Heading>
           <Text fontSize="lg" textAlign="center" color="gray.800" my={4}>
             Generated with:{' '}
-            <span style={{ fontWeight: 'bold', color: '#3A3A3A' }}>
-              {quiz.model}
-            </span>
           </Text>
 
           {quiz.questions.map((item, index) => (
@@ -142,16 +138,16 @@ export default function QuizPage(props: { quiz: QuizRow }) {
               w="100%"
               borderRadius="lg"
             >
-              <Text fontSize="lg">{item.question_data.question}</Text>
+              <Text fontSize="lg">{item.question}</Text>
               {submitted && (
                 <Text
                   color={
-                    item.question_data.correctAnswer === answers[index]
+                    item.correctAnswer === answers[index]
                       ? 'green.500'
                       : 'red.500'
                   }
                 >
-                  {item.question_data.correctAnswer
+                  {item.correctAnswer
                     ? 'Correct answer: True'
                     : 'Correct answer: False'}
                 </Text>
@@ -224,7 +220,7 @@ export async function getServerSideProps(context: any) {
           ...quiz,
           questions: quiz.questions.map((question) => ({
             ...question,
-            question_data: question.question_data as QuestionData
+            question_data: question
           }))
         }
       }

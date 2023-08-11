@@ -20,9 +20,8 @@ import { QuizCard } from 'components/QuizCards/QuizCard';
 import { withPageAuth } from '@supabase/auth-helpers-nextjs';
 
 type Quiz = {
-  id: number;
-  title: string;
-  difficulty: string | null;
+  id: string;
+  title: string | null;
 };
 
 const MyQuizzes: React.FC = () => {

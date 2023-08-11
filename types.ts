@@ -68,3 +68,33 @@ export interface Subscription {
   trial_end?: string;
   prices?: Price;
 }
+
+export type QuestionData = {
+  question: string;
+  type: 'true/false';
+  correctAnswer: boolean;
+};
+
+export type QuizRow = {
+  questions: QuestionData[];
+};
+
+
+export interface PostDataResponse {
+  ai_response: {
+    message: string;
+  };
+  quiz_response?: {
+    questions: Array<{
+      question: string;
+      type: 'true/false';
+      correctAnswer: boolean;
+    }>;
+  };
+}
+
+export type RequestData = {
+  currentModel: string;
+  message: string;
+  quizId: string;
+};

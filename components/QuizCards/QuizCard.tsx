@@ -16,7 +16,7 @@ import { useRouter } from 'next/router';
 export const QuizCard = ({
   quiz
 }: {
-  quiz: { id: number; title: string; difficulty: string | null };
+  quiz: { id: string; title: string | null; };
 }) => {
   const router = useRouter();
   return (
@@ -77,15 +77,6 @@ export const QuizCard = ({
             w="full"
           >
             <HStack w="full" justifyContent="space-between" fontSize="sm">
-              <Box
-                p={2}
-                py={1}
-                borderRadius="full"
-                bgColor="red.500"
-                color="white"
-              >
-                {quiz.difficulty}
-              </Box>
               <HStack
                 alignItems="center"
                 bg="blue.800"

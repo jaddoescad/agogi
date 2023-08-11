@@ -54,7 +54,7 @@ export default function Layout({ children, meta: pageMeta }: Props) {
       <main id="skip" className={styles.main}>
         {children}
       </main>
-      <Footer />
+      {/* <Footer />
       <Link href="https://discord.gg/crKZGpnz">
         <Button
           position="fixed"
@@ -66,7 +66,7 @@ export default function Layout({ children, meta: pageMeta }: Props) {
         >
           Discord
         </Button>
-      </Link>
+      </Link> */}
     </div>
   );
 }

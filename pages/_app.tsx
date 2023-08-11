@@ -23,14 +23,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() =>
     createBrowserSupabaseClient<Database>()
   );
-  // useEffect(() => {
-  //   document.body.classList?.remove('loading');
-  // }, []);
+
 
   return (
     <>
       <ChakraProvider>
-        <div className="bg-black">
+        <div>
           <SessionContextProvider supabaseClient={supabaseClient}>
             <MyUserContextProvider>
               <Layout>

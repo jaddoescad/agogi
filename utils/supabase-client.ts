@@ -2,7 +2,7 @@ import {
   createBrowserSupabaseClient,
   User
 } from '@supabase/auth-helpers-nextjs';
-import { ProductWithPrice } from 'types';
+import { ProductWithPrice, QuizRow } from 'types';
 import type { Database } from 'types_db';
 
 export const supabase = createBrowserSupabaseClient<Database>();
@@ -81,8 +81,7 @@ export const getQuizAndQuestions = async (quizId: string) => {
     .select(
       `
     id,
-    title,
-    difficulty
+    title
     `
     )
     .eq('id', quizId)
@@ -102,8 +101,7 @@ export const getHomePageQuizzes = async () => {
     .select(
       `
     id,
-    title,
-    difficulty
+    title
     `
     )
     .order('created_at', { ascending: false })
@@ -128,15 +126,11 @@ export const getMyQuizzes = async () => {
     .select(
       `
     id,
-    title,
-    difficulty
-    `
+    title    `
     )
     .eq('creator_id', userId)
     .order('created_at', { ascending: false })
-    .limit(50)
-    ;
-
+    .limit(50);
   if (error) {
     console.log(error.message);
     throw error;
@@ -152,8 +146,7 @@ export const paginateQuizzes = async (page: number) => {
     .select(
       `
       id,
-      title,
-      difficulty
+      title
       `
     )
     .order('created_at', { ascending: false })
@@ -175,7 +168,7 @@ export const searchQuizzes = async (search: string) => {
       `
       id,
       title,
-      difficulty
+      
       `
     )
     .textSearch('title', search)
@@ -196,8 +189,7 @@ export const paginateSearchQuizzes = async (search: string, page: number) => {
     .select(
       `
       id,
-      title,
-      difficulty
+      title
       `
     )
     .textSearch('title', search)
@@ -219,7 +211,6 @@ export const getQuiz = async (quizId: string) => {
       `
         id,
         title,
-        difficulty,
         created_at,
         creator_id,
         model,
@@ -241,3 +232,36 @@ export const getQuiz = async (quizId: string) => {
 
   return data ?? [];
 };
+
+export const getMessages = async (quizId: string) => {
+  console.log('quizId', quizId);
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('quiz_id', quizId);
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const clearChatMessages = async (quizId: string) => {
+  await supabase.from('messages').delete().eq('quiz_id', quizId);
+};
+
+export const getQuizQuestions = async (quizId: string) => {
+  const { data, error } = await supabase
+    .from('questions')
+    .select('question_data')
+    .eq('quiz_id', quizId);
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+
+  // Map over the data array to extract only the question_data values
+  return data?.map(question => question.question_data) ?? [];
+}
