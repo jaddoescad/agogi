@@ -4,8 +4,8 @@ import {
   useSessionContext,
   User
 } from '@supabase/auth-helpers-react';
-import { UserDetails } from 'types';
-import { Subscription } from 'types';
+import { UserDetails } from 'types/types';
+import { Subscription } from 'types/types';
 
 type UserContextType = {
   accessToken: string | null;

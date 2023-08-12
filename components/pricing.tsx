@@ -20,7 +20,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { postData } from 'utils/helpers';
 import { getStripe } from 'utils/stripe-client';
 import { useUser } from 'utils/useUser';
-import { Price, ProductWithPrice } from 'types';
+import { Price, ProductWithPrice } from 'types/types';
 import { getActiveProductsWithPrices } from '@/utils/supabase-client';
 import { GetStaticPropsResult } from 'next';
 

@@ -19,7 +19,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id?: string
+          id: string
           message: string
           quiz_id: string
           type: string
@@ -49,7 +49,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id?: string
+          id: string
           question_data?: Json | null
           quiz_id: string
         }

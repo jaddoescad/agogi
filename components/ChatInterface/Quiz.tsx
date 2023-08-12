@@ -2,16 +2,15 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Box, RadioGroup, Radio, Button, Text } from '@chakra-ui/react';
 import va from '@vercel/analytics';
-import { QuizRow } from 'types';
-import {getQuizQuestions} from '../../utils/supabase-client'
+import { Question } from 'types/types';
 
-export default function QuizPage(props: { quiz: any | null }) {
+export default function QuizPage(props: { questions: Question[] | null }) {
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const router = useRouter();
   const { quizid } = router.query;
-  const quiz = props.quiz;
+  const questions = props.questions;
 
   const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -25,9 +24,9 @@ export default function QuizPage(props: { quiz: any | null }) {
   };
 
   const handleReset = () => {
-    if (!quiz) return;
+    if (!questions) return;
 
-    setAnswers(Array(quiz.length).fill(null));
+    setAnswers(Array(questions.length).fill(null));
     setSubmitted(false);
     setResetKey((prevKey) => prevKey + 1); // increment key to force re-render
   };
@@ -40,8 +39,6 @@ export default function QuizPage(props: { quiz: any | null }) {
   }, [quizid]);
 
 
-
-    
 
   return (
     <>
@@ -59,8 +56,8 @@ export default function QuizPage(props: { quiz: any | null }) {
               Generated with:{' '}
             </Text>
 
-            {quiz &&
-              quiz.map((item, index) => (
+            {questions &&
+              questions.map((item, index) => (
                 <Box
                   key={`${resetKey}-${index}`}
                   border="1px"

@@ -2,8 +2,10 @@ import {
   createBrowserSupabaseClient,
   User
 } from '@supabase/auth-helpers-nextjs';
-import { ProductWithPrice, QuizRow } from 'types';
-import type { Database } from 'types_db';
+import { ProductWithPrice } from 'types/types';
+import type { Database } from 'types/types_db';
+import { isQuestion } from 'types/type_guards';
+import { Question } from 'types/types';
 
 export const supabase = createBrowserSupabaseClient<Database>();
 
@@ -237,7 +239,12 @@ export const getMessages = async (quizId: string) => {
   console.log('quizId', quizId);
   const { data, error } = await supabase
     .from('messages')
-    .select('*')
+    .select(
+      `
+      message,
+      type
+    `
+    )
     .eq('quiz_id', quizId);
 
   if (error) {
@@ -263,5 +270,6 @@ export const getQuizQuestions = async (quizId: string) => {
   }
 
   // Map over the data array to extract only the question_data values
-  return data?.map(question => question.question_data) ?? [];
-}
+  return (data?.map((question) => question.question_data).filter(isQuestion) ??
+    []) as Question[];
+};

@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import {QuestionData} from '../types';
+import {Question} from '../types/types';
 
 export const addQuizAndQuestions = async (
   quiz: any,
@@ -58,7 +58,7 @@ export const insertQuizOrDonothing = async (
 
 export const insertQuestions = async (
   supabase: SupabaseClient<any, 'public', any>,
-  questions: [QuestionData],
+  questions: [Question],
   quidId: string
 ) => {
 
@@ -80,3 +80,46 @@ export const insertQuestions = async (
 
   return data ?? [];
 };
+
+export const fetchQuestions = async (
+  supabase: SupabaseClient<any, 'public', any>,
+  quizId: string
+) => {
+  const { data, error } = await supabase
+    .from('questions')
+    .select(
+      `
+        question_data
+      `
+    )
+    .eq('quiz_id', quizId);
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+  return data ?? [];
+}
+
+export const fetchMessages = async (
+  supabase: SupabaseClient<any, 'public', any>,
+  quizId: string
+) => {
+  const { data, error } = await supabase
+    .from('messages')
+    .select(
+      `
+      message,
+      type
+    `
+    )
+    .eq('quiz_id', quizId)
+    .limit(10)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+  return data ?? [];
+}

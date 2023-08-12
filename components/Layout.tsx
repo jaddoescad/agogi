@@ -4,7 +4,7 @@ import styles from '../styles/Layout.module.css';
 import Navbar from 'components/ui/Navbar';
 import Footer from 'components/ui/Footer';
 import { ReactNode } from 'react';
-import { PageMeta } from '../types';
+import { PageMeta } from '../types/types';
 import { Button, Icon } from '@chakra-ui/react';
 import { FaDiscord } from 'react-icons/fa';
 import Link from 'next/link';

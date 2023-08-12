@@ -10,7 +10,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { AppProps } from 'next/app';
 import { MyUserContextProvider } from 'utils/useUser';
-import type { Database } from 'types_db';
+import type { Database } from 'types/types_db';
 import { ChakraProvider } from '@chakra-ui/react';
 import { Analytics } from '@vercel/analytics/react';
 import NextNProgress from 'nextjs-progressbar';

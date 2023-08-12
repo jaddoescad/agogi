@@ -13,29 +13,7 @@ import va from '@vercel/analytics';
 import Head from 'next/head';
 import { getURL } from '@/utils/helpers';
 
-type QuestionData = {
-  question: string;
-  correctAnswer: boolean;
-  // ...other properties
-};
-
-type QuestionRow = {
-  created_at: string | null;
-  id: number;
-  question_data: QuestionData;
-  quiz_id: number | null;
-};
-
-type QuizRow = {
-  created_at: string | null;
-  creator_id: string;
-  id: number;
-  title: string;
-  questions: QuestionRow[];
-  model: string | null;
-};
-
-export default function QuizPage(props: { quiz: QuizRow }) {
+export default function QuizPage(props: { quiz: any }) {
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -129,7 +107,7 @@ export default function QuizPage(props: { quiz: QuizRow }) {
             Generated with:{' '}
           </Text>
 
-          {quiz.questions.map((item, index) => (
+          {quiz.questions.map((item: any, index: any) => (
             <Box
               key={`${resetKey}-${index}`}
               border="1px"

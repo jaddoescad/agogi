@@ -69,29 +69,17 @@ export interface Subscription {
   prices?: Price;
 }
 
-export type QuestionData = {
+export type Question = {
+  type: string;
   question: string;
-  type: 'true/false';
   correctAnswer: boolean;
 };
 
-export type QuizRow = {
-  questions: QuestionData[];
+
+export type Message = {
+  message: string;
+  type: string;
 };
-
-
-export interface PostDataResponse {
-  ai_response: {
-    message: string;
-  };
-  quiz_response?: {
-    questions: Array<{
-      question: string;
-      type: 'true/false';
-      correctAnswer: boolean;
-    }>;
-  };
-}
 
 export type RequestData = {
   currentModel: string;

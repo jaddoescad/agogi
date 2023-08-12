@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from './stripe';
 import { toDateTime } from './helpers';
-import { Customer, UserDetails, Price, Product } from 'types';
-import type { Database } from 'types_db';
+import { Customer, UserDetails, Price, Product } from 'types/types';
+import type { Database } from 'types/types_db';
 import Stripe from 'stripe';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
