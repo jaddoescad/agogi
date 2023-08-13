@@ -22,6 +22,7 @@ export default function Home() {
     });
 
     getQuizQuestions(quizId).then((questions) => {
+        console.log("questions",questions)
       setQuestions(questions);
     });
   }, [quizId]);

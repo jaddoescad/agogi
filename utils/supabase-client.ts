@@ -264,6 +264,7 @@ export const getQuizQuestions = async (quizId: string) => {
     .select('question_data')
     .eq('quiz_id', quizId);
 
+
   if (error) {
     console.error('Error:', error);
     throw error;

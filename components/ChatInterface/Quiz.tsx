@@ -46,6 +46,22 @@ export default function QuizPage(props: { questions: Question[] | null }) {
     setShownAnswers({});
   }, [currentPage]);
 
+  if (totalPages === 0) {
+    return (
+      <Box
+        w="100%"
+        display="flex"
+        color="white"
+        h={'100%'}
+
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Text fontWeight={"bold"} fontSize="3xl">Please chat to generate quizzes</Text>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box

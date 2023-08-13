@@ -69,12 +69,20 @@ export interface Subscription {
   prices?: Price;
 }
 
-export type Question = {
-  type: string;
+export type TrueFalseQuestion = {
+  type: 'true-false';
   question: string;
   correctAnswer: boolean;
 };
 
+export type MultipleChoiceQuestion = {
+  type: 'multiple-choice';
+  question: string;
+  choices: string[];
+  correctAnswer: string; // The correct answer would be one of the choices.
+};
+
+export type Question = TrueFalseQuestion | MultipleChoiceQuestion;
 
 export type Message = {
   message: string;

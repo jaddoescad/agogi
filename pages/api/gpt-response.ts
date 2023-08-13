@@ -48,13 +48,14 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const systemMessagePrompt =
         SystemMessagePromptTemplate.fromTemplate(prompt);
-      const humanMessagePrompt =
-        HumanMessagePromptTemplate.fromTemplate(message);
+    //   const humanMessagePrompt =
+    //     HumanMessagePromptTemplate.fromTemplate(message);
 
       const chatPrompt = ChatPromptTemplate.fromPromptMessages([
         systemMessagePrompt,
-        humanMessagePrompt
+        // humanMessagePrompt
       ]);
+
 
       const past_questions = JSON.stringify(questions);
       const past_messages = JSON.stringify(messages);
@@ -63,10 +64,13 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         past_questions: past_questions ?? '[]',
         past_messages: past_messages ?? '[]'
       });
+
+      const humanMessagePrompt = new HumanMessage(message)
+
       console.log('chat prompt', formattedChatPrompt[0]);
       console.log('chat prompt', formattedChatPrompt[1]);
 
-      const result = await llm.call([...formattedChatPrompt]);
+      const result = await llm.call([...formattedChatPrompt, humanMessagePrompt]);
 
       console.log(result.content);
 
