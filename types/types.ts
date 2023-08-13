@@ -82,7 +82,7 @@ export type Message = {
 };
 
 export type RequestData = {
-  currentModel: string;
+  quizType: string;
   message: string;
   quizId: string;
 };

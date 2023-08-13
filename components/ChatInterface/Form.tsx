@@ -1,6 +1,14 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { postData } from 'utils/helpers';
-import { Box, Button, Textarea, Flex, Text, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Textarea,
+  Flex,
+  Text,
+  useToast,
+  Select
+} from '@chakra-ui/react';
 import { clearChatMessages } from 'utils/supabase-client';
 import { Question, Message } from 'types/types';
 
@@ -20,8 +28,6 @@ const css_scroll = {
 const Form = ({
   isLoading,
   setIsLoading,
-  currentModel,
-  setCurrentModel,
   history,
   setHistory,
   quizId,
@@ -30,8 +36,6 @@ const Form = ({
 }: {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  currentModel: string;
-  setCurrentModel: React.Dispatch<React.SetStateAction<string>>;
   history: Message[];
   setHistory: React.Dispatch<React.SetStateAction<Message[]>>;
   quizId: string;
@@ -50,6 +54,7 @@ const Form = ({
     }
   };
   const toast = useToast();
+  const [quizType, setQuizType] = useState<string>('true/false');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default behavior of form submission
@@ -70,8 +75,8 @@ const Form = ({
         url: '/api/gpt-response',
         data: {
           message,
-          currentModel,
-          quizId
+          quizId,
+          quizType
         }
       });
       if (response !== undefined) {
@@ -107,7 +112,25 @@ const Form = ({
 
   return (
     <>
-      <Flex justify="flex-end" mb={4}>
+      <Flex justify="space-between" align="center" mb={4}>
+        <Select
+          defaultValue={quizType}
+          w="200px" // Or any width you prefer
+          bg="white"
+          color="black"
+          variant="outline"
+          borderColor="gray.400"
+          focusBorderColor="blue.500"
+          fontWeight={500}
+          onChange={(e) => {
+            setQuizType(e.target.value);
+          }
+          }
+          _hover={{ borderColor: 'blue.500' }}
+        >
+          <option value="true/false">True/False</option>
+          <option value="multiple-choice">Multiple Choice</option>
+        </Select>
         <Button
           type="reset"
           p={4}

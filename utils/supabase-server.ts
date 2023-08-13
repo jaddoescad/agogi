@@ -59,7 +59,8 @@ export const insertQuizOrDonothing = async (
 export const insertQuestions = async (
   supabase: SupabaseClient<any, 'public', any>,
   questions: [Question],
-  quidId: string
+  quidId: string,
+  quizType: string
 ) => {
 
   const { data, error } = await supabase
@@ -68,7 +69,8 @@ export const insertQuestions = async (
       questions.map((question) => {
         return {
           quiz_id: quidId,
-          question_data: question
+          question_data: question,
+          type: quizType
         };
       })
     );

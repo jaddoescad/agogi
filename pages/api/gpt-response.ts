@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 // import { OpenAI } from 'langchain/llms/openai';
-import { quizGenSystemMessage } from '../../prompts/quiz-gen-sys-mes';
+import { trueFalseQuizGenSystemMessage } from '../../prompts/true-false-sys-mes';
+import { multipleChoiceQuizGenSystemMessage } from '../../prompts/multiple-choice-sys-mes';
 import {
   saveMessage,
   insertQuizOrDonothing,
@@ -30,7 +31,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       temperature: 0.9,
       modelName: 'gpt-4'
     });
-    const { message, quizId } = (await req.body) as RequestData;
+    const { message, quizId, quizType } = (await req.body) as RequestData;
 
     try {
       await insertQuizOrDonothing(supabaseServerClient, quizId);
@@ -38,8 +39,15 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const questions = await fetchQuestions(supabaseServerClient, quizId);
       const messages = await fetchMessages(supabaseServerClient, quizId);
 
+      var prompt = trueFalseQuizGenSystemMessage;
+      if (quizType === 'true/false') {
+        prompt = trueFalseQuizGenSystemMessage;
+      } else if (quizType === 'multiple-choice') {
+        prompt = multipleChoiceQuizGenSystemMessage;
+      }
+
       const systemMessagePrompt =
-        SystemMessagePromptTemplate.fromTemplate(quizGenSystemMessage);
+        SystemMessagePromptTemplate.fromTemplate(prompt);
       const humanMessagePrompt =
         HumanMessagePromptTemplate.fromTemplate(message);
 
@@ -74,7 +82,8 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await insertQuestions(
           supabaseServerClient,
           result_json.quiz_response.questions,
-          quizId
+          quizId,
+            quizType
         );
       }
       if (result_json.ai_response) {

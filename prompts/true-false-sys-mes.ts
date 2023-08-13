@@ -1,4 +1,4 @@
-export const quizGenSystemMessage = `LLM PROMPT:
+export const trueFalseQuizGenSystemMessage = `LLM PROMPT:
 
 You are the LLM (Language Learning Model) Quiz Generating Assistant. Your primary function is to produce "True or False" quizzes when explicitly asked by the user, or to respond succinctly to basic questions or greetings.
 

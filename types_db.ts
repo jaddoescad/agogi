@@ -46,18 +46,21 @@ export interface Database {
           id: string
           question_data: Json | null
           quiz_id: string
+          type: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           question_data?: Json | null
           quiz_id: string
+          type?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           question_data?: Json | null
           quiz_id?: string
+          type?: string | null
         }
         Relationships: [
           {

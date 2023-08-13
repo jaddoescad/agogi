@@ -41,6 +41,10 @@ export default function QuizPage(props: { questions: Question[] | null }) {
     }));
   };
 
+  useEffect(() => {
+    // Reset shownAnswers whenever the currentPage changes
+    setShownAnswers({});
+  }, [currentPage]);
 
   return (
     <>
@@ -71,9 +75,9 @@ export default function QuizPage(props: { questions: Question[] | null }) {
                     onClick={() => toggleAnswerVisibility(index)}
                     cursor="pointer"
                     display={'flex'}
-                    alignItems={'center'} // This is the change
+                    alignItems={'center'}
                     fontWeight={'bold'}
-                    _hover={{ textDecoration: 'underline' }} // Optional: underline on hover for clarity
+                    _hover={{ textDecoration: 'underline' }}
                   >
                     {shownAnswers[index] ? (
                       <VscTriangleDown />
@@ -84,60 +88,86 @@ export default function QuizPage(props: { questions: Question[] | null }) {
                   </Text>
 
                   <Collapse in={shownAnswers[index]}>
-                    <RadioGroup
-                      mt={2}
-                      value={item.correctAnswer ? 'true' : 'false'}
-                      isDisabled={true}
-                      flexDirection="column"
-                    >
-                      <Box m={1}>
-                        <Radio
-                          mr={'2'}
-                          value="true"
-                          fontWeight={item.correctAnswer ? 'bold' : 'normal'}
-                        >
-                          True
-                        </Radio>
-                      </Box>
-                      <Box m={1}>
-                        <Radio
-                          value="false"
-                          fontWeight={!item.correctAnswer ? 'bold' : 'normal'}
-                        >
-                          False
-                        </Radio>
-                      </Box>
-                    </RadioGroup>
+                    {item.type === 'multiple-choice' ? (
+                      <RadioGroup
+                        mt={2}
+                        value={item.correctAnswer}
+                        isDisabled={true}
+                        flexDirection="column"
+                      >
+                        {item.choices.map((choice) => (
+                          <Box m={1} key={choice}>
+                            <Radio
+                              value={choice}
+                              fontWeight={
+                                choice === item.correctAnswer
+                                  ? 'bold'
+                                  : 'normal'
+                              }
+                            >
+                              {choice}
+                            </Radio>
+                          </Box>
+                        ))}
+                      </RadioGroup>
+                    ) : (
+                      <RadioGroup
+                        mt={2}
+                        value={item.correctAnswer ? 'true' : 'false'}
+                        isDisabled={true}
+                        flexDirection="column"
+                      >
+                        <Box m={1}>
+                          <Radio
+                            value="true"
+                            fontWeight={item.correctAnswer ? 'bold' : 'normal'}
+                          >
+                            True
+                          </Radio>
+                        </Box>
+                        <Box m={1}>
+                          <Radio
+                            value="false"
+                            fontWeight={!item.correctAnswer ? 'bold' : 'normal'}
+                          >
+                            False
+                          </Radio>
+                        </Box>
+                      </RadioGroup>
+                    )}
                   </Collapse>
                 </Box>
               ))}
           </Box>
 
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-    <Button
-        onClick={() => setCurrentPage(currentPage - 1)}
-        isDisabled={currentPage === 1}
-        bg="gray.700"  // Set to a dark gray color
-        color="white"  // Set text color to white
-    >
-        Previous
-    </Button>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              isDisabled={currentPage === 1}
+              bg="gray.700" // Set to a dark gray color
+              color="white" // Set text color to white
+            >
+              Previous
+            </Button>
 
-    <Text mx={1}>
-        {currentPage}/{totalPages}
-    </Text>
+            <Text mx={1}>
+              {currentPage}/{totalPages}
+            </Text>
 
-    <Button
-        onClick={() => setCurrentPage(currentPage + 1)}
-        isDisabled={currentPage === totalPages}
-        bg="gray.700"  // Set to a dark gray color
-        color="white"  // Set text color to white
-        ml="-4"  // Add a negative margin to the left side to pull the buttons closer
-    >
-        Next
-    </Button>
-</Box>
-
+            <Button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+              bg="gray.700" // Set to a dark gray color
+              color="white" // Set text color to white
+              ml="-4" // Add a negative margin to the left side to pull the buttons closer
+            >
+              Next
+            </Button>
+          </Box>
         </Box>
       </Box>
     </>

@@ -34,12 +34,11 @@ export default function Home() {
         bg="gray.800"
         boxShadow="md"
         maxW={'500px'}
+        flex={1}
       >
         <Form
           isLoading={isLoading}
           setIsLoading={setIsLoading}
-          currentModel={currentModel}
-          setCurrentModel={setCurrentModel}
           history={history}
           setHistory={setHistory}
           quizId={quizId}

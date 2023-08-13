@@ -184,7 +184,6 @@ export default function Generate() {
         </Box>
       </Flex>
 
-      {/* Overlay */}
       <Modal
         isOpen={isOverlayVisible}
         onClose={() => {}}
