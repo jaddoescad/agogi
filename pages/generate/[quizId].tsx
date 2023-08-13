@@ -27,8 +27,14 @@ export default function Home() {
   }, [quizId]);
 
   return (
-    <Flex w="full" mx="auto" h="calc(100vh - 60px)">
-      <Flex w="30%" p={4} flexDir={'column'} bg="gray.800" boxShadow="md">
+    <Flex w="full" mx="auto" h="calc(100vh - 60px)" minWidth={'1000px'}>
+      <Flex
+        p={4}
+        flexDir={'column'}
+        bg="gray.800"
+        boxShadow="md"
+        maxW={'500px'}
+      >
         <Form
           isLoading={isLoading}
           setIsLoading={setIsLoading}
@@ -42,7 +48,6 @@ export default function Home() {
         />
       </Flex>
       <Flex
-        w="70%"
         flex={1}
         bg="gray.900"
         alignItems="center"

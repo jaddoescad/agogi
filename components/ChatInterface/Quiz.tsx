@@ -1,43 +1,45 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { Box, RadioGroup, Radio, Button, Text } from '@chakra-ui/react';
+import {
+  Box,
+  RadioGroup,
+  Radio,
+  Button,
+  Text,
+  Collapse
+} from '@chakra-ui/react';
 import va from '@vercel/analytics';
 import { Question } from 'types/types';
+import { VscTriangleRight, VscTriangleDown } from 'react-icons/vsc';
 
 export default function QuizPage(props: { questions: Question[] | null }) {
-  const [answers, setAnswers] = useState<boolean[]>([]);
-  const [submitted, setSubmitted] = useState(false);
-  const [resetKey, setResetKey] = useState(0);
   const router = useRouter();
   const { quizid } = router.query;
   const questions = props.questions;
 
-  const handleChange = (index: number, value: string) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = value === 'true';
-    setAnswers(newAnswers);
-  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentQuestions = questions?.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleSubmit = () => {
-    va.track('see how you did');
-    setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    if (!questions) return;
-
-    setAnswers(Array(questions.length).fill(null));
-    setSubmitted(false);
-    setResetKey((prevKey) => prevKey + 1); // increment key to force re-render
-  };
-
-  //track quiz views
   useEffect(() => {
     if (quizid) {
       va.track('quiz-view');
     }
   }, [quizid]);
 
+  // Calculate the total number of pages
+  const totalPages = questions ? Math.ceil(questions.length / itemsPerPage) : 0;
+
+  const [shownAnswers, setShownAnswers] = useState({});
+
+  const toggleAnswerVisibility = (index: number) => {
+    setShownAnswers((prev) => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
 
 
   return (
@@ -45,21 +47,16 @@ export default function QuizPage(props: { questions: Question[] | null }) {
       <Box
         w="100%"
         display="flex"
-        //   justifyContent="center"
         color="white"
         h={'100%'}
         overflowY={'scroll'}
       >
         <Box margin={'auto'} maxW={'600px'} w={'100%'}>
           <Box m={4}>
-            <Text fontSize="lg" textAlign="center" color="gray.800" my={4}>
-              Generated with:{' '}
-            </Text>
-
-            {questions &&
-              questions.map((item, index) => (
+            {currentQuestions &&
+              currentQuestions.map((item, index) => (
                 <Box
-                  key={`${resetKey}-${index}`}
+                  key={index}
                   border="1px"
                   p={4}
                   mb={2}
@@ -67,59 +64,80 @@ export default function QuizPage(props: { questions: Question[] | null }) {
                   borderRadius="lg"
                 >
                   <Text fontSize="lg">{item.question}</Text>
-                  {submitted && (
-                    <Text
-                      color={
-                        item.correctAnswer === answers[index]
-                          ? 'green.500'
-                          : 'red.500'
-                      }
-                    >
-                      {item.correctAnswer
-                        ? 'Correct answer: True'
-                        : 'Correct answer: False'}
-                    </Text>
-                  )}
-                  <RadioGroup
-                    mt={4}
-                    onChange={(value) => handleChange(index, value)}
-                    isDisabled={submitted}
+
+                  {/* Answer Visibility Toggle Button for each question */}
+                  <Text
+                    fontSize="sm"
+                    onClick={() => toggleAnswerVisibility(index)}
+                    cursor="pointer"
+                    display={'flex'}
+                    alignItems={'center'} // This is the change
+                    fontWeight={'bold'}
+                    _hover={{ textDecoration: 'underline' }} // Optional: underline on hover for clarity
                   >
-                    <Radio mr={'2'} value="true">
-                      True
-                    </Radio>
-                    <Radio value="false">False</Radio>
-                  </RadioGroup>
+                    {shownAnswers[index] ? (
+                      <VscTriangleDown />
+                    ) : (
+                      <VscTriangleRight />
+                    )}
+                    {' Answers'}
+                  </Text>
+
+                  <Collapse in={shownAnswers[index]}>
+                    <RadioGroup
+                      mt={2}
+                      value={item.correctAnswer ? 'true' : 'false'}
+                      isDisabled={true}
+                      flexDirection="column"
+                    >
+                      <Box m={1}>
+                        <Radio
+                          mr={'2'}
+                          value="true"
+                          fontWeight={item.correctAnswer ? 'bold' : 'normal'}
+                        >
+                          True
+                        </Radio>
+                      </Box>
+                      <Box m={1}>
+                        <Radio
+                          value="false"
+                          fontWeight={!item.correctAnswer ? 'bold' : 'normal'}
+                        >
+                          False
+                        </Radio>
+                      </Box>
+                    </RadioGroup>
+                  </Collapse>
                 </Box>
               ))}
-            <Box w={'100%'}>
-              {!submitted ? (
-                <Button
-                  mt={4}
-                  mx={'auto'}
-                  display={'block'}
-                  bg="blue.500"
-                  color="white"
-                  rounded={'true'}
-                  onClick={handleSubmit}
-                >
-                  See How You Did
-                </Button>
-              ) : (
-                <Button
-                  mt={4}
-                  mx={'auto'}
-                  display={'block'}
-                  bg="blue.500"
-                  color="white"
-                  rounded={'true'}
-                  onClick={handleReset}
-                >
-                  Try Again
-                </Button>
-              )}
-            </Box>
           </Box>
+
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Button
+        onClick={() => setCurrentPage(currentPage - 1)}
+        isDisabled={currentPage === 1}
+        bg="gray.700"  // Set to a dark gray color
+        color="white"  // Set text color to white
+    >
+        Previous
+    </Button>
+
+    <Text mx={1}>
+        {currentPage}/{totalPages}
+    </Text>
+
+    <Button
+        onClick={() => setCurrentPage(currentPage + 1)}
+        isDisabled={currentPage === totalPages}
+        bg="gray.700"  // Set to a dark gray color
+        color="white"  // Set text color to white
+        ml="-4"  // Add a negative margin to the left side to pull the buttons closer
+    >
+        Next
+    </Button>
+</Box>
+
         </Box>
       </Box>
     </>
