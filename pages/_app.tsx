@@ -15,6 +15,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { Analytics } from '@vercel/analytics/react';
 import NextNProgress from 'nextjs-progressbar';
 import Router from 'next/router';
+import 'katex/dist/katex.min.css';
 
 // Hook up NProgress to page change start and stop events
 

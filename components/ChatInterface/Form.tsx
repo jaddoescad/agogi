@@ -11,19 +11,9 @@ import {
 } from '@chakra-ui/react';
 import { clearChatMessages } from 'utils/supabase-client';
 import { Question, Message } from 'types/types';
-
-const css_scroll = {
-  '&::-webkit-scrollbar': {
-    width: '4px'
-  },
-  '&::-webkit-scrollbar-track': {
-    width: '6px'
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'gray',
-    borderRadius: '24px'
-  }
-};
+import { css_scroll } from 'styles/chakra-css-styles.js';
+import {HUMAN_USER} from '../../constants'
+import { useEffect } from 'react';
 
 const Form = ({
   isLoading,
@@ -32,7 +22,8 @@ const Form = ({
   setHistory,
   quizId,
   quiz,
-  setQuiz
+  setQuiz,
+  setCurrentPage
 }: {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,6 +32,7 @@ const Form = ({
   quizId: string;
   quiz: any | null;
   setQuiz: React.Dispatch<React.SetStateAction<Question[] | null>>;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const messageInput = useRef<HTMLTextAreaElement | null>(null);
   const handleEnter = (
@@ -54,7 +46,15 @@ const Form = ({
     }
   };
   const toast = useToast();
-  const [quizType, setQuizType] = useState<string>('true/false');
+  const [quizType, setQuizType] = useState<string>('multiple-choice');
+  const chatBoxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      const chatBox = chatBoxRef.current;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  }, [history]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default behavior of form submission
@@ -62,7 +62,7 @@ const Form = ({
     setIsLoading(true);
     const message = messageInput.current?.value;
     if (message !== undefined) {
-      setHistory((prev) => [...prev, { message: message, type: 'user' }]);
+      setHistory((prev) => [...prev, { message: message, type: HUMAN_USER }]);
       messageInput.current!.value = '';
     }
 
@@ -82,7 +82,7 @@ const Form = ({
       if (response !== undefined) {
         setHistory((prev) => [
           ...prev,
-          { message: response['ai_response']['message'], type: 'bot' }
+          { message: response['ai_response']['message'], type: 'ai' }
         ]);
 
         if (response.quiz_response) {
@@ -90,8 +90,8 @@ const Form = ({
           const newQuestions = quiz
             ? [...quiz, ...response.quiz_response.questions]
             : response.quiz_response.questions;
-          console.log(newQuestions);
           setQuiz(newQuestions);
+          setCurrentPage(Math.ceil(newQuestions.length / 5));
         }
       } else {
         throw new Error("Couldn't get response from API.");
@@ -124,12 +124,11 @@ const Form = ({
           fontWeight={500}
           onChange={(e) => {
             setQuizType(e.target.value);
-          }
-          }
+          }}
           _hover={{ borderColor: 'blue.500' }}
         >
-          <option value="true/false">True/False</option>
           <option value="multiple-choice">Multiple Choice</option>
+          <option value="true/false">True/False</option>
         </Select>
         <Button
           type="reset"
@@ -155,20 +154,23 @@ const Form = ({
         mb={6}
         h="500"
         p={4}
+        flex={"1"}
         overflowY="scroll"
         css={css_scroll}
+        ref={chatBoxRef}  
+
       >
         {history?.map((item, index) => (
           <Flex
             key={index}
-            justify={item.type === 'user' ? 'flex-start' : 'flex-end'}
+            justify={item.type === 'ai' ? 'flex-start' : 'flex-end'}
             w="100%"
             mt={2}
           >
             <Box
               p={3}
               rounded="lg"
-              bg={item.type === 'user' ? 'blue.500' : 'gray.500'}
+              bg={item.type === 'ai' ? 'blue.500' : 'gray.500'}
               color="white"
               w="50%"
             >

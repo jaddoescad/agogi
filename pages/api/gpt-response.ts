@@ -1,36 +1,27 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-// import { OpenAI } from 'langchain/llms/openai';
-import { trueFalseQuizGenSystemMessage } from '../../prompts/true-false-sys-mes';
-import { multipleChoiceQuizGenSystemMessage } from '../../prompts/multiple-choice-sys-mes';
+import { generateMultipleChoiceFullPrompt } from '../../prompts/multiple-choice-sys-mes';
+import { generateTrueAndFalsePrompt } from '../../prompts/true-false-sys-mes';
 import {
   saveMessage,
   insertQuizOrDonothing,
   insertQuestions
 } from '../../utils/supabase-server';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { HumanMessage, AIMessage, SystemMessage } from 'langchain/schema';
 import { RequestData } from 'types/types';
-import { ConversationSummaryMemory } from 'langchain/memory';
-import { OpenAI } from 'langchain/llms/openai';
 import { fetchQuestions, fetchMessages } from '../../utils/supabase-server';
-import {
-  ChatPromptTemplate,
-  PromptTemplate,
-  SystemMessagePromptTemplate,
-  AIMessagePromptTemplate,
-  HumanMessagePromptTemplate
-} from 'langchain/prompts';
-import { MessagesPlaceholder } from 'langchain/prompts';
+import { OpenAI } from 'langchain/llms/openai';
+import { v4 as uuidv4 } from 'uuid';
 
 const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const supabaseServerClient = createServerSupabaseClient({ req, res });
-    const llm = new ChatOpenAI({
+
+    const llm = new OpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
-      temperature: 0.9,
-      modelName: 'gpt-4'
+      temperature: 0.7,
+      modelName: 'gpt-3.5-turbo-16k'
     });
+
     const { message, quizId, quizType } = (await req.body) as RequestData;
 
     try {
@@ -39,44 +30,28 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const questions = await fetchQuestions(supabaseServerClient, quizId);
       const messages = await fetchMessages(supabaseServerClient, quizId);
 
-      var prompt = trueFalseQuizGenSystemMessage;
-      if (quizType === 'true/false') {
-        prompt = trueFalseQuizGenSystemMessage;
-      } else if (quizType === 'multiple-choice') {
-        prompt = multipleChoiceQuizGenSystemMessage;
-      }
-
-      const systemMessagePrompt =
-        SystemMessagePromptTemplate.fromTemplate(prompt);
-    //   const humanMessagePrompt =
-    //     HumanMessagePromptTemplate.fromTemplate(message);
-
-      const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-        systemMessagePrompt,
-        // humanMessagePrompt
-      ]);
-
-
+      var prompt;
       const past_questions = JSON.stringify(questions);
       const past_messages = JSON.stringify(messages);
 
-      const formattedChatPrompt = await chatPrompt.formatMessages({
-        past_questions: past_questions ?? '[]',
-        past_messages: past_messages ?? '[]'
-      });
+      const prompt = 
+      quizType ?
+      generateMultipleChoiceFullPrompt(
+        past_questions,
+        past_messages,
+        message,
+      ) :
+      generateTrueAndFalsePrompt(
+        past_questions,
+        past_messages,
+        message,
+      );
 
-      const humanMessagePrompt = new HumanMessage(message)
-
-      console.log('chat prompt', formattedChatPrompt[0]);
-      console.log('chat prompt', formattedChatPrompt[1]);
-
-      const result = await llm.call([...formattedChatPrompt, humanMessagePrompt]);
-
-      console.log(result.content);
-
-      const result_json = JSON.parse(result.content);
-
-      console.log(result_json);
+      const result = await llm.predict(prompt);
+      const result_json = JSON.parse(result);
+      for (let q of result_json.quiz_response.questions) {
+        q.id = uuidv4(); // Generating and attaching a UUID to each question
+    }
 
       if (
         result_json.quiz_response &&
@@ -87,9 +62,11 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           supabaseServerClient,
           result_json.quiz_response.questions,
           quizId,
-            quizType
+          quizType
         );
       }
+
+
       if (result_json.ai_response) {
         await saveMessage(
           supabaseServerClient,
@@ -101,7 +78,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.status(200).json(result_json);
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({
         error: {
           message: err?.message ?? 'Internal Server Error'

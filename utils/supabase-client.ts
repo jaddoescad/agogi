@@ -77,25 +77,7 @@ export async function getSubscription() {
   }
 }
 
-export const getQuizAndQuestions = async (quizId: string) => {
-  const { data, error } = await supabase
-    .from('quizzes')
-    .select(
-      `
-    id,
-    title
-    `
-    )
-    .eq('id', quizId)
-    .single();
 
-  if (error) {
-    console.log(error.message);
-    throw error;
-  }
-
-  return data ?? [];
-};
 
 export const getHomePageQuizzes = async () => {
   const { data, error } = await supabase
@@ -128,7 +110,9 @@ export const getMyQuizzes = async () => {
     .select(
       `
     id,
-    title    `
+    title,    
+    questions(count)
+    `
     )
     .eq('creator_id', userId)
     .order('created_at', { ascending: false })
@@ -274,3 +258,59 @@ export const getQuizQuestions = async (quizId: string) => {
   return (data?.map((question) => question.question_data).filter(isQuestion) ??
     []) as Question[];
 };
+
+export const updateQuizTitle = async (quizId: string, title: string) => {
+  await supabase
+    .from('quizzes')
+    .update({
+      title
+    })
+    .eq('id', quizId);
+}
+
+
+export const getQuizAndQuestions = async (quizId: string) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .select(
+      `
+        id,
+        title,
+        created_at,
+        creator_id,
+        model,
+        questions (
+          id,
+          quiz_id,
+          created_at,
+          question_data
+          )
+      `
+    )
+    .eq('id', quizId)
+    .single();
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  if (data) {
+    // Flatten the question_data structure
+    if (data.questions && data.questions.length > 0) {
+      data.questions = data.questions.map((question: any) => {
+        const { question_data, ...rest } = question;
+        return { ...rest, ...question_data }; // merge the rest properties with the question_data properties
+      });
+    }
+  
+
+  return data ?? [];
+}
+
+  return data ?? [];
+}
+
+export const deleteQuestion = async (questionId: string) => {
+  await supabase.from('questions').delete().eq('id', questionId);
+}

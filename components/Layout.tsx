@@ -15,6 +15,8 @@ interface Props {
   meta?: PageMeta;
 }
 
+
+
 export default function Layout({ children, meta: pageMeta }: Props) {
   const router = useRouter();
   const meta = {
@@ -22,6 +24,8 @@ export default function Layout({ children, meta: pageMeta }: Props) {
     description: 'AI powered quiz platform',
     ...pageMeta
   };
+
+  
 
   return (
     <div
@@ -50,23 +54,9 @@ export default function Layout({ children, meta: pageMeta }: Props) {
         <meta name="twitter:title" content={meta.title} />
         <meta name="twitter:description" content={meta.description} />
       </Head>
-      <Navbar />
       <main id="skip" className={styles.main}>
         {children}
       </main>
-      {/* <Footer />
-      <Link href="https://discord.gg/crKZGpnz">
-        <Button
-          position="fixed"
-          bottom={4}
-          right={4}
-          colorScheme="blue"
-          rounded={'full'}
-          leftIcon={<Icon as={FaDiscord} />}
-        >
-          Discord
-        </Button>
-      </Link> */}
     </div>
   );
 }

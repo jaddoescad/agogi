@@ -4,7 +4,8 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  MenuList
+  MenuList,
+  Flex
 } from '@chakra-ui/react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Link from 'next/link';
@@ -29,6 +30,8 @@ const CustomMenuItem = ({
       transition="background 0.2s, color 0.2s"
       padding="1"
       rounded="md"
+      display={'flex'}
+      background={'inherit'}
       _hover={{
         backgroundColor: 'violet.500',
         color: 'white'
@@ -38,10 +41,10 @@ const CustomMenuItem = ({
         color: 'white'
       }}
     >
-      <Box>
+      <Flex>
         <Icon className="mr-2 h-5 w-5 text-violet-200" aria-hidden="true" />
         {children}
-      </Box>
+      </Flex>
     </MenuItem>
   </Link>
 );
@@ -61,7 +64,7 @@ export default function Account() {
           rounded="md"
           bg="black"
           px="4"
-          py="2"
+          py="1"
           size="sm"
           fontSize="sm"
           color={'white'}
@@ -76,8 +79,10 @@ export default function Account() {
           border="1px"
           borderColor="gray.200"
           zIndex="dropdown"
+          backgroundColor={'black'}
+          p={'10px'}
         >
-          <CustomMenuItem icon={FaEdit} href="/myquizzes">
+          <CustomMenuItem icon={FaEdit} href="/quizzes">
             My Quizzes
           </CustomMenuItem>
           <SignOutButton />
@@ -99,6 +104,7 @@ const SignOutButton = () => {
       }}
       transition="background 0.2s, color 0.2s"
       padding="1"
+      backgroundColor={'inherit'}
       rounded="md"
       _hover={{
         backgroundColor: 'violet.500',

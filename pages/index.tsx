@@ -1,4 +1,3 @@
-import QuizCards  from 'components/QuizCards/QuizCards';
 import { getHomePageQuizzes } from 'utils/supabase-client';
 import Head from 'next/head';
 import { Box, VStack, HStack, Text, Button, Image, Center } from '@chakra-ui/react';
@@ -47,7 +46,7 @@ const Home: React.FC = () => {
                 <Text fontSize={["3xl", "5xl"]}>
                   AI Generated Quizzes
                 </Text>
-                <Link href={generateQuizID()}>
+                <Link href={"/quizzes"}>
                   <Button colorScheme="blue" px={4}>
                     Generate
                   </Button>
@@ -56,8 +55,8 @@ const Home: React.FC = () => {
             </Center>
 
           </Box>
-          {quizzes && quizzes.length > 0
-           && <QuizCards quizzes={quizzes} />}
+          {/* {quizzes && quizzes.length > 0
+           && <QuizCards quizzes={quizzes} />} */}
 
         </Box>
       </Box>

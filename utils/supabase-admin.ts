@@ -4,11 +4,10 @@ import { toDateTime } from './helpers';
 import { Customer, UserDetails, Price, Product } from 'types/types';
 import type { Database } from 'types/types_db';
 import Stripe from 'stripe';
-import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
 // as it has admin priviliges and overwrites RLS policies!
-const supabaseAdmin = createClient<Database>(
+export const supabaseAdmin = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );

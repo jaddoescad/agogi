@@ -94,3 +94,5 @@ export type RequestData = {
   message: string;
   quizId: string;
 };
+
+export type QuizType = 'true/false' | 'multiple-choice';
