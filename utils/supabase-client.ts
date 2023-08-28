@@ -77,8 +77,6 @@ export async function getSubscription() {
   }
 }
 
-
-
 export const getHomePageQuizzes = async () => {
   const { data, error } = await supabase
     .from('quizzes')
@@ -111,7 +109,10 @@ export const getMyQuizzes = async () => {
       `
     id,
     title,    
-    questions(count)
+    selected_topic,
+    topics(
+      questions(count)
+    )
     `
     )
     .eq('creator_id', userId)
@@ -248,7 +249,6 @@ export const getQuizQuestions = async (quizId: string) => {
     .select('question_data')
     .eq('quiz_id', quizId);
 
-
   if (error) {
     console.error('Error:', error);
     throw error;
@@ -266,25 +266,20 @@ export const updateQuizTitle = async (quizId: string, title: string) => {
       title
     })
     .eq('id', quizId);
-}
+};
 
-
-export const getQuizAndQuestions = async (quizId: string) => {
+export const getQuizAndTopics = async (quizId: string) => {
   const { data, error } = await supabase
     .from('quizzes')
     .select(
       `
         id,
         title,
-        created_at,
-        creator_id,
-        model,
-        questions (
+        topics_order,
+        topics (
           id,
-          quiz_id,
-          created_at,
-          question_data
-          )
+          title
+        )
       `
     )
     .eq('id', quizId)
@@ -303,14 +298,22 @@ export const getQuizAndQuestions = async (quizId: string) => {
         return { ...rest, ...question_data }; // merge the rest properties with the question_data properties
       });
     }
-  
+
+    return data ?? [];
+  }
 
   return data ?? [];
-}
-
-  return data ?? [];
-}
+};
 
 export const deleteQuestion = async (questionId: string) => {
   await supabase.from('questions').delete().eq('id', questionId);
-}
+};
+
+export const createQuizAndTopic = async () => {
+  const { data, error } = await supabase.rpc('create_quiz_and_topic');
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};

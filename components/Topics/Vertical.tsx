@@ -1,29 +1,51 @@
-import React from 'react';
-import {MeasuringStrategy, UniqueIdentifier} from '@dnd-kit/core';
-import {restrictToWindowEdges} from '@dnd-kit/modifiers';
+import React, { useEffect } from 'react';
+import { MeasuringStrategy, UniqueIdentifier } from '@dnd-kit/core';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import {
   AnimateLayoutChanges,
   defaultAnimateLayoutChanges,
-  verticalListSortingStrategy,
+  verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import {
   restrictToVerticalAxis,
-  restrictToFirstScrollableAncestor,
+  restrictToFirstScrollableAncestor
 } from '@dnd-kit/modifiers';
 
-import {createRange} from './utilities';
-import {Sortable, Props as SortableProps} from './Sortable';
+import { createRange } from './utilities';
+import { Sortable, Props as SortableProps } from './Sortable';
 
 export default {
-  title: 'Presets/Sortable/Vertical',
+  title: 'Presets/Sortable/Vertical'
 };
 
 const props: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
-  itemCount: 50,
+  itemCount: 50
 };
 
-export const BasicSetup = () => <Sortable {...props} />;
+export const SideBar = ({ topicList }) => {
+
+  useEffect(() => {
+    console.log("topics 2", topicList)
+  }, [topicList])
+
+  return (
+    <div
+      style={{
+        height: '100vh',
+        width: 500,
+        overflow: 'auto'
+      }}
+    >
+      <Sortable
+        {...props}
+        modifiers={[restrictToFirstScrollableAncestor]}
+        handle
+        topics={topicList}
+      />
+    </div>
+  );
+};
 
 export const WithoutDragOverlay = () => (
   <Sortable {...props} useDragOverlay={false} />
@@ -44,7 +66,7 @@ export const RestrictToScrollContainer = () => (
       height: '50vh',
       width: 350,
       margin: '200px auto 0',
-      overflow: 'auto',
+      overflow: 'auto'
     }}
   >
     <Sortable {...props} modifiers={[restrictToFirstScrollableAncestor]} />
@@ -56,7 +78,7 @@ export const ScrollContainer = () => (
     style={{
       height: '50vh',
       margin: '200px auto 0',
-      overflow: 'auto',
+      overflow: 'auto'
     }}
   >
     <Sortable {...props} />
@@ -68,7 +90,7 @@ export const PressDelay = () => (
     {...props}
     activationConstraint={{
       delay: 250,
-      tolerance: 5,
+      tolerance: 5
     }}
   />
 );
@@ -77,7 +99,7 @@ export const MinimumDistance = () => (
   <Sortable
     {...props}
     activationConstraint={{
-      distance: 15,
+      distance: 15
     }}
   />
 );
@@ -93,9 +115,9 @@ export const VariableHeights = () => {
   return (
     <Sortable
       {...props}
-      wrapperStyle={({id}) => {
+      wrapperStyle={({ id }) => {
         return {
-          height: randomHeights[Number(id)],
+          height: randomHeights[Number(id)]
         };
       }}
     />
@@ -128,9 +150,9 @@ export const MarginBetweenItems = () => {
   return (
     <Sortable
       {...props}
-      wrapperStyle={({index}) => {
+      wrapperStyle={({ index }) => {
         return {
-          marginBottom: getMargin(index),
+          marginBottom: getMargin(index)
         };
       }}
     />
@@ -141,9 +163,9 @@ export const RerenderBeforeSorting = () => {
   return (
     <Sortable
       {...props}
-      wrapperStyle={({active}) => {
+      wrapperStyle={({ active }) => {
         return {
-          height: active ? 100 : 80,
+          height: active ? 100 : 80
         };
       }}
     />
@@ -152,13 +174,13 @@ export const RerenderBeforeSorting = () => {
 
 export const RemovableItems = () => {
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
-    defaultAnimateLayoutChanges({...args, wasDragging: true});
+    defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
   return (
     <Sortable
       {...props}
       animateLayoutChanges={animateLayoutChanges}
-      measuring={{droppable: {strategy: MeasuringStrategy.Always}}}
+      measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       removable
       handle
     />
@@ -167,6 +189,9 @@ export const RemovableItems = () => {
 
 export const TransformedContainer = () => {
   return (
-    <Sortable {...props} style={{transform: 'translate3d(100px, 100px, 0)'}} />
+    <Sortable
+      {...props}
+      style={{ transform: 'translate3d(100px, 100px, 0)' }}
+    />
   );
 };

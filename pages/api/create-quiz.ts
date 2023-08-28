@@ -120,8 +120,6 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const quizId = await addQuizAndQuestions(quiz, supabaseServerClient);
 
-    console.log('quiz added successfully', quizId);
-
     res.status(200).json({ quizId: quizId });
   } catch (error) {
     if (error instanceof Error) {

@@ -36,6 +36,11 @@ import {
 import { createRange } from './utilities';
 import { Item, List, Wrapper } from './components';
 
+type Item = {
+  id: UniqueIdentifier;
+  title: string;
+};
+
 export interface Props {
   activationConstraint?: PointerActivationConstraint;
   animateLayoutChanges?: AnimateLayoutChanges;
@@ -47,7 +52,7 @@ export interface Props {
   getNewIndex?: NewIndexGetter;
   handle?: boolean;
   itemCount?: number;
-  items?: UniqueIdentifier[];
+  topics?: { id: UniqueIdentifier; title: string }[];
   measuring?: MeasuringConfiguration;
   modifiers?: Modifiers;
   renderItem?: any;
@@ -103,7 +108,7 @@ export function Sortable({
   getNewIndex,
   handle = false,
   itemCount = 16,
-  items: initialItems,
+  topics,
   isDisabled = () => false,
   measuring,
   modifiers,
@@ -115,11 +120,25 @@ export function Sortable({
   useDragOverlay = true,
   wrapperStyle = () => ({})
 }: Props) {
-  const [items, setItems] = useState<UniqueIdentifier[]>(
+
+
+
+
+  const [items, setItems] = useState<Item[]>(
     () =>
-      initialItems ??
-      createRange<UniqueIdentifier>(itemCount, (index) => index + 1)
+      topics ??
+      []
   );
+
+  //useeffect for topics
+
+  useEffect(() => {
+    console.log('topics3', topics);
+    if (!topics) return;
+    setItems(topics);
+  }, [topics]);
+  
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -145,6 +164,8 @@ export function Sortable({
     // This code will only run after the component is mounted on the client side.
     setIsMounted(true);
   }, []);
+
+  
 
   const isFirstAnnouncement = useRef(true);
   const getIndex = (id: UniqueIdentifier) => items.indexOf(id);
@@ -231,17 +252,20 @@ export function Sortable({
       modifiers={modifiers}
     >
       <Wrapper style={style} center>
-        <SortableContext items={items} strategy={strategy}>
+        <SortableContext
+          items={items.map((item) => item.id)}
+          strategy={strategy}
+        >
           <Container>
-            {items.map((value, index) => (
+            {items.map((item, index) => (
               <SortableItem
-                key={value}
-                id={value}
+                key={item.id}
+                id={item.id}
                 handle={handle}
                 index={index}
                 style={getItemStyles}
                 wrapperStyle={wrapperStyle}
-                disabled={isDisabled(value)}
+                disabled={isDisabled(item.id)}
                 renderItem={renderItem}
                 onRemove={handleRemove}
                 animateLayoutChanges={animateLayoutChanges}

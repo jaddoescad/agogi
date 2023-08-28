@@ -1,19 +1,19 @@
 import Link from 'next/link';
 import React from 'react';
-import {
-  Text,
-  Center,
-  VStack,
-  Box
-} from '@chakra-ui/react';
+import { Text, Center, VStack, Box } from '@chakra-ui/react';
 
 export const QuizCard = ({
   quiz
 }: {
-  quiz: { id: string; title: string | null; questionCount: number };
+  quiz: {
+    id: string;
+    title: string | null;
+    questionCount: number;
+    topicId: string;
+  };
 }) => {
   return (
-    <Link href={`/generate/${quiz.id}`}>
+    <Link href={`/generate/${quiz.id}/${quiz.selected_topic}`}>
       <Box
         justifyContent="space-between"
         alignItems="center"
@@ -29,20 +29,27 @@ export const QuizCard = ({
         h="12rem"
         w="12rem"
       >
-        <Text textAlign="center" size="md" color="white" width="100%" fontWeight={'bold'} fontSize={'large'}>
+        <Text
+          textAlign="center"
+          size="md"
+          color="white"
+          width="100%"
+          fontWeight={'bold'}
+          fontSize={'large'}
+        >
           {quiz.title ?? 'Untitled'}
         </Text>
-        
+
         <Box
           bg="teal.600"
           color="white"
-          fontWeight={"extrabold"}
-          borderRadius="full"   // this provides maximum roundness
+          fontWeight={'extrabold'}
+          borderRadius="full" // this provides maximum roundness
           px={2.5}
           py={1}
         >
           <Text textAlign="center" size="md" fontSize={'sm'}>
-            {quiz.questions[0].count ?? 0}
+            {quiz?.topics[0]?.count ?? 0}
           </Text>
         </Box>
       </Box>

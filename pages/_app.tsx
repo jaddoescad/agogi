@@ -16,32 +16,41 @@ import { Analytics } from '@vercel/analytics/react';
 import NextNProgress from 'nextjs-progressbar';
 import Router from 'next/router';
 import 'katex/dist/katex.min.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Hook up NProgress to page change start and stop events
-
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() =>
     createBrowserSupabaseClient<Database>()
   );
 
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <>
-      <ChakraProvider>
-        <div>
-          <SessionContextProvider supabaseClient={supabaseClient}>
-            <MyUserContextProvider>
-              <Layout>
-              <NextNProgress color="#29D" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider>
+          <div>
+            <SessionContextProvider supabaseClient={supabaseClient}>
+              <MyUserContextProvider>
+                <Layout>
+                  <NextNProgress
+                    color="#29D"
+                    startPosition={0.3}
+                    stopDelayMs={200}
+                    height={3}
+                    showOnShallow={true}
+                  />
 
-                <Component {...pageProps} />
-              </Layout>
-            </MyUserContextProvider>
-          </SessionContextProvider>
-        </div>
-      </ChakraProvider>
-      <Analytics />
+                  <Component {...pageProps} />
+                </Layout>
+              </MyUserContextProvider>
+            </SessionContextProvider>
+          </div>
+        </ChakraProvider>
+        <Analytics />
+      </QueryClientProvider>
     </>
   );
 }
