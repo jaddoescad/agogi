@@ -11,6 +11,8 @@ import { withPageAuth } from '@/utils/supabase-server';
 import { generateQuizID } from '@/utils/generate-quiz-id';
 import { Spinner } from '@chakra-ui/react';
 import { createQuizAndTopic } from '@/utils/supabase-client';
+import { default_unpublished_img } from 'utils/constants';
+import { Image } from '@chakra-ui/react';
 
 type Quiz = {
   id: string;
@@ -19,16 +21,13 @@ type Quiz = {
 import { useRouter } from 'next/router'; // Import the router if you're using Next.js
 import { Button, Icon } from '@chakra-ui/react'; // Assuming you're using Chakra UI
 import { AddIcon } from '@chakra-ui/icons'; // Importing an add icon from Chakra UI
+import Link from 'next/link';
 
 const MyQuizzes: React.FC = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
 
   const router = useRouter(); // Get the router instance
-
-  const handleAddQuiz = () => {
-    router.push('/path-to-add-quiz-page'); // Replace with your actual path to the add quiz page
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,28 +75,13 @@ const MyQuizzes: React.FC = () => {
                   justifyContent="center"
                   _hover={{ bg: 'gray.100' }}
                   onClick={() => {
-                    //                   CREATE OR REPLACE FUNCTION create_quiz_and_topic() RETURNS json AS $$
-                    // DECLARE
-                    //     quiz_id UUID;
-                    //     topic_id UUID;
-                    //     current_user_id UUID;
-                    // BEGIN
-                    //     current_user_id := auth.uid();
-                    //     INSERT INTO quizzes (title, user_id) VALUES ('Untitled', current_user_id) RETURNING id INTO quiz_id;
-                    //     INSERT INTO topics (title, quiz_id) VALUES ('New Topic', quiz_id) RETURNING id INTO topic_id;
-
-                    //     COMMIT;
-                    //     RETURN json_build_object('quiz_id', quiz_id, 'topic_id', topic_id);
-                    // END;
-                    // $$ LANGUAGE plpgsql;
-
-                    // router.push(`/generate/${generateQuizID()}`);
-
-                    createQuizAndTopic().then((res) => {
-                      router.push(`/generate/${res.quiz_id}/${res.topic_id}`);
-                    }).catch((err) => {
-                      alert(err.message);
-                    });
+                    createQuizAndTopic()
+                      .then((res) => {
+                        router.push(`/generate/${res.quiz_id}`);
+                      })
+                      .catch((err) => {
+                        alert(err.message);
+                      });
                   }}
                 >
                   <AddIcon size="lg" />
@@ -105,7 +89,14 @@ const MyQuizzes: React.FC = () => {
                 </Box>
 
                 {quizzes.map((quiz) => (
-                  <QuizCard quiz={quiz} key={quiz.id} />
+                  <Link
+                    href={`/generate/${quiz.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <Box>
+                      <QuizCard quiz={quiz} key={quiz.id} />
+                    </Box>
+                  </Link>
                 ))}
               </SimpleGrid>
             )}

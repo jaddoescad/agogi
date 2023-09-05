@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Form from '../../../components/ChatInterface/Form';
-import QuizPage from '../../../components/ChatInterface/Quiz';
+import Form from '../../components/ChatInterface/Form';
+import QuizPage from '../../components/ChatInterface/Quiz';
 import { Box, Flex } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import {
   getMessages,
-  getQuizQuestions,
+  getQuestions,
   getQuizAndTopics
 } from 'utils/supabase-client';
 import { Question, Message } from 'types/types';
@@ -15,14 +15,15 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { withPageAuth } from '@/utils/supabase-server';
 import { getURL } from '@/utils/helpers';
-import { SideBar } from '../../../components/Topics/Vertical';
+import { SideBar } from '../../components/Topics/Vertical';
 import { useGetQuizAndTopics } from 'hooks/useGetQuizAndTopics';
+import { checkQuizAndTopicExist } from 'utils/supabase-server';
 
 const init_message = {
   message: 'Hello! What type of quiz topic would you like to generate?',
   type: 'ai'
 };
-export default function Home() {
+export default function GenerateQuiz() {
   const [history, setHistory] = useState<Message[]>([{ ...init_message }]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentModel, setCurrentModel] = useState<string>('gpt-4');
@@ -31,6 +32,7 @@ export default function Home() {
   const [title, setTitle] = useState<string | null>('Untitled');
   const [currentPage, setCurrentPage] = useState(1);
   const [topics, setTopics] = useState<any[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const {
     data,
@@ -44,35 +46,55 @@ export default function Home() {
 
   useEffect(() => {
     if (!quizId) return;
-    getMessages(quizId).then((messages) => {
+    getMessages(selectedTopic).then((messages) => {
       setHistory([init_message, ...messages]);
     });
 
-    if (data && data.title) {
-      setTitle(data.title || ''); // setting title to state if available
+    getQuestions(selectedTopic).then((questions) => {
+      console.log("questions", questions)
+      setQuestions(questions);
+    });
+  }, [selectedTopic]);
+
+  useEffect(() => {
+    if (!data) return;
+
+    if (data.selected_topic) {
+      setSelectedTopic(data.selected_topic);
     }
-    if (data && data.topics_order) {
+
+    if (data.title) {
+      setTitle(data.title);
+    }
+
+    if (data.topics_order && data.topics) {
       const topics = data.topics.filter((topic) =>
         data.topics_order.includes(topic.id)
       );
-      
       setTopics(topics);
     }
-  }, [quizId, data]);
-
+  }, [data]);
 
   return (
     <Flex minWidth={'1000px'}>
-      <SideBar topicList={topics} />
+      <SideBar
+        topicList={topics}
+        quizId={quizId}
+        topicsOrder={data?.topics_order}
+        selectedTopic={selectedTopic}
+        setSelectedTopic={setSelectedTopic}
+      />
       <Box w="full">
         <Navbar
           logoBackToQuizzes
           preview
           share
           quizId={quizId}
+          quizTitle={title}
           preview_disabled={!questions || questions.length === 0}
           share_disabled={!questions || questions.length === 0}
           share_Url={`${getURL()}preview/${quizId}`}
+          setQuizTitle={setTitle}
         />
         <Flex mx="auto" h="calc(100vh - 60px)">
           <Flex
@@ -92,6 +114,7 @@ export default function Home() {
               quiz={questions}
               setQuiz={setQuestions}
               setCurrentPage={setCurrentPage}
+              topicId={selectedTopic}
             />
           </Flex>
           <Flex
@@ -103,7 +126,6 @@ export default function Home() {
           >
             <QuizPage
               questions={questions}
-              title={title}
               setTitle={setTitle}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
@@ -119,6 +141,25 @@ export default function Home() {
 export const getServerSideProps = withPageAuth(
   { redirectTo: '/signin' },
   async (ctx, supabaseServerClient) => {
+    const quizId = ctx.query.quizId as string;
+
+    if (!quizId) {
+      return {
+        notFound: true
+      };
+    }
+
+    const topicsExist = await checkQuizAndTopicExist(
+      quizId,
+      supabaseServerClient
+    );
+
+    if (!topicsExist || topicsExist.length === 0) {
+      return {
+        notFound: true
+      };
+    }
+
     return {
       props: {}
     };

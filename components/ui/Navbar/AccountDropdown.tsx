@@ -7,12 +7,12 @@ import {
   MenuList,
   Flex
 } from '@chakra-ui/react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { IconType } from 'react-icons';
 import { BiChevronDown } from 'react-icons/bi';
 import { FaEdit, FaArchive } from 'react-icons/fa';
+import { supabase } from 'utils/supabase-client';
 
 const CustomMenuItem = ({
   icon: Icon,
@@ -94,12 +94,11 @@ export default function Account() {
 
 const SignOutButton = () => {
   const router = useRouter();
-  const supabaseClient = useSupabaseClient();
 
   return (
     <MenuItem
       onClick={async () => {
-        await supabaseClient.auth.signOut();
+        await supabase.auth.signOut();
         router.push('/signin');
       }}
       transition="background 0.2s, color 0.2s"

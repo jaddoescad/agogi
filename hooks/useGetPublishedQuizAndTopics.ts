@@ -1,15 +1,13 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useQuery } from "@tanstack/react-query";
-import { Database } from "types/types_db";
-import { getQuizAndTopics } from "utils/supabase-client";
+import { getPublishedQuizAndTopics } from "utils/supabase-client";
 
-export function useGetQuizAndTopics(quizId: string) {
+export function useGetPublishedQuizAndTopics(quizId: string) {
   const key = ["creator_quiz", quizId];
   return useQuery(
     key,
     async () => {
       
-      return getQuizAndTopics(quizId).then(
+      return getPublishedQuizAndTopics(quizId).then(
         (result) => result
       );
     },

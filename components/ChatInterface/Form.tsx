@@ -12,7 +12,7 @@ import {
 import { clearChatMessages } from 'utils/supabase-client';
 import { Question, Message } from 'types/types';
 import { css_scroll } from 'styles/chakra-css-styles.js';
-import {HUMAN_USER} from '../../constants'
+import {HUMAN_USER} from '../../utils/constants'
 import { useEffect } from 'react';
 
 const Form = ({
@@ -21,6 +21,7 @@ const Form = ({
   history,
   setHistory,
   quizId,
+  topicId,
   quiz,
   setQuiz,
   setCurrentPage
@@ -33,6 +34,7 @@ const Form = ({
   quiz: any | null;
   setQuiz: React.Dispatch<React.SetStateAction<Question[] | null>>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  topicId: string;
 }) => {
   const messageInput = useRef<HTMLTextAreaElement | null>(null);
   const handleEnter = (
@@ -76,7 +78,8 @@ const Form = ({
         data: {
           message,
           quizId,
-          quizType
+          quizType,
+          topicId
         }
       });
       if (response !== undefined) {
@@ -86,7 +89,6 @@ const Form = ({
         ]);
 
         if (response.quiz_response) {
-          console.log(response.quiz_response);
           const newQuestions = quiz
             ? [...quiz, ...response.quiz_response.questions]
             : response.quiz_response.questions;

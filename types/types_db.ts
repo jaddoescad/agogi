@@ -32,28 +32,28 @@ export interface Database {
           created_at: string
           id: string
           message: string
-          quiz_id: string
+          topic_id: string
           type: string
         }
         Insert: {
           created_at?: string
           id?: string
           message: string
-          quiz_id: string
+          topic_id: string
           type: string
         }
         Update: {
           created_at?: string
           id?: string
           message?: string
-          quiz_id?: string
+          topic_id?: string
           type?: string
         }
         Relationships: [
           {
-            foreignKeyName: "messages_quiz_id_fkey"
-            columns: ["quiz_id"]
-            referencedRelation: "quizzes"
+            foreignKeyName: "messages_topic_id_fkey"
+            columns: ["topic_id"]
+            referencedRelation: "topics"
             referencedColumns: ["id"]
           }
         ]
@@ -180,39 +180,116 @@ export interface Database {
           }
         ]
       }
+      questions_snapshot: {
+        Row: {
+          created_at: string | null
+          id: string
+          question_data: Json | null
+          topic_id: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          question_data?: Json | null
+          topic_id?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          question_data?: Json | null
+          topic_id?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_question_to_topic_snapshot"
+            columns: ["topic_id"]
+            referencedRelation: "topics_snapshot"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_snapshot_topic_id_fkey"
+            columns: ["topic_id"]
+            referencedRelation: "topics_snapshot"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       quizzes: {
         Row: {
           created_at: string
           creator_id: string | null
           id: string
-          model: string | null
-          quiz_order: Json[] | null
+          image_url: string | null
+          published: boolean | null
+          published_quiz_id: string | null
           selected_topic: string | null
           title: string | null
+          topics_order: string[] | null
         }
         Insert: {
           created_at?: string
           creator_id?: string | null
-          id: string
-          model?: string | null
-          quiz_order?: Json[] | null
+          id?: string
+          image_url?: string | null
+          published?: boolean | null
+          published_quiz_id?: string | null
           selected_topic?: string | null
           title?: string | null
+          topics_order?: string[] | null
         }
         Update: {
           created_at?: string
           creator_id?: string | null
           id?: string
-          model?: string | null
-          quiz_order?: Json[] | null
+          image_url?: string | null
+          published?: boolean | null
+          published_quiz_id?: string | null
           selected_topic?: string | null
           title?: string | null
+          topics_order?: string[] | null
         }
         Relationships: [
           {
             foreignKeyName: "quizzes_creator_id_fkey"
             columns: ["creator_id"]
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quizzes_published_quiz_id_fkey"
+            columns: ["published_quiz_id"]
+            referencedRelation: "quizzes_snapshot"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      quizzes_snapshot: {
+        Row: {
+          created_at: string | null
+          id: string
+          original_quiz_id: string | null
+          topics_order: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          original_quiz_id?: string | null
+          topics_order?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          original_quiz_id?: string | null
+          topics_order?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_snapshot_original_quiz_id_fkey"
+            columns: ["original_quiz_id"]
+            referencedRelation: "quizzes"
             referencedColumns: ["id"]
           }
         ]
@@ -293,7 +370,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id: string
+          id?: string
           quiz_id?: string | null
           title?: string | null
         }
@@ -308,6 +385,40 @@ export interface Database {
             foreignKeyName: "topics_quiz_id_fkey"
             columns: ["quiz_id"]
             referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      topics_snapshot: {
+        Row: {
+          created_at: string | null
+          id: string
+          quiz_id: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          quiz_id?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          quiz_id?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_topic_to_quiz_snapshot"
+            columns: ["quiz_id"]
+            referencedRelation: "quizzes_snapshot"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "topics_snapshot_quiz_id_fkey"
+            columns: ["quiz_id"]
+            referencedRelation: "quizzes_snapshot"
             referencedColumns: ["id"]
           }
         ]
@@ -344,9 +455,46 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
+      check_quiz_exists: {
+        Args: {
+          quizid: string
+          topicid: string
+        }
+        Returns: undefined
+      }
       create_quiz_and_topic: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      create_topic: {
+        Args: {
+          quiz_id: string
+        }
+        Returns: Json
+      }
+      delete_topic: {
+        Args: {
+          topic_id: string
+        }
+        Returns: Json
+      }
+      get_published_questions: {
+        Args: {
+          tid: string
+        }
+        Returns: unknown
+      }
+      get_questions: {
+        Args: {
+          tid: string
+        }
+        Returns: unknown
+      }
+      publish_quiz: {
+        Args: {
+          qid: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

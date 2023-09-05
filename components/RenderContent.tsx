@@ -2,6 +2,7 @@ import React from 'react';
 import Latex from 'react-latex';
 
 export const RenderContent = ({ content }) => {
+  console.log("content", content)
   // Regex patterns to match <codeblock>...</codeblock> and <inlinecode>...</inlinecode> tags with global flag
   const blockCodePattern = /<codeblock>([\s\S]*?)<\/codeblock>/g;
   const inlineCodePattern = /<inlinecode>(.*?)<\/inlinecode>/g;

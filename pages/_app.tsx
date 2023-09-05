@@ -7,7 +7,6 @@ import React from 'react';
 
 import Layout from 'components/Layout';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { AppProps } from 'next/app';
 import { MyUserContextProvider } from 'utils/useUser';
 import type { Database } from 'types/types_db';
@@ -17,13 +16,12 @@ import NextNProgress from 'nextjs-progressbar';
 import Router from 'next/router';
 import 'katex/dist/katex.min.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { supabase } from 'utils/supabase-client';
 
 // Hook up NProgress to page change start and stop events
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const [supabaseClient] = useState(() =>
-    createBrowserSupabaseClient<Database>()
-  );
+
 
   const [queryClient] = useState(() => new QueryClient());
 
@@ -32,7 +30,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <ChakraProvider>
           <div>
-            <SessionContextProvider supabaseClient={supabaseClient}>
+            <SessionContextProvider supabaseClient={supabase}>
               <MyUserContextProvider>
                 <Layout>
                   <NextNProgress

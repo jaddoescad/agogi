@@ -23,12 +23,12 @@ export const addQuizAndQuestions = async (
 export const saveMessage = async (
   supabase: SupabaseClient<any, 'public', any>,
   message: string,
-  quizId: string,
+  topicId: string,
   type: string
 ) => {
   const { data, error } = await supabase.from('messages').insert([
     {
-      quiz_id: quizId,
+      topic_id: topicId,
       message: message,
       type: type
     }
@@ -60,13 +60,13 @@ export const insertQuizOrDonothing = async (
 export const insertQuestions = async (
   supabase: SupabaseClient<any, 'public', any>,
   questions: [Question],
-  quidId: string,
+  topicId: string,
   quizType: string
 ) => {
   const { data, error } = await supabase.from('questions').insert(
     questions.map((question) => {
       return {
-        quiz_id: quidId,
+        topic_id: topicId,
         question_data: question,
         type: quizType
       };
@@ -83,7 +83,7 @@ export const insertQuestions = async (
 
 export const fetchQuestions = async (
   supabase: SupabaseClient<any, 'public', any>,
-  quizId: string
+  topicId: string
 ) => {
   const { data, error } = await supabase
     .from('questions')
@@ -92,7 +92,7 @@ export const fetchQuestions = async (
         question_data
       `
     )
-    .eq('quiz_id', quizId)
+    .eq('topic_id', topicId)
     .limit(20)
     .order('created_at', { ascending: false });
 
@@ -105,7 +105,7 @@ export const fetchQuestions = async (
 
 export const fetchMessages = async (
   supabase: SupabaseClient<any, 'public', any>,
-  quizId: string
+  topicId: string
 ) => {
   const { data, error } = await supabase
     .from('messages')
@@ -115,7 +115,7 @@ export const fetchMessages = async (
       type
     `
     )
-    .eq('quiz_id', quizId)
+    .eq('topic_id', topicId)
     .limit(10)
     .order('created_at', { ascending: false });
 
@@ -230,3 +230,15 @@ export const getQuiz = async (
 
   return data ?? [];
 };
+
+
+export const checkQuizAndTopicExist = async (quizId: string,  supabase: SupabaseClient<any, 'public', any>) => {
+  const {data, error} = await supabase.from('topics').select('*').eq('quiz_id', quizId);
+  console.log('data', data);
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+}

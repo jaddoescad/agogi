@@ -83,9 +83,11 @@ export const getHomePageQuizzes = async () => {
     .select(
       `
     id,
-    title
+    title,
+    image_url
     `
     )
+    .eq('published', true)
     .order('created_at', { ascending: false })
     .limit(12);
 
@@ -108,11 +110,8 @@ export const getMyQuizzes = async () => {
     .select(
       `
     id,
-    title,    
-    selected_topic,
-    topics(
-      questions(count)
-    )
+    title,
+    image_url
     `
     )
     .eq('creator_id', userId)
@@ -220,8 +219,7 @@ export const getQuiz = async (quizId: string) => {
   return data ?? [];
 };
 
-export const getMessages = async (quizId: string) => {
-  console.log('quizId', quizId);
+export const getMessages = async (topicId: string) => {
   const { data, error } = await supabase
     .from('messages')
     .select(
@@ -230,7 +228,7 @@ export const getMessages = async (quizId: string) => {
       type
     `
     )
-    .eq('quiz_id', quizId);
+    .eq('topic_id', topicId);
 
   if (error) {
     console.error('Error:', error);
@@ -243,21 +241,32 @@ export const clearChatMessages = async (quizId: string) => {
   await supabase.from('messages').delete().eq('quiz_id', quizId);
 };
 
-export const getQuizQuestions = async (quizId: string) => {
-  const { data, error } = await supabase
-    .from('questions')
-    .select('question_data')
-    .eq('quiz_id', quizId);
+//use rpc
+export const getQuestions = async (topicId: string) => {
+  const { data, error } = await supabase.rpc('get_questions', {
+    tid: topicId
+  });
 
   if (error) {
     console.error('Error:', error);
     throw error;
   }
-
-  // Map over the data array to extract only the question_data values
-  return (data?.map((question) => question.question_data).filter(isQuestion) ??
-    []) as Question[];
+  return data ?? [];
 };
+
+
+export const getPublishedQuestions = async (topicId: string) => {
+  const { data, error } = await supabase.rpc('get_published_questions', {
+    tid: topicId
+  });
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+  return data ?? [];
+};
+
 
 export const updateQuizTitle = async (quizId: string, title: string) => {
   await supabase
@@ -276,6 +285,7 @@ export const getQuizAndTopics = async (quizId: string) => {
         id,
         title,
         topics_order,
+        selected_topic,
         topics (
           id,
           title
@@ -290,16 +300,32 @@ export const getQuizAndTopics = async (quizId: string) => {
     throw error;
   }
 
-  if (data) {
-    // Flatten the question_data structure
-    if (data.questions && data.questions.length > 0) {
-      data.questions = data.questions.map((question: any) => {
-        const { question_data, ...rest } = question;
-        return { ...rest, ...question_data }; // merge the rest properties with the question_data properties
-      });
-    }
 
-    return data ?? [];
+  return data ?? [];
+};
+
+export const getPublishedQuizAndTopics = async (quizId: string) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .select(
+      `
+        id,
+        title,
+        quizzes_snapshot!quizzes_snapshot_original_quiz_id_fkey(
+        topics_order,
+        topics_snapshot!fk_topic_to_quiz_snapshot (
+          id,
+          title
+        )
+      )
+      `
+    )
+    .eq('id', quizId)
+    .single();
+
+  if (error) {
+    console.log(error.message);
+    throw error;
   }
 
   return data ?? [];
@@ -315,5 +341,114 @@ export const createQuizAndTopic = async () => {
     console.log(error.message);
     throw error;
   }
+  return data ?? [];
+};
+
+export const createTopic = async (quizId: string) => {
+  const { data, error } = await supabase.rpc('create_topic', {
+    quiz_id: quizId
+  });
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const deleteTopic = async (topicId: string) => {
+  const { data, error } = await supabase.rpc('delete_topic', {
+    topic_id: topicId
+  });
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const editTopicTitle = async (topicId: string, title: string) => {
+  const { data, error } = await supabase
+    .from('topics')
+    .update({ title })
+    .eq('id', topicId);
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const updateTopicOrder = async (
+  quizId: string,
+  topicsOrder: string[]
+) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .update({ topics_order: topicsOrder })
+    .eq('id', quizId);
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const updateSelectedTopic = async (quizId: string, topicId: string) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .update({ selected_topic: topicId })
+    .eq('id', quizId);
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};
+
+export const publishQuiz = async (quizId: string) => {
+  const { data, error } = await supabase.rpc('publish_quiz', {
+    qid: quizId
+  });
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+};
+
+export const getQuizInfo = async (quizId: string) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .select(
+      `
+    id,
+    title,
+    image_url
+  `
+    )
+    .eq('id', quizId)
+    .single();
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+};
+
+export const uploadImageUrl = async (quizId: string, url: string) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .update({ image_url: url })
+    .eq('id', quizId);
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
   return data ?? [];
 };

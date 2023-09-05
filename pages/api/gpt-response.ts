@@ -22,13 +22,15 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       modelName: 'gpt-3.5-turbo-16k'
     });
 
-    const { message, quizId, quizType } = (await req.body) as RequestData;
+    const { message, quizId, quizType, topicId } = (await req.body) as RequestData;
 
     try {
+      console.log("topicId", topicId);
       await insertQuizOrDonothing(supabaseServerClient, quizId);
-      await saveMessage(supabaseServerClient, message, quizId, 'user');
-      const questions = await fetchQuestions(supabaseServerClient, quizId);
-      const messages = await fetchMessages(supabaseServerClient, quizId);
+      await saveMessage(supabaseServerClient, message, topicId, 'user');
+      const questions = await fetchQuestions(supabaseServerClient, topicId);
+      const messages = await fetchMessages(supabaseServerClient, topicId);
+
 
       var prompt;
       const past_questions = JSON.stringify(questions);
@@ -61,7 +63,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await insertQuestions(
           supabaseServerClient,
           result_json.quiz_response.questions,
-          quizId,
+          topicId,
           quizType
         );
       }
@@ -71,7 +73,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await saveMessage(
           supabaseServerClient,
           result_json.ai_response.message,
-          quizId,
+          topicId,
           'ai'
         );
       }

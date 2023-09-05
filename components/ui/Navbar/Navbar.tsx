@@ -13,7 +13,8 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import va from '@vercel/analytics';
-
+import { publishQuiz } from 'utils/supabase-client';
+import { useState } from 'react';
 import SearchBar from './SearchBar';
 import AccountDropdown from './AccountDropdown';
 import { AiFillEye } from 'react-icons/ai';
@@ -26,9 +27,10 @@ import {
   AlertDialogContent,
   AlertDialogOverlay
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import React, { useRef } from 'react';
 import { useClipboard } from '@chakra-ui/react';
+import { FiEdit, FiSave } from 'react-icons/fi';
+import { updateQuizTitle } from 'utils/supabase-client';
 
 export default function WithSubnavigation({
   search = false,
@@ -40,7 +42,10 @@ export default function WithSubnavigation({
   quizId = null,
   preview_disabled = false,
   share_disabled = false,
-  share_Url = null
+  share_Url = null,
+  quizTitle = null,
+  setQuizTitle = null,
+  quizPreviewTitle
 }: {
   search?: boolean;
   generate?: boolean;
@@ -52,6 +57,9 @@ export default function WithSubnavigation({
   preview_disabled?: boolean;
   share_disabled?: boolean;
   share_Url?: string | null;
+  quizTitle?: string | null;
+  setQuizTitle?: any;
+  quizPreviewTitle?: boolean;
 }) {
   const { user } = useUser();
   const router = useRouter();
@@ -61,6 +69,40 @@ export default function WithSubnavigation({
   const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef();
   const { hasCopied, onCopy } = useClipboard(share_Url);
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(quizTitle || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    }
+  };
+
+  const handlePublish = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (quizId) await publishQuiz(quizId);
+      alert('Quiz published!');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    try {
+      await updateQuizTitle(quizId, quizTitle); // Assuming the updateQuizTitle requires the quizid and new title
+      setInputValue(quizTitle); // Update inputValue with the new title
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update title:', error);
+    } finally {
+    }
+  };
 
   return (
     <Box>
@@ -94,22 +136,31 @@ export default function WithSubnavigation({
           )}
 
           {logoBackToQuizzes && (
-            <Link href="/quizzes" aria-label="Back to Quizzes">
-              <Flex align="center" className="s.logo" cursor={'pointer'}>
-                {/* Back Button (Assuming you have a back arrow icon) */}
-                <IconButton
-                  aria-label="Back"
-                  icon={<IoIosArrowBack size={'25'} />}
-                  variant="ghost"
-                  _hover={{ bg: 'transparent' }}
+            <Flex alignItems="center" gap={2}>
+              {isEditing ? (
+                <Input
+                  value={quizTitle}
+                  onBlur={handleSaveTitle}
+                  onChange={(e) => setQuizTitle(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  autoFocus
                 />
+              ) : (
+                <Box>{quizTitle}</Box>
+              )}
 
-                <Box fontSize="lg" fontWeight="bold">
-                  AI Quizzes
-                </Box>
-              </Flex>
-            </Link>
+              <IconButton
+                icon={isEditing ? <FiSave /> : <FiEdit />} // you can use a different icon to represent saving
+                variant="ghost"
+                color={'white'}
+                _hover={{ bg: 'gray.600' }}
+                onClick={() => setIsEditing(!isEditing)}
+                aria-label="Edit Quiz Title"
+              />
+            </Flex>
           )}
+
+          {quizPreviewTitle && <Box>{quizTitle}</Box>}
 
           {search && (
             <Flex
@@ -134,7 +185,7 @@ export default function WithSubnavigation({
           {preview && (
             <IconButton
               aria-label="Confirm Edit"
-              icon={<AiFillEye size={'1.5rem'} />}
+              icon={<AiFillEye color="white" size={'1.5rem'} />}
               variant="ghost"
               disabled={preview_disabled}
               _hover={{ bg: 'gray.700' }}
@@ -177,12 +228,14 @@ export default function WithSubnavigation({
                 color={'white'}
                 disabled={share_disabled}
                 onClick={() => {
-                  setIsOpen(true);
-                  va.track('share-quiz');
+                  va.track('publish-quiz');
+                  console.log('publishing quiz');
+                  // handlePublish();
+                  router.push(`/settings/${quizId}`);
                 }}
                 display={{ base: 'none', md: 'inline-flex' }}
               >
-                Share
+                Publish
               </Button>
 
               <AlertDialog

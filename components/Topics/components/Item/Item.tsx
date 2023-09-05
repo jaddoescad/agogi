@@ -1,47 +1,27 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames';
-import type {DraggableSyntheticListeners} from '@dnd-kit/core';
-import type {Transform} from '@dnd-kit/utilities';
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton
+} from '@chakra-ui/react';
+import { BiDotsHorizontalRounded } from 'react-icons/bi';
 
-import {Handle, Remove} from './components';
+import { Handle } from './components';
 
 import styles from './Item.module.css';
+import { Box } from '@chakra-ui/react';
+import { useDeleteTopicMutation } from 'hooks/useDeleteTopic';
+import { useEditTopicTitle } from 'hooks/useEditTopic';
+import { ItemProps } from 'types/types';
+import { updateSelectedTopic } from 'utils/supabase-client';
+import { useRouter } from 'next/router';
 
-export interface Props {
-  dragOverlay?: boolean;
-  color?: string;
-  disabled?: boolean;
-  dragging?: boolean;
-  handle?: boolean;
-  handleProps?: any;
-  height?: number;
-  index?: number;
-  fadeIn?: boolean;
-  transform?: Transform | null;
-  listeners?: DraggableSyntheticListeners;
-  sorting?: boolean;
-  style?: React.CSSProperties;
-  transition?: string | null;
-  wrapperStyle?: React.CSSProperties;
-  value: React.ReactNode;
-  onRemove?(): void;
-  renderItem?(args: {
-    dragOverlay: boolean;
-    dragging: boolean;
-    sorting: boolean;
-    index: number | undefined;
-    fadeIn: boolean;
-    listeners: DraggableSyntheticListeners;
-    ref: React.Ref<HTMLElement>;
-    style: React.CSSProperties | undefined;
-    transform: Props['transform'];
-    transition: Props['transition'];
-    value: Props['value'];
-  }): React.ReactElement;
-}
-
+// } = async (quizId: string, topicId: string)
 export const Item = React.memo(
-  React.forwardRef<HTMLLIElement, Props>(
+  React.forwardRef<HTMLDivElement, ItemProps>(
     (
       {
         color,
@@ -60,12 +40,48 @@ export const Item = React.memo(
         style,
         transition,
         transform,
-        value,
+        title,
         wrapperStyle,
+        quizId,
+        topicId,
+        selectedTopic,
+        setSelectedTopic,
         ...props
       },
       ref
     ) => {
+      const [isEditing, setIsEditing] = React.useState(false);
+      const [inputValue, setInputValue] = React.useState(
+        typeof title === 'string' ? title : ''
+      );
+
+      const router = useRouter();
+
+      const handleEdit = () => {
+        setIsEditing((prev) => !prev);
+      };
+
+      useEffect(() => {
+        if (typeof title === 'string') {
+          setInputValue(title);
+        }
+      }, [title]);
+
+      const handleSave = () => {
+        editTopicTitle(
+          { topicId: topicId.toString(), title: inputValue, quizId },
+          {
+            onSuccess: () => {
+              setIsEditing(false);
+            },
+            onError: (error) => {
+              // Handle the error, maybe by showing an error message to the user
+              console.error('Failed to edit topic title:', error);
+            }
+          }
+        );
+      };
+
       useEffect(() => {
         if (!dragOverlay) {
           return;
@@ -77,6 +93,9 @@ export const Item = React.memo(
           document.body.style.cursor = '';
         };
       }, [dragOverlay]);
+      const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+      const deleteTopic = useDeleteTopicMutation();
+      const { mutate: editTopicTitle } = useEditTopicTitle();
 
       return renderItem ? (
         renderItem({
@@ -90,12 +109,14 @@ export const Item = React.memo(
           style,
           transform,
           transition,
-          value,
+          title
         })
       ) : (
-        <li
+        <Box
+          display={'flex'}
+          boxSizing="border-box"
           className={classNames(
-            styles.Wrapper,
+            !isMenuOpen && styles.Wrapper,
             fadeIn && styles.fadeIn,
             sorting && styles.sorting,
             dragOverlay && styles.dragOverlay
@@ -119,36 +140,142 @@ export const Item = React.memo(
                 ? `${transform.scaleY}`
                 : undefined,
               '--index': index,
-              '--color': color,
+              '--color': color
             } as React.CSSProperties
           }
           ref={ref}
         >
-          <div
+          <Box
+            bg={selectedTopic === topicId ? 'teal' : 'transparent'}
+            color="white"
+            position="relative"
+            
+            display="flex"
+            flexGrow={1}
+            alignItems="center"
+            w="100%"
+            padding="3px 5px"
+            boxShadow="0 0 0 1px rgba(63, 63, 68, 0.05)"
+            outline="none"
+            borderRadius="4px"
+            boxSizing="border-box"
+            listStyleType="none"
+            transformOrigin="50% 50%"
+            fontWeight="400"
+            fontSize="1rem"
+            overflowWrap="break-word"
+            rounded={'lg'}
+
+
+
+            onClick={() => {
+              updateSelectedTopic(quizId, topicId.toString());
+              setSelectedTopic(topicId.toString());
+            }}
+            // transition="box-shadow 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22)"
+            style={{
+              boxShadow: '0 0 0 1px rgba(63, 63, 68, 0.05)',
+              transition:
+                'box-shadow 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22) !important'
+            }}
             className={classNames(
               styles.Item,
               dragging && styles.dragging,
-              handle && styles.withHandle,
-              dragOverlay && styles.dragOverlay,
-              disabled && styles.disabled,
-              color && styles.color
+              dragOverlay && styles.dragOverlay
             )}
-            style={style}
+            // style={style}
             data-cypress="draggable-item"
             {...(!handle ? listeners : undefined)}
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            {value}
-            <span className={styles.Actions}>
-              {onRemove ? (
-                <Remove className={styles.Remove} onClick={onRemove} />
-              ) : null}
+            <Box>
               {handle ? <Handle {...handleProps} {...listeners} /> : null}
-            </span>
-          </div>
-        </li>
+            </Box>
+            <Box flex={1}>
+              {isEditing ? (
+                <input
+                  value={inputValue} // This should be the value attribute
+                  onChange={(e) => setInputValue(e.target.value)} // Use e.target.value here
+                  onBlur={handleSave}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSave();
+                    }
+                  }}
+                  style={{
+                    // Add styling to make the input look like the original text.
+                    border: 'none',
+                    backgroundColor: 'transparent'
+                    // Add more styles or remove based on the original text's appearance.
+                  }}
+                  autoFocus // Automatically focus the input when it appears.
+                />
+              ) : (
+                `${title}`
+              )}
+            </Box>
+
+            <MoreOptionsMenu
+              onOpen={() => setIsMenuOpen(true)}
+              onClose={() => setIsMenuOpen(false)}
+              onEdit={handleEdit}
+              deleteTopic={() => {
+                // deleteTopic.mutate({ quizId, topicId: topicId.toString() })
+
+                // murtate and also alert if error
+                deleteTopic.mutate(
+                  { quizId, topicId: topicId.toString() },
+                  {
+                    onError: (error) => {
+                      alert(error.message);
+                    }
+                  }
+                );
+              }}
+            />
+          </Box>
+        </Box>
       );
     }
   )
+);
+
+const MoreOptionsMenu = ({ onOpen, onClose, deleteTopic, onEdit }) => (
+  <Menu onOpen={onOpen} onClose={onClose}>
+    <MenuButton
+      as={IconButton}
+      aria-label="Options"
+      icon={<BiDotsHorizontalRounded />}
+      size="sm"
+      variant="ghost"
+      color={'white'}
+      _hover={{ bg: 'gray.700' }}
+      _focus={{ bg: 'gray.700' }}
+      _active={{ bg: 'gray.700' }}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    />
+    <MenuList background={'gray.900'}>
+      <MenuItem
+        background={'gray.900'}
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit();
+        }}
+      >
+        Edit
+      </MenuItem>
+      <MenuItem
+        background={'gray.900'}
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteTopic();
+        }}
+      >
+        Delete
+      </MenuItem>
+    </MenuList>
+  </Menu>
 );

@@ -1,4 +1,7 @@
 import Stripe from 'stripe';
+import type { Transform } from '@dnd-kit/utilities';
+import { UniqueIdentifier } from '@dnd-kit/core';
+
 export interface PageMeta {
   title: string;
   description: string;
@@ -93,6 +96,50 @@ export type RequestData = {
   quizType: string;
   message: string;
   quizId: string;
+  topicId: string;
 };
 
 export type QuizType = 'true/false' | 'multiple-choice';
+import type { DraggableSyntheticListeners } from '@dnd-kit/core';
+
+export interface ItemProps {
+  dragOverlay?: boolean;
+  color?: string;
+  disabled?: boolean;
+  dragging?: boolean;
+  handle?: boolean;
+  handleProps?: any;
+  height?: number;
+  index?: number;
+  fadeIn?: boolean;
+  transform?: Transform | null;
+  listeners?: DraggableSyntheticListeners;
+  sorting?: boolean;
+  style?: React.CSSProperties;
+  transition?: string | null;
+  wrapperStyle?: React.CSSProperties;
+  title: React.ReactNode;
+  quizId: string;
+  topicId: UniqueIdentifier;
+  selectedTopic: string;
+  setSelectedTopic: React.Dispatch<React.SetStateAction<string>>;
+  onRemove?(): void;
+  renderItem?(args: {
+    dragOverlay: boolean;
+    dragging: boolean;
+    sorting: boolean;
+    index: number | undefined;
+    fadeIn: boolean;
+    listeners: DraggableSyntheticListeners;
+    ref: React.Ref<HTMLElement>;
+    style: React.CSSProperties | undefined;
+    transform: ItemProps['transform'];
+    transition: ItemProps['transition'];
+    title: ItemProps['title'];
+  }): React.ReactElement;
+}
+
+export type ItemType = {
+  id: UniqueIdentifier;
+  title: string;
+};

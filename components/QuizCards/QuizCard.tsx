@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import { Text, Center, VStack, Box } from '@chakra-ui/react';
+import { default_unpublished_img } from 'utils/constants';
+import { Image } from '@chakra-ui/react';
 
 export const QuizCard = ({
   quiz
@@ -10,10 +12,12 @@ export const QuizCard = ({
     title: string | null;
     questionCount: number;
     topicId: string;
+    selected_topic: string;
+    image_url?: string; // Add this if it's not already in your quiz type
   };
 }) => {
   return (
-    <Link href={`/generate/${quiz.id}/${quiz.selected_topic}`}>
+    // <Link href={`/generate/${quiz.id}`}>
       <Box
         justifyContent="space-between"
         alignItems="center"
@@ -29,6 +33,14 @@ export const QuizCard = ({
         h="12rem"
         w="12rem"
       >
+        <Image
+          src={quiz.image_url ?? default_unpublished_img}
+          alt={quiz.title ?? 'Untitled'}
+          boxSize="100px"
+          objectFit="cover"
+          borderRadius="full"
+          mb={3}
+        />
         <Text
           textAlign="center"
           size="md"
@@ -39,20 +51,7 @@ export const QuizCard = ({
         >
           {quiz.title ?? 'Untitled'}
         </Text>
-
-        <Box
-          bg="teal.600"
-          color="white"
-          fontWeight={'extrabold'}
-          borderRadius="full" // this provides maximum roundness
-          px={2.5}
-          py={1}
-        >
-          <Text textAlign="center" size="md" fontSize={'sm'}>
-            {quiz?.topics[0]?.count ?? 0}
-          </Text>
-        </Box>
       </Box>
-    </Link>
+    // </Link>
   );
 };
