@@ -138,7 +138,6 @@ export default function WithSubnavigation({
                 <Text fontSize="md" fontWeight="medium" ml="2" mr="1">
                   {`AGOGI`}
                 </Text>
-                <Text fontSize="md">{`- AI Generated Quizzes`}</Text>
               </Flex>
             </Link>
           )}
