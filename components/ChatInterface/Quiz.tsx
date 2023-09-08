@@ -11,7 +11,7 @@ import {
   IconButton
 } from '@chakra-ui/react';
 import va from '@vercel/analytics';
-import { Question } from 'types/types';
+import { Question, ShownAnswers } from 'types/types';
 import {
   VscTriangleRight,
   VscTriangleDown,
@@ -28,11 +28,14 @@ import { RenderContent } from 'components/RenderContent';
 import { deleteQuestion, deleteAllQuestionsOfTopic } from '../../utils/supabase-client';
 import DeleteConfirmationModal from 'components/deleteModal';
 
+
+
 export default function QuizPage({
   title = 'Untitled',
   questions,
   setTitle,
   setQuestions,
+  
 }: {
   title: string;
   questions: Question[];
@@ -40,8 +43,8 @@ export default function QuizPage({
   setQuestions: React.Dispatch<React.SetStateAction<Question[] | null>>;
 }) {
   const router = useRouter();
-  const { quizId } = router.query as { quizid: string };
-
+  const { quizId } = router.query as { quizId: string };
+  const [shownAnswers, setShownAnswers] = useState<ShownAnswers>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
@@ -71,7 +74,6 @@ export default function QuizPage({
     }
   };
 
-  const [shownAnswers, setShownAnswers] = useState({});
 
   const toggleAnswerVisibility = (index: number) => {
     setShownAnswers((prev) => ({

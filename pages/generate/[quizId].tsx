@@ -10,7 +10,7 @@ import {
   getQuizAndTopics,
   deleteAllQuestionsOfTopic
 } from 'utils/supabase-client';
-import { Question, Message } from 'types/types';
+import { Question, Message, MultipleChoiceQuestion } from 'types/types';
 import Navbar from 'components/ui/Navbar';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
@@ -19,7 +19,6 @@ import { getURL } from '@/utils/helpers';
 import { SideBar } from '../../components/Topics/Vertical';
 import { useGetQuizAndTopics } from 'hooks/useGetQuizAndTopics';
 import { checkQuizAndTopicExist } from 'utils/supabase-server';
-
 
 const init_message = {
   message: 'Hello! What type of quiz topic would you like to generate?',
@@ -47,13 +46,13 @@ export default function GenerateQuiz() {
 
   useEffect(() => {
     if (!quizId) return;
+    if (!selectedTopic) return;
     getMessages(selectedTopic).then((messages) => {
       setHistory([init_message, ...messages]);
     });
 
     getQuestions(selectedTopic).then((questions) => {
-      console.log('questions', questions);
-      setQuestions(questions);
+      setQuestions(questions as MultipleChoiceQuestion[]);
     });
   }, [selectedTopic]);
 
@@ -69,7 +68,7 @@ export default function GenerateQuiz() {
     }
 
     if (data.topics_order && data.topics) {
-      const topics = data.topics.filter((topic) =>
+      const topics = data.topics.filter((topic: any) =>
         data.topics_order.includes(topic.id)
       );
       setTopics(topics);
@@ -115,7 +114,7 @@ export default function GenerateQuiz() {
               quiz={questions}
               setQuiz={setQuestions}
               setCurrentPage={setCurrentPage}
-              topicId={selectedTopic}
+              topicId={selectedTopic as string}
             />
           </Flex>
 
@@ -130,6 +129,7 @@ export default function GenerateQuiz() {
               <Button
                 onClick={async () => {
                   try {
+                    if (!selectedTopic) return;
                     await deleteAllQuestionsOfTopic(selectedTopic);
                   } catch (error) {
                     console.error('Failed to delete all questions:', error);
@@ -141,10 +141,9 @@ export default function GenerateQuiz() {
                 Delete ALL Questions
               </Button>
               <QuizPage
-                questions={questions}
+                title={title || 'Untitled'}
+                questions={questions || []}
                 setTitle={setTitle}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
                 setQuestions={setQuestions}
               />
             </Box>

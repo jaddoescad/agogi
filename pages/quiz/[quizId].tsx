@@ -33,7 +33,7 @@ export default function Quiz() {
     try {
       setIsLoading(true);
       const refreshedQuestions = await getPublishedQuestions(selectedTopic);
-      setQuestions(refreshedQuestions);
+      setQuestions(refreshedQuestions as Question[]);
     } catch (error) {
       console.error('Failed to refresh questions:', error);
     } finally {
@@ -55,7 +55,7 @@ export default function Quiz() {
       if (topics_order && topics) {
         setTopicsOrder(topics_order);
         const topics_ = topics.sort(
-          (a, b) => topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
+          (a:any, b:any) => topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
         );
         setTopics(topics_);
         setSelectedTopic(topics_order[0]);
@@ -85,14 +85,13 @@ export default function Quiz() {
     <Box>
       <Preview
         topics={topics}
-        title={title}
-        selectedTopic={selectedTopic}
+        title={title || 'Untitled'}
+        selectedTopic={selectedTopic || topics[0]?.id}
         setSelectedTopic={setSelectedTopic}
         questions={questions}
-        topicTitle={topicTitle}
+        topicTitle={topicTitle || 'Untitled'}
         topicsOrder={topicsOrder}
       />
     </Box>
   );
 }
- 

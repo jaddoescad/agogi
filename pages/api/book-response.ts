@@ -88,7 +88,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       };
 
       return res.status(200).json(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       res.status(500).json({
         error: {

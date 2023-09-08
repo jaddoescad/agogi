@@ -36,48 +36,7 @@ import { Item } from './components';
 import { useCreateTopicMutation } from 'hooks/useCreateTopic';
 import { Box, Button } from '@chakra-ui/react';
 import { updateTopicOrder } from 'utils/supabase-client';
-import { ItemType } from 'types/types';
-
-export interface Props {
-  activationConstraint?: PointerActivationConstraint;
-  animateLayoutChanges?: AnimateLayoutChanges;
-  adjustScale?: boolean;
-  collisionDetection?: CollisionDetection;
-  coordinateGetter?: KeyboardCoordinateGetter;
-  Container?: any; // To-do: Fix me
-  dropAnimation?: DropAnimation | null;
-  getNewIndex?: NewIndexGetter;
-  handle?: boolean;
-  quizId: string;
-  itemCount?: number;
-  topics?: { id: UniqueIdentifier; title: string }[];
-  measuring?: MeasuringConfiguration;
-  modifiers?: Modifiers;
-  renderItem?: any;
-  removable?: boolean;
-  reorderItems?: typeof arrayMove;
-  strategy?: SortingStrategy;
-  style?: React.CSSProperties;
-  useDragOverlay?: boolean;
-  topicsOrder?: string[];
-  selectedTopic: string;
-  setSelectedTopic: React.Dispatch<React.SetStateAction<string>>;
-  getItemStyles?(args: {
-    id: UniqueIdentifier;
-    index: number;
-    isSorting: boolean;
-    isDragOverlay: boolean;
-    overIndex: number;
-    isDragging: boolean;
-  }): React.CSSProperties;
-  wrapperStyle?(args: {
-    active: Pick<Active, 'id'> | null;
-    index: number;
-    isDragging: boolean;
-    id: UniqueIdentifier;
-  }): React.CSSProperties;
-  isDisabled?(id: UniqueIdentifier): boolean;
-}
+import { ItemType, SortableProps, SortableItemProps } from 'types/types';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -114,7 +73,7 @@ export function Sortable({
   style,
   useDragOverlay = true,
   wrapperStyle = () => ({})
-}: Props) {
+}: SortableProps) {
   const [items, setItems] = useState<ItemType[]>([]);
 
   const handleReorder = (fromIndex: number, toIndex: number) => {
@@ -185,7 +144,7 @@ export function Sortable({
     createTopic.mutate(
       { quizId: quizId },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setItems((prevItems) => [...prevItems, data]);
         }
       }
@@ -308,28 +267,6 @@ export function Sortable({
   );
 }
 
-interface SortableItemProps {
-  animateLayoutChanges?: AnimateLayoutChanges;
-  disabled?: boolean;
-  getNewIndex?: NewIndexGetter;
-  id: UniqueIdentifier;
-  title: string;
-  index: number;
-  handle: boolean;
-  useDragOverlay?: boolean;
-  quizId: string;
-  setSelectedTopic: React.Dispatch<React.SetStateAction<string>>;
-  selectedTopic: string;
-  onRemove?(id: UniqueIdentifier): void;
-  style(values: any): React.CSSProperties;
-  renderItem?(args: any): React.ReactElement;
-  wrapperStyle?(args: {
-    active: Pick<Active, 'id'> | null;
-    index: number;
-    isDragging: boolean;
-    id: UniqueIdentifier;
-  }): React.CSSProperties;
-}
 
 export function SortableItem({
   disabled,

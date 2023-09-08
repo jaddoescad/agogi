@@ -12,12 +12,14 @@ import {
   Center
 } from '@chakra-ui/react';
 import Navbar from 'components/ui/Navbar/Navbar';
-import { RenderContent } from 'components/RenderContent';
-import { getQuestions } from 'utils/supabase-client';
-import { Question } from 'types/types';
-import { Spinner } from '@chakra-ui/react';
 import { useDisclosure } from '@chakra-ui/react';
 import { useMediaQuery } from '@chakra-ui/react';
+import {
+  PreviewQuizProps,
+  QuestionNavigationProps,
+  RadioButtonWrapperProps,
+  ControlButtonsProps
+} from 'types/types';
 
 export default function PreviewQuiz({
   topics,
@@ -27,15 +29,15 @@ export default function PreviewQuiz({
   questions,
   topicTitle,
   topicsOrder
-}) {
-  const [answers, setAnswers] = useState<(boolean | string)[]>([]);
+}: PreviewQuizProps) {
+  const [answers, setAnswers] = useState<(string)[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
 
-  const handleChange = (index: number, value: string | boolean) => {
+  const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
     newAnswers[index] = value;
     setAnswers(newAnswers);
@@ -84,7 +86,7 @@ export default function PreviewQuiz({
   };
 
   useEffect(() => {
-    console.log("ello", isLargerThan768)
+    console.log('ello', isLargerThan768);
     if (isLargerThan768) onOpen();
   }, [isLargerThan768]);
 
@@ -141,6 +143,7 @@ export default function PreviewQuiz({
                 submitted={submitted}
                 currentQuestionIndex={currentQuestionIndex}
                 questions={questions}
+                handleReset={handleReset}
               />
             </Box>
           ) : (
@@ -152,13 +155,13 @@ export default function PreviewQuiz({
   );
 }
 
-function RadioButtonWrapper({
+const RadioButtonWrapper: React.FC<RadioButtonWrapperProps> = ({
   value,
   currentAnswer,
   onChange,
   isDisabled,
   label
-}) {
+}) => {
   return (
     <Box
       border="1px solid"
@@ -191,14 +194,26 @@ function RadioButtonWrapper({
       </Text>
     </Box>
   );
-}
+};
 
 import { IconButton, Link } from '@chakra-ui/react';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import Logo from '@/components/icons/Logo';
 import { CloseButton } from '@chakra-ui/react';
 
-export const SideBar = ({ topics, onTopicClick, selectedTopic, onClose }) => {
+type SideBarProps = {
+  topics: any[];
+  onTopicClick: (id: string) => void;
+  selectedTopic: string | number;
+  onClose: () => void;
+};
+
+export const SideBar: React.FC<SideBarProps> = ({
+  topics,
+  onTopicClick,
+  selectedTopic,
+  onClose
+}) => {
   const handleTopicClick = (id: string) => {
     onTopicClick(id);
   };
@@ -258,7 +273,7 @@ export const SideBar = ({ topics, onTopicClick, selectedTopic, onClose }) => {
   );
 };
 
-export const QuestionNavigation = ({
+export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   topicTitle,
   topicsOrder,
   selectedTopic,
@@ -325,7 +340,16 @@ export const QuestionNavigation = ({
   );
 };
 
-export const QuestionBox = ({
+type QuestionBoxProps = {
+  currentQuestion: any;
+  handleChange: (index: number, value: string) => void;
+  currentQuestionIndex: number;
+  submitted: boolean;
+  feedback: string | null;
+  answers: string[];
+};
+
+export const QuestionBox: React.FC<QuestionBoxProps> = ({
   currentQuestion,
   handleChange,
   currentQuestionIndex,
@@ -375,12 +399,12 @@ export const QuestionBox = ({
         display={'flex'}
         flexDir={'column'}
       >
-        {currentQuestion.choices.map((choice, index) => (
+        {currentQuestion.choices.map((choice: string, index: number) => (
           <RadioButtonWrapper
             key={index}
             value={index.toString()}
             currentAnswer={answers[currentQuestionIndex]}
-            onChange={(val) => handleChange(currentQuestionIndex, val)}
+            onChange={(value: any) => handleChange(currentQuestionIndex, value.toString())}
             isDisabled={submitted}
             label={choice}
           />
@@ -390,12 +414,13 @@ export const QuestionBox = ({
   );
 };
 
-export const ControlButtons = ({
+export const ControlButtons: React.FC<ControlButtonsProps> = ({
   handlePreviousQuestion,
   handleNextQuestion,
   submitted,
   currentQuestionIndex,
-  questions
+  questions,
+  handleReset
 }) => {
   return (
     <Flex justifyContent="space-between">

@@ -28,6 +28,7 @@ import {
   ModalCloseButton,
   Button
 } from '@chakra-ui/react';
+import {MoreOptionsMenuProps, ModalDeleteProps} from 'types/types';
 
 // } = async (quizId: string, topicId: string)
 export const Item = React.memo(
@@ -156,13 +157,13 @@ export const Item = React.memo(
           }
           ref={ref}
         >
-          {ModalDelete(
-            isDeleteModalOpen,
-            setIsDeleteModalOpen,
-            deleteTopic,
-            quizId,
-            topicId
-          )}
+          <ModalDelete
+            isDeleteModalOpen={isDeleteModalOpen}
+            setIsDeleteModalOpen={setIsDeleteModalOpen}
+            deleteTopic={deleteTopic}
+            quizId={quizId}
+            topicId={topicId}
+          />
           <Box
             bg={selectedTopic === topicId ? 'teal' : 'transparent'}
             color="white"
@@ -245,52 +246,64 @@ export const Item = React.memo(
   )
 );
 
-const MoreOptionsMenu = ({ onOpen, onClose, deleteTopic, onEdit }) => (
-  <Menu onOpen={onOpen} onClose={onClose}>
-    <MenuButton
-      as={IconButton}
-      aria-label="Options"
-      icon={<BiDotsHorizontalRounded />}
-      size="sm"
-      variant="ghost"
-      color={'white'}
-      _hover={{ bg: 'gray.700' }}
-      _focus={{ bg: 'gray.700' }}
-      _active={{ bg: 'gray.700' }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    />
-    <MenuList background={'gray.900'}>
-      <MenuItem
-        background={'gray.900'}
-        onClick={(e) => {
-          e.stopPropagation();
-          onEdit();
-        }}
-      >
-        Edit
-      </MenuItem>
-      <MenuItem
-        background={'gray.900'}
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteTopic();
-        }}
-      >
-        Delete
-      </MenuItem>
-    </MenuList>
-  </Menu>
-);
 
-const ModalDelete = (
+
+const MoreOptionsMenu: React.FC<MoreOptionsMenuProps> = ({
+  onOpen,
+  onClose,
+  deleteTopic,
+  onEdit
+}) => {
+  return (
+    <Menu onOpen={onOpen} onClose={onClose}>
+      <MenuButton
+        as={IconButton}
+        aria-label="Options"
+        icon={<BiDotsHorizontalRounded />}
+        size="sm"
+        variant="ghost"
+        color={'white'}
+        _hover={{ bg: 'gray.700' }}
+        _focus={{ bg: 'gray.700' }}
+        _active={{ bg: 'gray.700' }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      />
+      <MenuList background={'gray.900'}>
+        <MenuItem
+          background={'gray.900'}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          background={'gray.900'}
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteTopic();
+          }}
+        >
+          Delete
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  );
+};
+
+
+
+
+const ModalDelete: React.FC<ModalDeleteProps> = ({
   isDeleteModalOpen,
   setIsDeleteModalOpen,
   deleteTopic,
   quizId,
   topicId
-) => {
+}) => {
   return (
     <Modal
       isOpen={isDeleteModalOpen}
@@ -309,7 +322,7 @@ const ModalDelete = (
               deleteTopic.mutate(
                 { quizId, topicId: topicId.toString() },
                 {
-                  onError: (error) => {
+                  onError: (error: any) => {
                     alert(error.message);
                   }
                 }

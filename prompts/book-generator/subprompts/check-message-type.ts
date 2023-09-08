@@ -1,4 +1,4 @@
-export const quizIntentionPrompt = (message) => {
+export const quizIntentionPrompt = (message: string) => {
     return `Objective: Respond with a JSON structure. If the user intends to generate quizzes, provide an array of 30 questions on the topic they specify. If they don't express such an intention, reply with a courteous message.
 
 Rules:
@@ -126,7 +126,7 @@ ${message}`;
 }
 
 
-export const questionPrompt = (question) => {
+export const questionPrompt = (question: string) => {
     return `
 Objective: Create a question-answer structure based on the provided question and choices. Identify the correct answer and present it as the index of the choices.
 

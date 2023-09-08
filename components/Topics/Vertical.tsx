@@ -1,11 +1,11 @@
 import React from 'react';
 import { verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import { Sortable, Props as SortableProps } from './Sortable';
+import { Sortable } from './Sortable';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { IoIosArrowBack } from 'react-icons/io';
-
+import { SortableProps , SideBarProps} from 'types/types';
 
 export default {
   title: 'Presets/Sortable/Vertical'
@@ -15,18 +15,25 @@ const props: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy
 };
 
-export const SideBar = ({
+
+export const SideBar: React.FC<SideBarProps> = ({
   topicList,
   quizId,
   topicsOrder,
   selectedTopic,
   setSelectedTopic
 }) => {
-
   return (
     <Box h={'100vh'} w={'350px'} overflow={'auto'} bg={'#0C0D0F'}>
-      <Link href="/quizzes" aria-label="Back to Quizzes" color='white'>
-        <Flex align="center" className="s.logo" cursor={'pointer'} color={'white'} paddingTop={'3'} paddingLeft={'2'}>
+      <Link href="/quizzes" aria-label="Back to Quizzes" color="white">
+        <Flex
+          align="center"
+          className="s.logo"
+          cursor={'pointer'}
+          color={'white'}
+          paddingTop={'3'}
+          paddingLeft={'2'}
+        >
           <IconButton
             aria-label="Back"
             icon={<IoIosArrowBack size={'25'} />}
@@ -49,7 +56,6 @@ export const SideBar = ({
         selectedTopic={selectedTopic}
         setSelectedTopic={setSelectedTopic}
       />
-      
     </Box>
   );
 };

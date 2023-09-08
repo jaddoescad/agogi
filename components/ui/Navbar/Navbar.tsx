@@ -19,14 +19,6 @@ import SearchBar from './SearchBar';
 import AccountDropdown from './AccountDropdown';
 import { AiFillEye } from 'react-icons/ai';
 import { IoIosArrowBack } from 'react-icons/io';
-import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay
-} from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { useClipboard } from '@chakra-ui/react';
 import { FiEdit, FiSave } from 'react-icons/fi';
@@ -40,11 +32,11 @@ export default function WithSubnavigation({
   preview = false,
   logo = false,
   logoBackToQuizzes = false,
-  quizId = null,
+  quizId,
   preview_disabled = false,
   share_disabled = false,
   share_Url = null,
-  quizTitle = null,
+  quizTitle,
   setQuizTitle = null,
   quizPreviewTitle,
   sidebarToggle,
@@ -57,7 +49,7 @@ export default function WithSubnavigation({
   preview?: boolean;
   logo?: boolean;
   logoBackToQuizzes?: boolean;
-  quizId?: string | null;
+  quizId?: string;
   preview_disabled?: boolean;
   share_disabled?: boolean;
   share_Url?: string | null;
@@ -65,23 +57,20 @@ export default function WithSubnavigation({
   setQuizTitle?: any;
   quizPreviewTitle?: boolean;
   sidebarToggle?: boolean;
-  onOpen?: (() => void);
+  onOpen?: () => void;
   isOpenNavbar?: boolean;
 }) {
   const { user } = useUser();
   const router = useRouter();
 
   // ...
-  const [isOpen, setIsOpen] = useState(false);
-  const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef();
-  const { hasCopied, onCopy } = useClipboard(share_Url);
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(quizTitle || '');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e:  React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSaveTitle();
     }
@@ -93,8 +82,8 @@ export default function WithSubnavigation({
     try {
       if (quizId) await publishQuiz(quizId);
       alert('Quiz published!');
-    } catch (err) {
-      alert(err.message);
+    } catch (err: any) {
+      alert(err?.message);
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +91,8 @@ export default function WithSubnavigation({
 
   const handleSaveTitle = async () => {
     try {
+      if (!quizId) return;
+      if (!quizTitle) return;
       await updateQuizTitle(quizId, quizTitle); // Assuming the updateQuizTitle requires the quizid and new title
       setInputValue(quizTitle); // Update inputValue with the new title
       setIsEditing(false);
@@ -127,7 +118,7 @@ export default function WithSubnavigation({
           {sidebarToggle && !isOpenNavbar && (
             <IconButton
               aria-label="Confirm Edit"
-              icon={<HamburgerIcon color="white" size={'1.5rem'} />}
+              icon={<HamburgerIcon color="white" />}
               variant="ghost"
               disabled={preview_disabled}
               _hover={{ bg: 'gray.700' }}
@@ -156,7 +147,7 @@ export default function WithSubnavigation({
             <Flex alignItems="center" gap={2}>
               {isEditing ? (
                 <Input
-                  value={quizTitle}
+                  value={quizTitle || ''}
                   onBlur={handleSaveTitle}
                   onChange={(e) => setQuizTitle(e.target.value)}
                   onKeyDown={handleKeyPress}
@@ -254,36 +245,6 @@ export default function WithSubnavigation({
               >
                 Publish
               </Button>
-
-              <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-              >
-                <AlertDialogOverlay>
-                  <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                      Share Quiz Link
-                    </AlertDialogHeader>
-
-                    <AlertDialogBody>
-                      <Stack spacing={2}>
-                        <Text fontWeight="bold">Link</Text>
-                        <Input fontWeight={500} value={share_Url} isReadOnly />
-                      </Stack>
-                    </AlertDialogBody>
-
-                    <AlertDialogFooter>
-                      <Button ref={cancelRef} onClick={onClose}>
-                        Cancel
-                      </Button>
-                      <Button colorScheme="blue" onClick={onCopy} ml={3}>
-                        {hasCopied ? 'Copied' : 'Copy'}
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialogOverlay>
-              </AlertDialog>
             </>
           )}
           {user ? (

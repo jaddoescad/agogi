@@ -59,7 +59,7 @@ export const insertQuizOrDonothing = async (
 
 export const insertQuestions = async (
   supabase: SupabaseClient<any, 'public', any>,
-  questions: [Question],
+  questions: Question[],
   topicId: string,
   quizType: string
 ) => {
