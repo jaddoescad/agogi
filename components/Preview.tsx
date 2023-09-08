@@ -36,6 +36,7 @@ export default function PreviewQuiz({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const displayValue = useBreakpointValue({ base: 'none', md: 'block' });
 
@@ -88,12 +89,12 @@ export default function PreviewQuiz({
   };
 
   useEffect(() => {
-    console.log('ello', isLargerThan768);
     if (isLargerThan768) onOpen();
-  }, [isLargerThan768]);
+    if (isSmallerThan768) onClose();
+  }, [isLargerThan768, isSmallerThan768]);
 
   return (
-    <Flex minWidth={['100%', '100%', '1000px']}>
+    <Flex minWidth={['100%', '100%', '100%']}>
       {isOpen && (
         <SideBar
           topics={topics}
@@ -103,7 +104,14 @@ export default function PreviewQuiz({
         />
       )}
 
-      <Box  display="flex" flexDir={"column"} w="100%" bg="gray.900" color="white" h="100vh">
+      <Box
+        display="flex"
+        flexDir={'column'}
+        w="100%"
+        bg="gray.900"
+        color="white"
+        h="100vh"
+      >
         <Navbar
           isOpenNavbar={isOpen}
           quizTitle={title}
@@ -113,15 +121,14 @@ export default function PreviewQuiz({
         />
 
         <Box
-          margin={['0', 'auto']}
-          maxW={['100%', '600px']}
           w={'100%'}
           overflow={'scroll'}
           flex={1}
           p={5}
         >
           {questions && questions.length > 0 ? (
-            <Box pt={5}>
+            <Box           margin={['0', 'auto']}
+            maxW={['100%', '600px']} pt={5}>
               <QuestionNavigation
                 topicTitle={topicTitle}
                 topicsOrder={topicsOrder}
