@@ -103,7 +103,7 @@ export default function PreviewQuiz({
         />
       )}
 
-      <Box w="100%" bg="gray.900" color="white" h="100vh">
+      <Box  display="flex" flexDir={"column"} w="100%" bg="gray.900" color="white" h="100vh">
         <Navbar
           isOpenNavbar={isOpen}
           quizTitle={title}
@@ -117,6 +117,7 @@ export default function PreviewQuiz({
           maxW={['100%', '600px']}
           w={'100%'}
           overflow={'scroll'}
+          flex={1}
           p={5}
         >
           {questions && questions.length > 0 ? (
