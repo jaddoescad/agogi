@@ -41,7 +41,7 @@ const Form = ({
     e: React.KeyboardEvent<HTMLTextAreaElement> &
       React.FormEvent<HTMLFormElement>
   ) => {
-    if (e.key === 'Enter' && isLoading === false) {
+    if (e.key === 'Enter' && !e.shiftKey && isLoading === false) {
       e.preventDefault();
       // setIsLoading(true);
       handleSubmit(e);
@@ -74,7 +74,7 @@ const Form = ({
 
     try {
       let response = await postData({
-        url: '/api/gpt-response',
+        url: '/api/book-response',
         data: {
           message,
           quizId,
@@ -85,13 +85,13 @@ const Form = ({
       if (response !== undefined) {
         setHistory((prev) => [
           ...prev,
-          { message: response['ai_response']['message'], type: 'ai' }
+          { message: response['message'], type: 'ai' }
         ]);
 
-        if (response.quiz_response) {
+        if (response.questions) {
           const newQuestions = quiz
-            ? [...quiz, ...response.quiz_response.questions]
-            : response.quiz_response.questions;
+            ? [...quiz, ...response.questions]
+            : response.questions;
           setQuiz(newQuestions);
           setCurrentPage(Math.ceil(newQuestions.length / 5));
         }

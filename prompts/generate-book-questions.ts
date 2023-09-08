@@ -6,20 +6,15 @@ import {mathNotationInstructions, codeNotation} from './quiz-generator/subprompt
 
 
 
-export const generateTrueAndFalsePrompt = (
-    past_questions: string,
+export const generateBookQuestions = (
     message: string,
   ) => {
     return (
       introAndSystemMessage(message) +
       TrueOrFalseQuizPrompt() +
       rules() +
-      mathNotationInstructions() +
-      codeNotation() +
       sampleUserInputTopic() +
       sampleUserInputGreeting() +
-      trueFalseMathSample() +
-      sampleUserInputCodingWithTrueFalseCodeblockAnswer()+
-      history(past_questions)
+      sampleUserInputCodingWithTrueFalseCodeblockAnswer()
     );
   };

@@ -452,3 +452,17 @@ export const uploadImageUrl = async (quizId: string, url: string) => {
 
   return data ?? [];
 };
+
+
+export const deleteAllQuestionsOfTopic = async (topicId: string) => {
+  const {data, error} = await supabase.from('questions').delete().eq('topic_id', topicId);
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+
+}
+  

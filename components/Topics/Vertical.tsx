@@ -6,6 +6,7 @@ import { Box, Flex, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { IoIosArrowBack } from 'react-icons/io';
 
+
 export default {
   title: 'Presets/Sortable/Vertical'
 };
@@ -21,6 +22,7 @@ export const SideBar = ({
   selectedTopic,
   setSelectedTopic
 }) => {
+
   return (
     <Box h={'100vh'} w={'350px'} overflow={'auto'} bg={'#0C0D0F'}>
       <Link href="/quizzes" aria-label="Back to Quizzes" color='white'>

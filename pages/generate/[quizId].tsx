@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Form from '../../components/ChatInterface/Form';
 import QuizPage from '../../components/ChatInterface/Quiz';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Button, Flex } from '@chakra-ui/react';
 import Router, { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import {
   getMessages,
   getQuestions,
-  getQuizAndTopics
+  getQuizAndTopics,
+  deleteAllQuestionsOfTopic
 } from 'utils/supabase-client';
 import { Question, Message } from 'types/types';
 import Navbar from 'components/ui/Navbar';
@@ -18,6 +19,7 @@ import { getURL } from '@/utils/helpers';
 import { SideBar } from '../../components/Topics/Vertical';
 import { useGetQuizAndTopics } from 'hooks/useGetQuizAndTopics';
 import { checkQuizAndTopicExist } from 'utils/supabase-server';
+
 
 const init_message = {
   message: 'Hello! What type of quiz topic would you like to generate?',
@@ -33,7 +35,6 @@ export default function GenerateQuiz() {
   const [currentPage, setCurrentPage] = useState(1);
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-
   const {
     data,
     isLoading: isQuizLoading,
@@ -51,7 +52,7 @@ export default function GenerateQuiz() {
     });
 
     getQuestions(selectedTopic).then((questions) => {
-      console.log("questions", questions)
+      console.log('questions', questions);
       setQuestions(questions);
     });
   }, [selectedTopic]);
@@ -117,6 +118,7 @@ export default function GenerateQuiz() {
               topicId={selectedTopic}
             />
           </Flex>
+
           <Flex
             flex={1}
             bg="gray.900"
@@ -124,13 +126,28 @@ export default function GenerateQuiz() {
             justifyContent="center"
             h={'100%'}
           >
-            <QuizPage
-              questions={questions}
-              setTitle={setTitle}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              setQuestions={setQuestions}
-            />
+            <Box w="100%" color="white" h={'100%'}>
+              <Button
+                onClick={async () => {
+                  try {
+                    await deleteAllQuestionsOfTopic(selectedTopic);
+                  } catch (error) {
+                    console.error('Failed to delete all questions:', error);
+                  } finally {
+                    setQuestions([]);
+                  }
+                }}
+              >
+                Delete ALL Questions
+              </Button>
+              <QuizPage
+                questions={questions}
+                setTitle={setTitle}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                setQuestions={setQuestions}
+              />
+            </Box>
           </Flex>
         </Flex>
       </Box>

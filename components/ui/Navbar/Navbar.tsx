@@ -31,6 +31,7 @@ import React, { useRef } from 'react';
 import { useClipboard } from '@chakra-ui/react';
 import { FiEdit, FiSave } from 'react-icons/fi';
 import { updateQuizTitle } from 'utils/supabase-client';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 export default function WithSubnavigation({
   search = false,
@@ -45,7 +46,10 @@ export default function WithSubnavigation({
   share_Url = null,
   quizTitle = null,
   setQuizTitle = null,
-  quizPreviewTitle
+  quizPreviewTitle,
+  sidebarToggle,
+  onOpen,
+  isOpenNavbar
 }: {
   search?: boolean;
   generate?: boolean;
@@ -60,6 +64,9 @@ export default function WithSubnavigation({
   quizTitle?: string | null;
   setQuizTitle?: any;
   quizPreviewTitle?: boolean;
+  sidebarToggle?: boolean;
+  onOpen?: (() => void);
+  isOpenNavbar?: boolean;
 }) {
   const { user } = useUser();
   const router = useRouter();
@@ -117,6 +124,16 @@ export default function WithSubnavigation({
         mx="auto"
       >
         <Flex flex={{ base: 1 }} justify={{ md: 'start' }} align="center">
+          {sidebarToggle && !isOpenNavbar && (
+            <IconButton
+              aria-label="Confirm Edit"
+              icon={<HamburgerIcon color="white" size={'1.5rem'} />}
+              variant="ghost"
+              disabled={preview_disabled}
+              _hover={{ bg: 'gray.700' }}
+              onClick={onOpen}
+            />
+          )}
           {logo && (
             <Link href="/" className="s.logo" aria-label="Logo">
               <Flex

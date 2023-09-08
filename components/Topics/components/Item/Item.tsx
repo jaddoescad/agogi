@@ -18,6 +18,16 @@ import { useEditTopicTitle } from 'hooks/useEditTopic';
 import { ItemProps } from 'types/types';
 import { updateSelectedTopic } from 'utils/supabase-client';
 import { useRouter } from 'next/router';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button
+} from '@chakra-ui/react';
 
 // } = async (quizId: string, topicId: string)
 export const Item = React.memo(
@@ -54,6 +64,7 @@ export const Item = React.memo(
       const [inputValue, setInputValue] = React.useState(
         typeof title === 'string' ? title : ''
       );
+      const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
       const router = useRouter();
 
@@ -145,11 +156,17 @@ export const Item = React.memo(
           }
           ref={ref}
         >
+          {ModalDelete(
+            isDeleteModalOpen,
+            setIsDeleteModalOpen,
+            deleteTopic,
+            quizId,
+            topicId
+          )}
           <Box
             bg={selectedTopic === topicId ? 'teal' : 'transparent'}
             color="white"
             position="relative"
-            
             display="flex"
             flexGrow={1}
             alignItems="center"
@@ -165,9 +182,6 @@ export const Item = React.memo(
             fontSize="1rem"
             overflowWrap="break-word"
             rounded={'lg'}
-
-
-
             onClick={() => {
               updateSelectedTopic(quizId, topicId.toString());
               setSelectedTopic(topicId.toString());
@@ -221,17 +235,7 @@ export const Item = React.memo(
               onClose={() => setIsMenuOpen(false)}
               onEdit={handleEdit}
               deleteTopic={() => {
-                // deleteTopic.mutate({ quizId, topicId: topicId.toString() })
-
-                // murtate and also alert if error
-                deleteTopic.mutate(
-                  { quizId, topicId: topicId.toString() },
-                  {
-                    onError: (error) => {
-                      alert(error.message);
-                    }
-                  }
-                );
+                setIsDeleteModalOpen(true);
               }}
             />
           </Box>
@@ -279,3 +283,47 @@ const MoreOptionsMenu = ({ onOpen, onClose, deleteTopic, onEdit }) => (
     </MenuList>
   </Menu>
 );
+
+const ModalDelete = (
+  isDeleteModalOpen,
+  setIsDeleteModalOpen,
+  deleteTopic,
+  quizId,
+  topicId
+) => {
+  return (
+    <Modal
+      isOpen={isDeleteModalOpen}
+      onClose={() => setIsDeleteModalOpen(false)}
+    >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Confirm Deletion</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>Are you sure you want to delete this topic?</ModalBody>
+        <ModalFooter>
+          <Button
+            colorScheme="red"
+            mr={3}
+            onClick={() => {
+              deleteTopic.mutate(
+                { quizId, topicId: topicId.toString() },
+                {
+                  onError: (error) => {
+                    alert(error.message);
+                  }
+                }
+              );
+              setIsDeleteModalOpen(false); // Close modal after deletion
+            }}
+          >
+            Delete
+          </Button>
+          <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};

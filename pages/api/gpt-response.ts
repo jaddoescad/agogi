@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { generateMultipleChoiceFullPrompt } from '../../prompts/multiple-choice-sys-mes';
+import { generateMultipleChoiceFullPrompt } from '../../prompts/quiz-generator/multiple-choice-sys-mes';
 import { generateTrueAndFalsePrompt } from '../../prompts/true-false-sys-mes';
 import {
   saveMessage,
@@ -22,44 +22,30 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       modelName: 'gpt-3.5-turbo-16k'
     });
 
-    const { message, quizId, quizType, topicId } = (await req.body) as RequestData;
+    const { message, quizId, quizType, topicId } =
+      (await req.body) as RequestData;
 
     try {
-      console.log("topicId", topicId);
       await insertQuizOrDonothing(supabaseServerClient, quizId);
       await saveMessage(supabaseServerClient, message, topicId, 'user');
       const questions = await fetchQuestions(supabaseServerClient, topicId);
-      const messages = await fetchMessages(supabaseServerClient, topicId);
 
-
-      var prompt;
       const past_questions = JSON.stringify(questions);
-      const past_messages = JSON.stringify(messages);
 
-      const prompt = 
-      quizType ?
-      generateMultipleChoiceFullPrompt(
-        past_questions,
-        past_messages,
-        message,
-      ) :
-      generateTrueAndFalsePrompt(
-        past_questions,
-        past_messages,
-        message,
-      );
-
+      const prompt = quizType
+        ? generateMultipleChoiceFullPrompt(past_questions, message)
+        : generateTrueAndFalsePrompt(past_questions, message);
       const result = await llm.predict(prompt);
       const result_json = JSON.parse(result);
-      for (let q of result_json.quiz_response.questions) {
-        q.id = uuidv4(); // Generating and attaching a UUID to each question
-    }
 
       if (
         result_json.quiz_response &&
         result_json.quiz_response.questions &&
         result_json.quiz_response.questions.length > 0
       ) {
+        for (let q of result_json.quiz_response.questions) {
+          q.id = uuidv4(); // Generating and attaching a UUID to each question
+        }
         await insertQuestions(
           supabaseServerClient,
           result_json.quiz_response.questions,
@@ -67,7 +53,6 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           quizType
         );
       }
-
 
       if (result_json.ai_response) {
         await saveMessage(

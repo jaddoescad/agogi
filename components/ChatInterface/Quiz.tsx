@@ -25,14 +25,14 @@ import { Spinner } from '@chakra-ui/react';
 import { css_scroll } from 'styles/chakra-css-styles.js';
 import React from 'react';
 import { RenderContent } from 'components/RenderContent';
-import { deleteQuestion } from '../../utils/supabase-client';
+import { deleteQuestion, deleteAllQuestionsOfTopic } from '../../utils/supabase-client';
 import DeleteConfirmationModal from 'components/deleteModal';
 
 export default function QuizPage({
   title = 'Untitled',
   questions,
   setTitle,
-  setQuestions
+  setQuestions,
 }: {
   title: string;
   questions: Question[];
@@ -47,6 +47,8 @@ export default function QuizPage({
   const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
     null
   );
+
+
 
   useEffect(() => {
     if (quizId) {
@@ -106,6 +108,7 @@ export default function QuizPage({
       // marginTop={'100px'}
     >
       <Box margin={'auto'} maxW={'600px'} w={'100%'}>
+
         <Box m={4} mt={20}>
           {questions &&
             questions.map((item, index) => (

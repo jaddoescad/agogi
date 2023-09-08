@@ -16,19 +16,24 @@ import { RenderContent } from 'components/RenderContent';
 import { getQuestions } from 'utils/supabase-client';
 import { Question } from 'types/types';
 import { Spinner } from '@chakra-ui/react';
+import { useDisclosure } from '@chakra-ui/react';
+import { useMediaQuery } from '@chakra-ui/react';
 
 export default function PreviewQuiz({
-  quizId,
   topics,
   title,
   selectedTopic,
   setSelectedTopic,
   questions,
+  topicTitle,
+  topicsOrder
 }) {
   const [answers, setAnswers] = useState<(boolean | string)[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
+  const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
 
   const handleChange = (index: number, value: string | boolean) => {
     const newAnswers = [...answers];
@@ -38,6 +43,20 @@ export default function PreviewQuiz({
       setFeedback('Correct');
     } else {
       setFeedback('Incorrect');
+    }
+  };
+
+  const goToNextTopic = () => {
+    const currentIndex = topicsOrder.indexOf(selectedTopic);
+    if (currentIndex < topicsOrder.length - 1) {
+      setSelectedTopic(topicsOrder[currentIndex + 1]);
+    }
+  };
+
+  const goToPreviousTopic = () => {
+    const currentIndex = topicsOrder.indexOf(selectedTopic);
+    if (currentIndex > 0) {
+      setSelectedTopic(topicsOrder[currentIndex - 1]);
     }
   };
 
@@ -64,117 +83,65 @@ export default function PreviewQuiz({
     setFeedback(null); // reset feedback
   };
 
+  useEffect(() => {
+    console.log("ello", isLargerThan768)
+    if (isLargerThan768) onOpen();
+  }, [isLargerThan768]);
+
   return (
     <Flex minWidth={'1000px'}>
-      <SideBar
-        topics={topics}
-        onTopicClick={setSelectedTopic}
-        selectedTopic={selectedTopic}
-      />
+      {isOpen && (
+        <SideBar
+          topics={topics}
+          onTopicClick={setSelectedTopic}
+          selectedTopic={selectedTopic}
+          onClose={onClose}
+        />
+      )}
+
       <Box w="100%" bg="gray.900" color="white">
-        <Navbar quizTitle={title} quizPreviewTitle />
+        <Navbar
+          isOpenNavbar={isOpen}
+          quizTitle={title}
+          quizPreviewTitle
+          sidebarToggle
+          onOpen={onOpen}
+        />
 
         <Box h="calc(100vh - 60px)" margin={'auto'} maxW={'600px'} w={'100%'}>
           {questions && questions.length > 0 ? (
             <Box pt={14}>
-              <Progress value={progress} size="md" colorScheme="blue" mb={4} />
+              <QuestionNavigation
+                topicTitle={topicTitle}
+                topicsOrder={topicsOrder}
+                selectedTopic={selectedTopic}
+                goToNextTopic={goToNextTopic}
+                goToPreviousTopic={goToPreviousTopic}
+              />
 
-              <Box
-                border="1px"
-                p={4}
-                mb={2}
-                w="100%"
-                borderRadius="lg"
-                bg="gray.800"
-                boxShadow="md"
-              >
-                <Text fontSize="lg" color="white">
-                  <RenderContent
-                    content={`${questions[currentQuestionIndex].question}`}
-                  />
-                </Text>
-                <Text
-                  mt={2}
-                  fontSize="md"
-                  color={feedback === 'Correct' ? 'green.500' : 'red.500'}
-                >
-                  {feedback}
-                </Text>
-                {submitted && (
-                  <Text
-                    mt={2}
-                    fontSize="md"
-                    color={
-                      questions[
-                        currentQuestionIndex
-                      ].correctAnswer.toString() ===
-                      answers[currentQuestionIndex]
-                        ? 'green.500'
-                        : 'red.500'
-                    }
-                  >
-                    Correct answer:{' '}
-                    {
-                      questions[currentQuestionIndex].choices[
-                        questions[currentQuestionIndex].correctAnswer
-                      ]
-                    }
-                  </Text>
-                )}
+              <Progress
+                value={progress}
+                size="md"
+                colorScheme="blue"
+                mb={4}
+                mt={4}
+              />
 
-                <RadioGroup
-                  mt={4}
-                  onChange={(value) =>
-                    handleChange(currentQuestionIndex, value)
-                  }
-                  value={answers[currentQuestionIndex]}
-                  display={'flex'}
-                  flexDir={'column'}
-                >
-                  {questions[currentQuestionIndex]?.choices?.map(
-                    (choice, index) => {
-                      return (
-                        <Box key={index}>
-                          <RadioButtonWrapper
-                            value={index.toString()} // Convert index to string to comply with RadioGroup expectations
-                            currentAnswer={answers[currentQuestionIndex]}
-                            onChange={(val) =>
-                              handleChange(currentQuestionIndex, val)
-                            }
-                            isDisabled={submitted}
-                            label={choice}
-                          />
-                        </Box>
-                      );
-                    }
-                  )}
-                </RadioGroup>
-              </Box>
-              <Flex justifyContent="space-between">
-                <Button
-                  mt={4}
-                  mx={2} // added margin for separation
-                  display={'block'}
-                  bg="blue.500"
-                  color="white"
-                  rounded={'true'}
-                  onClick={handlePreviousQuestion}
-                  isDisabled={currentQuestionIndex === 0 || submitted} // disable if it's the first question or quiz is submitted
-                >
-                  Back
-                </Button>
-                <Button
-                  mt={4}
-                  mx={2}
-                  display={'block'}
-                  bg="blue.500"
-                  color="white"
-                  rounded={'true'}
-                  onClick={!submitted ? handleNextQuestion : handleReset}
-                >
-                  {!submitted ? 'Next' : 'Try Again'}
-                </Button>
-              </Flex>
+              <QuestionBox
+                currentQuestion={questions[currentQuestionIndex]}
+                handleChange={handleChange}
+                currentQuestionIndex={currentQuestionIndex}
+                submitted={submitted}
+                feedback={feedback}
+                answers={answers}
+              />
+              <ControlButtons
+                handlePreviousQuestion={handlePreviousQuestion}
+                handleNextQuestion={handleNextQuestion}
+                submitted={submitted}
+                currentQuestionIndex={currentQuestionIndex}
+                questions={questions}
+              />
             </Box>
           ) : (
             <Text>No questions available.</Text>
@@ -227,17 +194,18 @@ function RadioButtonWrapper({
 }
 
 import { IconButton, Link } from '@chakra-ui/react';
-import { IoIosArrowBack } from 'react-icons/io';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import Logo from '@/components/icons/Logo';
+import { CloseButton } from '@chakra-ui/react';
 
-export const SideBar = ({ topics, onTopicClick, selectedTopic }) => {
+export const SideBar = ({ topics, onTopicClick, selectedTopic, onClose }) => {
   const handleTopicClick = (id: string) => {
     onTopicClick(id);
   };
 
   return (
     <Box h={'100vh'} w={'350px'} overflow={'auto'} bg={'#0C0D0F'}>
-      <Link href="/" aria-label="Back to Quizzes" color="white">
+      <Box aria-label="Back to Quizzes" color="white">
         <Flex
           align="center"
           p="5"
@@ -246,29 +214,212 @@ export const SideBar = ({ topics, onTopicClick, selectedTopic }) => {
           }}
           cursor={'pointer'}
         >
-          <Logo />
-          <Text fontSize="md" fontWeight="medium" ml="2" mr="1">
-            {`AGOGI`}
-          </Text>
-          {/* <Text fontSize="md">{`- AI Generated Quizzes`}</Text> */}
+          <Link href="/">
+            <Flex
+              align="center"
+              _hover={{
+                textDecoration: 'none'
+              }}
+              cursor={'pointer'}
+            >
+              <Logo />
+              <Text fontSize="md" fontWeight="medium" ml="2" mr="1">
+                {`AGOGI`}
+              </Text>
+            </Flex>
+          </Link>
+          <CloseButton ml="auto" color={'white'} onClick={onClose} />
         </Flex>
-      </Link>
+      </Box>
       {topics.map((topic, index) => (
-        <Button
+        <Box
           key={topic.id}
           pl={6}
-          py={8}
+          pr={6}
+          py={4}
           color="white"
           bg={selectedTopic === topic.id ? 'teal' : 'transparent'}
           onClick={() => handleTopicClick(topic.id)}
           _hover={{ bg: selectedTopic === topic.id ? 'teal' : 'gray.700' }}
-          // _active={{ bg: 'gray.700' }}
+          position="relative"
+          display="flex"
+          flexGrow={1}
+          alignItems="center"
           w="100%"
+          fontWeight="500"
+          fontSize="1rem"
+          overflowWrap="break-word"
           justifyContent="flex-start"
         >
           {topic.title}
-        </Button>
+        </Box>
       ))}
     </Box>
+  );
+};
+
+export const QuestionNavigation = ({
+  topicTitle,
+  topicsOrder,
+  selectedTopic,
+  goToNextTopic,
+  goToPreviousTopic
+}) => {
+  return (
+    <Flex
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      width="100%"
+    >
+      <Box
+        display="flex"
+        onClick={goToPreviousTopic}
+        flexDirection="column"
+        alignItems="center"
+        cursor={'pointer'}
+      >
+        <IconButton
+          icon={<IoIosArrowBack />}
+          aria-label="Previous Chapter"
+          isDisabled={topicsOrder.indexOf(selectedTopic) === 0}
+          rounded={'full'}
+        />
+        <Text
+          fontSize={'smaller'}
+          fontWeight={'bold'}
+          mt={2}
+          textAlign="center"
+        >
+          Previous Chapter
+        </Text>
+      </Box>
+      <Heading as="h1" size="md" m={4} textAlign="center">
+        {topicTitle}
+      </Heading>
+      <Box
+        cursor={'pointer'}
+        display="flex"
+        onClick={goToNextTopic}
+        flexDirection="column"
+        alignItems="center"
+      >
+        <IconButton
+          icon={<IoIosArrowForward />}
+          aria-label="Next Chapter"
+          rounded={'full'}
+          isDisabled={
+            topicsOrder.indexOf(selectedTopic) === topicsOrder.length - 1
+          }
+        />
+        <Text
+          fontSize={'smaller'}
+          fontWeight={'bold'}
+          mt={2}
+          textAlign="center"
+        >
+          Next Chapter
+        </Text>
+      </Box>
+    </Flex>
+  );
+};
+
+export const QuestionBox = ({
+  currentQuestion,
+  handleChange,
+  currentQuestionIndex,
+  submitted,
+  feedback,
+  answers
+}) => {
+  return (
+    <Box
+      border="1px"
+      p={4}
+      mb={2}
+      w="100%"
+      borderRadius="lg"
+      bg="gray.800"
+      boxShadow="md"
+    >
+      <Text fontSize="lg" color="white">
+        {currentQuestion.question}
+      </Text>
+      <Text
+        mt={2}
+        fontSize="md"
+        color={feedback === 'Correct' ? 'green.500' : 'red.500'}
+      >
+        {feedback}
+      </Text>
+      {submitted && (
+        <Text
+          mt={2}
+          fontSize="md"
+          color={
+            currentQuestion.correctAnswer.toString() ===
+            answers[currentQuestionIndex]
+              ? 'green.500'
+              : 'red.500'
+          }
+        >
+          Correct answer:{' '}
+          {currentQuestion.choices[currentQuestion.correctAnswer]}
+        </Text>
+      )}
+      <RadioGroup
+        mt={4}
+        onChange={(value) => handleChange(currentQuestionIndex, value)}
+        value={answers[currentQuestionIndex]}
+        display={'flex'}
+        flexDir={'column'}
+      >
+        {currentQuestion.choices.map((choice, index) => (
+          <RadioButtonWrapper
+            key={index}
+            value={index.toString()}
+            currentAnswer={answers[currentQuestionIndex]}
+            onChange={(val) => handleChange(currentQuestionIndex, val)}
+            isDisabled={submitted}
+            label={choice}
+          />
+        ))}
+      </RadioGroup>
+    </Box>
+  );
+};
+
+export const ControlButtons = ({
+  handlePreviousQuestion,
+  handleNextQuestion,
+  submitted,
+  currentQuestionIndex,
+  questions
+}) => {
+  return (
+    <Flex justifyContent="space-between">
+      <Button
+        mt={4}
+        mx={2}
+        bg="blue.500"
+        color="white"
+        rounded={'true'}
+        onClick={handlePreviousQuestion}
+        isDisabled={currentQuestionIndex === 0 || submitted}
+      >
+        Back
+      </Button>
+      <Button
+        mt={4}
+        mx={2}
+        bg="blue.500"
+        color="white"
+        rounded={'true'}
+        onClick={!submitted ? handleNextQuestion : handleReset}
+      >
+        {!submitted ? 'Next' : 'Try Again'}
+      </Button>
+    </Flex>
   );
 };

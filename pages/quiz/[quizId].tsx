@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
+import { Box, Button } from '@chakra-ui/react';
 
 export default function Quiz() {
   const quizId = useRouter().query.quizId as string;
@@ -12,6 +13,9 @@ export default function Quiz() {
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [topicTitle, setTopicTitle] = useState<string | null>('');
+  const [topicsOrder, setTopicsOrder] = useState<string[]>([]);
 
   const {
     data,
@@ -23,8 +27,23 @@ export default function Quiz() {
     isError: boolean;
   };
 
+  const refreshQuestions = async () => {
+    if (!selectedTopic) return;
+
+    try {
+      setIsLoading(true);
+      const refreshedQuestions = await getPublishedQuestions(selectedTopic);
+      setQuestions(refreshedQuestions);
+    } catch (error) {
+      console.error('Failed to refresh questions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!data) return;
+    setIsLoading(true);
     if (data.title) {
       setTitle(data.title);
     }
@@ -34,39 +53,46 @@ export default function Quiz() {
 
     if (quizzes_snapshot) {
       if (topics_order && topics) {
+        setTopicsOrder(topics_order);
         const topics_ = topics.sort(
           (a, b) => topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
         );
         setTopics(topics_);
         setSelectedTopic(topics_order[0]);
+      } else {
+        console.error('Failed to load quiz');
+        setIsLoading(false);
       }
+    } else {
+      console.error('Failed to load quiz');
+      setIsLoading(false);
     }
   }, [data]);
 
   useEffect(() => {
-    if (!selectedTopic) return;
-    getPublishedQuestions(selectedTopic).then((questions) => {
-      setQuestions(questions);
-    });
+    refreshQuestions();
+    setTopicTitle(topics.find((topic) => topic.id === selectedTopic)?.title);
   }, [selectedTopic]);
 
-    //track quiz views
-    useEffect(() => {
-        if (quizId) {
-          va.track('quiz-view');
-        }
-      }, [quizId]);
-
-  
+  //track quiz views
+  useEffect(() => {
+    if (quizId) {
+      va.track('quiz-view');
+    }
+  }, [quizId]);
 
   return (
-    <Preview
-      quizId={quizId}
-      topics={topics}
-      title={title}
-      selectedTopic={selectedTopic}
-      setSelectedTopic={setSelectedTopic}
-      questions={questions}           
-    />
+    <Box>
+      <Preview
+        topics={topics}
+        title={title}
+        selectedTopic={selectedTopic}
+        setSelectedTopic={setSelectedTopic}
+        questions={questions}
+        topicTitle={topicTitle}
+        topicsOrder={topicsOrder}
+      />
+    </Box>
   );
 }
+ 
