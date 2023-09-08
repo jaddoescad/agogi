@@ -103,7 +103,7 @@ export default function PreviewQuiz({
         />
       )}
 
-      <Box w="100%" bg="gray.900" color="white">
+      <Box w="100%" bg="gray.900" color="white" h="100vh">
         <Navbar
           isOpenNavbar={isOpen}
           quizTitle={title}
@@ -113,13 +113,14 @@ export default function PreviewQuiz({
         />
 
         <Box
-          h="calc(100vh - 60px)"
           margin={['0', 'auto']}
           maxW={['100%', '600px']}
           w={'100%'}
+          overflow={'scroll'}
+          p={5}
         >
           {questions && questions.length > 0 ? (
-            <Box pt={14}>
+            <Box pt={5}>
               <QuestionNavigation
                 topicTitle={topicTitle}
                 topicsOrder={topicsOrder}
