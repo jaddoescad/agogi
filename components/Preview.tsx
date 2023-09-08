@@ -112,13 +112,13 @@ export default function PreviewQuiz({
         color="white"
         h="100vh"
       >
-        <Navbar
+        {/* <Navbar
           isOpenNavbar={isOpen}
           quizTitle={title}
           quizPreviewTitle
           sidebarToggle
           onOpen={onOpen}
-        />
+        /> */}
 
         <Box
           w={'100%'}
