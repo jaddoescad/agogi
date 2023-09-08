@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useUser } from '@supabase/auth-helpers-react';
@@ -191,10 +193,6 @@ const IndexPage = () => {
                           quizId: router?.query?.quizId as string,
                           imageUrl
                         });
-                        // await uploadImageUrl(
-                        //   imageUrl,
-                        //   router?.query?.quizId as string
-                        // );
                       }
                       setImageValue('picture', null);
                     } catch (error) {

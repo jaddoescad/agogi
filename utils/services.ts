@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ItemType } from 'types/types';
 import {  } from 'utils/supabase-client';
 

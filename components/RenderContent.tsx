@@ -1,8 +1,11 @@
 import React from 'react';
 import Latex from 'react-latex';
 
-export const RenderContent = ({ content }) => {
-  console.log("content", content)
+interface RenderContentProps {
+  content: any;
+}
+
+export const RenderContent: React.FC<RenderContentProps> = ({ content }) => {
   // Regex patterns to match <codeblock>...</codeblock> and <inlinecode>...</inlinecode> tags with global flag
   const blockCodePattern = /<codeblock>([\s\S]*?)<\/codeblock>/g;
   const inlineCodePattern = /<inlinecode>(.*?)<\/inlinecode>/g;
@@ -38,6 +41,7 @@ export const RenderContent = ({ content }) => {
       let lastIndex = 0;
 
       for (const match of segment.matchAll(inlineCodePattern)) {
+        if (match && match.index !== undefined) {
         if (lastIndex !== match.index) {
           parts.push(
             <Latex key={'latex-' + index}>
@@ -53,6 +57,7 @@ export const RenderContent = ({ content }) => {
         );
 
         lastIndex = match.index + match[0].length;
+        }
       }
 
       if (lastIndex < segment.length) {

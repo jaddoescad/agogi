@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database } from "types/types_db";

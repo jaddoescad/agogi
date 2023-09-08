@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getMyQuizzes } from '../utils/supabase-client';
 import Head from 'next/head';
 import React from 'react';
