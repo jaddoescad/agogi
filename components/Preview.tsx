@@ -9,7 +9,8 @@ import {
   Text,
   Progress,
   Flex,
-  Center
+  Center,
+  useBreakpointValue
 } from '@chakra-ui/react';
 import Navbar from 'components/ui/Navbar/Navbar';
 import { useDisclosure } from '@chakra-ui/react';
@@ -30,12 +31,13 @@ export default function PreviewQuiz({
   topicTitle,
   topicsOrder
 }: PreviewQuizProps) {
-  const [answers, setAnswers] = useState<(string)[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const displayValue = useBreakpointValue({ base: 'none', md: 'block' });
 
   const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -91,7 +93,7 @@ export default function PreviewQuiz({
   }, [isLargerThan768]);
 
   return (
-    <Flex minWidth={'1000px'}>
+    <Flex minWidth={['100%', '100%', '1000px']}>
       {isOpen && (
         <SideBar
           topics={topics}
@@ -110,7 +112,12 @@ export default function PreviewQuiz({
           onOpen={onOpen}
         />
 
-        <Box h="calc(100vh - 60px)" margin={'auto'} maxW={'600px'} w={'100%'}>
+        <Box
+          h="calc(100vh - 60px)"
+          margin={['0', 'auto']}
+          maxW={['100%', '600px']}
+          w={'100%'}
+        >
           {questions && questions.length > 0 ? (
             <Box pt={14}>
               <QuestionNavigation
@@ -165,8 +172,8 @@ const RadioButtonWrapper: React.FC<RadioButtonWrapperProps> = ({
   return (
     <Box
       border="1px solid"
-      p={4}
-      mb={2}
+      p={[2, 4]}
+      mb={[1, 2]}
       w="100%"
       borderRadius="lg"
       bg={currentAnswer === value ? 'gray.700' : 'gray.800'}
@@ -219,7 +226,12 @@ export const SideBar: React.FC<SideBarProps> = ({
   };
 
   return (
-    <Box h={'100vh'} w={'350px'} overflow={'auto'} bg={'#0C0D0F'}>
+    <Box
+      h={'100vh'}
+      w={['100%', '100%', '350px']}
+      overflow={'auto'}
+      bg={'#0C0D0F'}
+    >
       <Box aria-label="Back to Quizzes" color="white">
         <Flex
           align="center"
@@ -404,7 +416,9 @@ export const QuestionBox: React.FC<QuestionBoxProps> = ({
             key={index}
             value={index.toString()}
             currentAnswer={answers[currentQuestionIndex]}
-            onChange={(value: any) => handleChange(currentQuestionIndex, value.toString())}
+            onChange={(value: any) =>
+              handleChange(currentQuestionIndex, value.toString())
+            }
             isDisabled={submitted}
             label={choice}
           />
