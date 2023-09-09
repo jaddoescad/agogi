@@ -94,82 +94,153 @@ export default function PreviewQuiz({
   }, [isLargerThan768, isSmallerThan768]);
 
   return (
-    <Flex minWidth={['100%', '100%', '100%']}>
+    <Flex minWidth={['100%', '100%', 'auto']}>
       {isOpen && (
-        <SideBar
-          topics={topics}
-          onTopicClick={setSelectedTopic}
-          selectedTopic={selectedTopic}
-          onClose={onClose}
-        />
+        <Box
+          h={'100vh'}
+          w={isSmallerThan768 ? '100%' : '350px'}
+          overflow={'auto'}
+          bg={'#0C0D0F'}
+        >
+          <SideBar
+            topics={topics}
+            onTopicClick={setSelectedTopic}
+            selectedTopic={selectedTopic}
+            onClose={onClose}
+          />
+        </Box>
       )}
 
-      <Box
-        display="flex"
-        flexDir={'column'}
-        w="100%"
-        bg="gray.900"
-        color="white"
-        h="100vh"
-      >
-        <Navbar
-          isOpenNavbar={isOpen}
-          quizTitle={title}
-          quizPreviewTitle
-          sidebarToggle
-          onOpen={onOpen}
-        />
-
+      {((!isOpen && isSmallerThan768) || isLargerThan768) && (
         <Box
-          w={'100%'}
-          overflow={'scroll'}
-          flex={1}
-          p={5}
+          display="flex"
+          flexDir={'column'}
+          w="100%"
+          bg="gray.900"
+          color="white"
+          h="100vh"
         >
-          {questions && questions.length > 0 ? (
-            <Box           margin={['0', 'auto']}
-            maxW={['100%', '600px']} pt={5}>
-              <QuestionNavigation
-                topicTitle={topicTitle}
-                topicsOrder={topicsOrder}
-                selectedTopic={selectedTopic}
-                goToNextTopic={goToNextTopic}
-                goToPreviousTopic={goToPreviousTopic}
-              />
+          <Navbar
+            isOpenNavbar={isOpen}
+            quizTitle={title}
+            quizPreviewTitle
+            sidebarToggle
+            onOpen={onOpen}
+          />
 
-              <Progress
-                value={progress}
-                size="md"
-                colorScheme="blue"
-                mb={4}
-                mt={4}
-              />
+          <Box w={'100%'} overflow={'scroll'} flex={1} p={5}>
+            {questions && questions.length > 0 ? (
+              <Box margin={['0', 'auto']} maxW={['100%', '600px']} pt={5}>
+                <QuestionNavigation
+                  topicTitle={topicTitle}
+                  topicsOrder={topicsOrder}
+                  selectedTopic={selectedTopic}
+                  goToNextTopic={goToNextTopic}
+                  goToPreviousTopic={goToPreviousTopic}
+                />
 
-              <QuestionBox
-                currentQuestion={questions[currentQuestionIndex]}
-                handleChange={handleChange}
-                currentQuestionIndex={currentQuestionIndex}
-                submitted={submitted}
-                feedback={feedback}
-                answers={answers}
-              />
-              <ControlButtons
-                handlePreviousQuestion={handlePreviousQuestion}
-                handleNextQuestion={handleNextQuestion}
-                submitted={submitted}
-                currentQuestionIndex={currentQuestionIndex}
-                questions={questions}
-                handleReset={handleReset}
-              />
-            </Box>
-          ) : (
-            <Text>No questions available.</Text>
-          )}
+                <Progress
+                  value={progress}
+                  size="md"
+                  colorScheme="blue"
+                  mb={4}
+                  mt={4}
+                />
+
+                <QuestionBox
+                  currentQuestion={questions[currentQuestionIndex]}
+                  handleChange={handleChange}
+                  currentQuestionIndex={currentQuestionIndex}
+                  submitted={submitted}
+                  feedback={feedback}
+                  answers={answers}
+                />
+                <ControlButtons
+                  handlePreviousQuestion={handlePreviousQuestion}
+                  handleNextQuestion={handleNextQuestion}
+                  submitted={submitted}
+                  currentQuestionIndex={currentQuestionIndex}
+                  questions={questions}
+                  handleReset={handleReset}
+                />
+              </Box>
+            ) : (
+              <Text>No questions available.</Text>
+            )}
+          </Box>
         </Box>
-      </Box>
+      )}
     </Flex>
   );
 }
+
+export const SideBar: React.FC<SideBarProps> = ({
+  topics,
+  onTopicClick,
+  selectedTopic,
+  onClose
+}) => {
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+
+  const handleTopicClick = (id: string) => {
+    onTopicClick(id);
+    if (isSmallerThan768 === true) onClose();
+  };
+
+  return (
+    <Box h={'100%'} w={'100%'}>
+      <Box aria-label="Back to Quizzes" color="white">
+        <Flex
+          align="center"
+          p="5"
+          _hover={{
+            textDecoration: 'none'
+          }}
+          cursor={'pointer'}
+        >
+          <Link href="/">
+            <Flex
+              align="center"
+              _hover={{
+                textDecoration: 'none'
+              }}
+              cursor={'pointer'}
+            >
+              <Logo />
+              <Text fontSize="md" fontWeight="medium" ml="2" mr="1">
+                {`AGOGI`}
+              </Text>
+            </Flex>
+          </Link>
+          <CloseButton ml="auto" color={'white'} onClick={onClose} />
+        </Flex>
+      </Box>
+      {topics.map((topic, index) => (
+        <Box
+          key={topic.id}
+          pl={6}
+          pr={6}
+          py={4}
+          color="white"
+          bg={selectedTopic === topic.id ? 'teal' : 'transparent'}
+          onClick={() => handleTopicClick(topic.id)}
+          _hover={{ bg: selectedTopic === topic.id ? 'teal' : 'gray.700' }}
+          position="relative"
+          display="flex"
+          flexGrow={1}
+          alignItems="center"
+          w="100%"
+          fontWeight="500"
+          fontSize="1rem"
+          overflowWrap="break-word"
+          justifyContent="flex-start"
+        >
+          {topic.title}
+        </Box>
+      ))}
+    </Box>
+  );
+};
 
 const RadioButtonWrapper: React.FC<RadioButtonWrapperProps> = ({
   value,
@@ -224,75 +295,7 @@ type SideBarProps = {
   onClose: () => void;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({
-  topics,
-  onTopicClick,
-  selectedTopic,
-  onClose
-}) => {
-  const handleTopicClick = (id: string) => {
-    onTopicClick(id);
-  };
 
-  return (
-    <Box
-      h={'100vh'}
-      w={['100%', '100%', '350px']}
-      overflow={'auto'}
-      bg={'#0C0D0F'}
-    >
-      <Box aria-label="Back to Quizzes" color="white">
-        <Flex
-          align="center"
-          p="5"
-          _hover={{
-            textDecoration: 'none'
-          }}
-          cursor={'pointer'}
-        >
-          <Link href="/">
-            <Flex
-              align="center"
-              _hover={{
-                textDecoration: 'none'
-              }}
-              cursor={'pointer'}
-            >
-              <Logo />
-              <Text fontSize="md" fontWeight="medium" ml="2" mr="1">
-                {`AGOGI`}
-              </Text>
-            </Flex>
-          </Link>
-          <CloseButton ml="auto" color={'white'} onClick={onClose} />
-        </Flex>
-      </Box>
-      {topics.map((topic, index) => (
-        <Box
-          key={topic.id}
-          pl={6}
-          pr={6}
-          py={4}
-          color="white"
-          bg={selectedTopic === topic.id ? 'teal' : 'transparent'}
-          onClick={() => handleTopicClick(topic.id)}
-          _hover={{ bg: selectedTopic === topic.id ? 'teal' : 'gray.700' }}
-          position="relative"
-          display="flex"
-          flexGrow={1}
-          alignItems="center"
-          w="100%"
-          fontWeight="500"
-          fontSize="1rem"
-          overflowWrap="break-word"
-          justifyContent="flex-start"
-        >
-          {topic.title}
-        </Box>
-      ))}
-    </Box>
-  );
-};
 
 export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   topicTitle,
