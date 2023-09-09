@@ -119,6 +119,7 @@ export default function PreviewQuiz({
           bg="gray.900"
           color="white"
           h="100vh"
+          overflow={'auto'}
         >
           <Navbar
             isOpenNavbar={isOpen}
@@ -128,7 +129,7 @@ export default function PreviewQuiz({
             onOpen={onOpen}
           />
 
-          <Box w={'100%'} overflow={'scroll'} flex={1} p={5}>
+          <Box w={'100%'} flex={1} p={5}>
             {questions && questions.length > 0 ? (
               <Box margin={['0', 'auto']} maxW={['100%', '600px']} pt={5}>
                 <QuestionNavigation
