@@ -46,6 +46,15 @@ export type PreviewQuizProps = {
   questions: Question[]; // You've imported `Question` type, so I'm using it here.
   topicTitle: string;
   topicsOrder: (string)[]; // I'm assuming it's an array of either strings or numbers.
+  currentQuestionIndex: number;
+  setCurrentQuestionIndex: React.Dispatch<SetStateAction<number>>;
+  feedback: string | null;
+  setFeedback: React.Dispatch<SetStateAction<string | null>>;
+  answers: string[];
+  setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
+  submitted: boolean;
+  setSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  isQuestionLoading: boolean;
 };
 
 export interface Product {

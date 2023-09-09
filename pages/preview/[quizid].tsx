@@ -15,46 +15,51 @@ export default function Quiz() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [topicTitle, setTopicTitle] = useState<string | null>('');
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
 
-  const {
-    data,
-    isLoading: isQuizLoading,
-    isError
-  } = useGetQuizAndTopics(quizId) as {
-    data: any;
-    isLoading: boolean;
-    isError: boolean;
-  };
+const {
+  data,
+  isLoading: isQuizLoading,
+  isError
+} = useGetQuizAndTopics(quizId) as {
+  data: any;
+  isLoading: boolean;
+  isError: boolean;
+};
 
-  useEffect(() => {
-    if (!data) return;
-    if (data.title) {
-      setTitle(data.title);
+useEffect(() => {
+  if (!data) return;
+  if (data.title) {
+    setTitle(data.title);
+  }
+
+  const topics_order = data?.topics_order;
+  const topics = data?.topics;
+
+  if (data) {
+    if (topics_order && topics) {
+      const topics_ = topics.sort(
+        (a: any, b: any) =>
+          topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
+      );
+      setTopics(topics_);
+      setSelectedTopic(topics_order[0]);
     }
+  }
+}, [data]);
 
-    const topics_order = data?.topics_order;
-    const topics = data?.topics;
+useEffect(() => {
+  if (!selectedTopic) return;
 
-    if (data) {
-      if (topics_order && topics) {
-        const topics_ = topics.sort(
-          (a:any, b:any) => topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
-        );
-        setTopics(topics_);
-        setSelectedTopic(topics_order[0]);
-      }
-    }
-  }, [data]);
+  setTopicTitle(topics.find((topic) => topic.id === selectedTopic).title);
 
-  useEffect(() => {
-    if (!selectedTopic) return;
-
-    setTopicTitle(topics.find((topic) => topic.id === selectedTopic).title);
-
-    getQuestions(selectedTopic).then((questions) => {
-      setQuestions(questions as Question[]);
-    });
-  }, [selectedTopic]);
+  getQuestions(selectedTopic).then((questions) => {
+    setQuestions(questions as Question[]);
+  });
+}, [selectedTopic]);
 
   //track quiz views
   useEffect(() => {
@@ -65,7 +70,7 @@ export default function Quiz() {
 
   // return <Preview quizId={quizId} />
   return (
-    <Box>
+    <Box bg={'#0C0D0F'}>
       <Preview
         topics={topics}
         title={title || 'Untitled'}
@@ -74,6 +79,14 @@ export default function Quiz() {
         questions={questions}
         topicTitle={topicTitle || 'Untitled'}
         topicsOrder={data?.topics_order}
+        currentQuestionIndex={currentQuestionIndex}
+        setCurrentQuestionIndex={setCurrentQuestionIndex}
+        feedback={feedback}
+        setFeedback={setFeedback}
+        answers={answers}
+        setAnswers={setAnswers}
+        submitted={submitted}
+        setSubmitted={setSubmitted}
       />
     </Box>
   );

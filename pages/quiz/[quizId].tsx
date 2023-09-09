@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Spinner } from '@chakra-ui/react';
 
 export default function Quiz() {
   const quizId = useRouter().query.quizId as string;
@@ -13,9 +13,13 @@ export default function Quiz() {
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [topicTitle, setTopicTitle] = useState<string | null>('');
   const [topicsOrder, setTopicsOrder] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
 
   const {
     data,
@@ -31,19 +35,19 @@ export default function Quiz() {
     if (!selectedTopic) return;
 
     try {
-      setIsLoading(true);
+      setIsQuestionLoading(true);
       const refreshedQuestions = await getPublishedQuestions(selectedTopic);
+      setCurrentQuestionIndex(0);
       setQuestions(refreshedQuestions as Question[]);
     } catch (error) {
       console.error('Failed to refresh questions:', error);
     } finally {
-      setIsLoading(false);
+      setIsQuestionLoading(false);
     }
   };
 
   useEffect(() => {
     if (!data) return;
-    setIsLoading(true);
     if (data.title) {
       setTitle(data.title);
     }
@@ -55,17 +59,16 @@ export default function Quiz() {
       if (topics_order && topics) {
         setTopicsOrder(topics_order);
         const topics_ = topics.sort(
-          (a:any, b:any) => topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
+          (a: any, b: any) =>
+            topics_order.indexOf(a.id) - topics_order.indexOf(b.id)
         );
         setTopics(topics_);
         setSelectedTopic(topics_order[0]);
       } else {
         console.error('Failed to load quiz');
-        setIsLoading(false);
       }
     } else {
       console.error('Failed to load quiz');
-      setIsLoading(false);
     }
   }, [data]);
 
@@ -82,16 +85,31 @@ export default function Quiz() {
   }, [quizId]);
 
   return (
-    <Box>
-      <Preview
-        topics={topics}
-        title={title || 'Untitled'}
-        selectedTopic={selectedTopic || topics[0]?.id}
-        setSelectedTopic={setSelectedTopic}
-        questions={questions}
-        topicTitle={topicTitle || 'Untitled'}
-        topicsOrder={topicsOrder}
-      />
-    </Box>
+    <Flex bg={'#0C0D0F'} w={"100vw"} h="100vh" flexDir={"column"} justifyContent={"center"}>
+      {!isQuizLoading ? (
+        <Preview
+          topics={topics}
+          title={title || 'Untitled'}
+          selectedTopic={selectedTopic || topics[0]?.id}
+          setSelectedTopic={setSelectedTopic}
+          questions={questions}
+          topicTitle={topicTitle || 'Untitled'}
+          topicsOrder={topicsOrder}
+          currentQuestionIndex={currentQuestionIndex}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          answers={answers}
+          setAnswers={setAnswers}
+          submitted={submitted}
+          setSubmitted={setSubmitted}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          isQuestionLoading={isQuestionLoading}
+        />
+      ) : (
+        <Center mt={5}>
+          <Spinner color='white' />
+        </Center>
+      )}
+    </Flex>
   );
 }

@@ -1,5 +1,4 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -21,6 +20,7 @@ import {
   RadioButtonWrapperProps,
   ControlButtonsProps
 } from 'types/types';
+import { Spinner } from '@chakra-ui/react';
 
 export default function PreviewQuiz({
   topics,
@@ -29,12 +29,17 @@ export default function PreviewQuiz({
   setSelectedTopic,
   questions,
   topicTitle,
-  topicsOrder
+  topicsOrder,
+  feedback,
+  setFeedback,
+  answers,
+  setAnswers,
+  submitted,
+  setSubmitted,
+  currentQuestionIndex,
+  setCurrentQuestionIndex,
+  isQuestionLoading
 }: PreviewQuizProps) {
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [submitted, setSubmitted] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [feedback, setFeedback] = useState<string | null>(null);
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
@@ -120,6 +125,7 @@ export default function PreviewQuiz({
           color="white"
           h="100vh"
           overflow={'auto'}
+          paddingBottom={'50px'}
         >
           <Navbar
             isOpenNavbar={isOpen}
@@ -128,47 +134,58 @@ export default function PreviewQuiz({
             sidebarToggle
             onOpen={onOpen}
           />
+          {!isQuestionLoading ? (
+            <Box w={'100%'} flex={1} p={5}>
+              {questions && questions.length > 0 ? (
+                <Box margin={['0', 'auto']} maxW={['100%', '600px']} pt={5}>
+                  <QuestionNavigation
+                    topicTitle={topicTitle}
+                    topicsOrder={topicsOrder}
+                    selectedTopic={selectedTopic}
+                    goToNextTopic={goToNextTopic}
+                    goToPreviousTopic={goToPreviousTopic}
+                  />
 
-          <Box w={'100%'} flex={1} p={5}>
-            {questions && questions.length > 0 ? (
-              <Box margin={['0', 'auto']} maxW={['100%', '600px']} pt={5}>
-                <QuestionNavigation
-                  topicTitle={topicTitle}
-                  topicsOrder={topicsOrder}
-                  selectedTopic={selectedTopic}
-                  goToNextTopic={goToNextTopic}
-                  goToPreviousTopic={goToPreviousTopic}
-                />
+                  <Progress
+                    value={progress}
+                    size="md"
+                    colorScheme="blue"
+                    mb={4}
+                    mt={4}
+                  />
 
-                <Progress
-                  value={progress}
-                  size="md"
-                  colorScheme="blue"
-                  mb={4}
-                  mt={4}
-                />
-
-                <QuestionBox
-                  currentQuestion={questions[currentQuestionIndex]}
-                  handleChange={handleChange}
-                  currentQuestionIndex={currentQuestionIndex}
-                  submitted={submitted}
-                  feedback={feedback}
-                  answers={answers}
-                />
-                <ControlButtons
-                  handlePreviousQuestion={handlePreviousQuestion}
-                  handleNextQuestion={handleNextQuestion}
-                  submitted={submitted}
-                  currentQuestionIndex={currentQuestionIndex}
-                  questions={questions}
-                  handleReset={handleReset}
-                />
-              </Box>
-            ) : (
-              <Text>No questions available.</Text>
-            )}
-          </Box>
+                  <QuestionBox
+                    currentQuestion={questions[currentQuestionIndex]}
+                    handleChange={handleChange}
+                    currentQuestionIndex={currentQuestionIndex}
+                    submitted={submitted}
+                    feedback={feedback}
+                    answers={answers}
+                  />
+                  <ControlButtons
+                    handlePreviousQuestion={handlePreviousQuestion}
+                    handleNextQuestion={handleNextQuestion}
+                    submitted={submitted}
+                    currentQuestionIndex={currentQuestionIndex}
+                    questions={questions}
+                    handleReset={handleReset}
+                  />
+                </Box>
+              ) : (
+                <Text>No questions available.</Text>
+              )}
+            </Box>
+          ) : (
+            <Center h={'100%'} w={'100%'}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="xl"
+              />
+            </Center>
+          )}
         </Box>
       )}
     </Flex>
@@ -295,8 +312,6 @@ type SideBarProps = {
   selectedTopic: string | number;
   onClose: () => void;
 };
-
-
 
 export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   topicTitle,
