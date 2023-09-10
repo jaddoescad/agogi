@@ -30,16 +30,15 @@ export const QuizCard = ({
         m={2}
         bg="#162457"
         as="div"
-        h="12rem"
         w="12rem"
       >
         <Image
           src={quiz.image_url ?? default_unpublished_img}
           alt={quiz.title ?? 'Untitled'}
-          boxSize="100px"
           objectFit="cover"
-          borderRadius="full"
+          borderRadius="l"
           mb={3}
+          flex={1}
         />
         <Text
           textAlign="center"
