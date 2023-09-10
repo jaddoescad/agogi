@@ -6,7 +6,7 @@ import { useGetPublishedQuizAndTopics } from 'hooks/useGetPublishedQuizAndTopics
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
 import { getQuestions } from '@/utils/supabase-client';
-import { Box } from '@chakra-ui/react';
+import { Box} from '@chakra-ui/react';
 
 export default function Quiz() {
   const quizId = useRouter().query.quizId as string;
