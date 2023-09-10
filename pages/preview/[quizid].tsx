@@ -6,7 +6,7 @@ import { useGetPublishedQuizAndTopics } from 'hooks/useGetPublishedQuizAndTopics
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
 import { getQuestions } from '@/utils/supabase-client';
-import { Box} from '@chakra-ui/react';
+import { Box, Center, Spinner } from '@chakra-ui/react';
 
 export default function Quiz() {
   const quizId = useRouter().query.quizId as string;
@@ -19,6 +19,7 @@ export default function Quiz() {
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
 
 const {
   data,
@@ -51,14 +52,26 @@ useEffect(() => {
   }
 }, [data]);
 
-useEffect(() => {
+const refreshQuestions = async () => {
   if (!selectedTopic) return;
 
+  try {
+    setIsQuestionLoading(true);
+    const refreshedQuestions = await getQuestions(selectedTopic);
+    setCurrentQuestionIndex(0);
+    setQuestions(refreshedQuestions as Question[]);
+  } catch (error) {
+    console.error('Failed to refresh questions:', error);
+  } finally {
+    setIsQuestionLoading(false);
+  }
+};
+
+useEffect(() => {
+  if (!selectedTopic) return;
+  refreshQuestions();
   setTopicTitle(topics.find((topic) => topic.id === selectedTopic).title);
 
-  getQuestions(selectedTopic).then((questions) => {
-    setQuestions(questions as Question[]);
-  });
 }, [selectedTopic]);
 
   //track quiz views
@@ -71,23 +84,30 @@ useEffect(() => {
   // return <Preview quizId={quizId} />
   return (
     <Box bg={'#0C0D0F'}>
-      <Preview
-        topics={topics}
-        title={title || 'Untitled'}
-        selectedTopic={selectedTopic || topics[0]?.id}
-        setSelectedTopic={setSelectedTopic}
-        questions={questions}
-        topicTitle={topicTitle || 'Untitled'}
-        topicsOrder={data?.topics_order}
-        currentQuestionIndex={currentQuestionIndex}
-        setCurrentQuestionIndex={setCurrentQuestionIndex}
-        feedback={feedback}
-        setFeedback={setFeedback}
-        answers={answers}
-        setAnswers={setAnswers}
-        submitted={submitted}
-        setSubmitted={setSubmitted}
-      />
+      {!isQuizLoading ? (
+        <Preview
+          topics={topics}
+          title={title || 'Untitled'}
+          selectedTopic={selectedTopic || topics[0]?.id}
+          setSelectedTopic={setSelectedTopic}
+          questions={questions}
+          topicTitle={topicTitle || 'Untitled'}
+          topicsOrder={data?.topics_order}
+          currentQuestionIndex={currentQuestionIndex}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          answers={answers}
+          setAnswers={setAnswers}
+          submitted={submitted}
+          setSubmitted={setSubmitted}
+          isQuestionLoading={isQuestionLoading}
+        />
+      ) : (
+        <Center mt={5}>
+          <Spinner color="white" />
+        </Center>
+      )}
     </Box>
   );
 }
