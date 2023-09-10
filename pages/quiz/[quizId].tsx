@@ -48,6 +48,7 @@ export default function Quiz() {
 
   useEffect(() => {
     if (!data) return;
+    resetQuiz();
     if (data.title) {
       setTitle(data.title);
     }
@@ -73,6 +74,7 @@ export default function Quiz() {
   }, [data]);
 
   useEffect(() => {
+    resetQuiz();
     refreshQuestions();
     setTopicTitle(topics.find((topic) => topic.id === selectedTopic)?.title);
   }, [selectedTopic]);
@@ -83,6 +85,13 @@ export default function Quiz() {
       va.track('quiz-view');
     }
   }, [quizId]);
+
+  const resetQuiz = () => {
+    setAnswers([]);
+    setCurrentQuestionIndex(0);
+    setSubmitted(false);
+    setFeedback(null);
+  }
 
   return (
     <Flex bg={'#0C0D0F'} w={"100vw"} h="100vh" flexDir={"column"} justifyContent={"center"}>
