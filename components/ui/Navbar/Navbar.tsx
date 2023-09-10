@@ -167,7 +167,12 @@ export default function WithSubnavigation({
             </Flex>
           )}
 
-          {quizPreviewTitle && <Box>{quizTitle}</Box>}
+          {quizPreviewTitle && <Box
+            fontSize="md"
+            fontWeight="bold"
+            ml="2"
+            mr="1"
+          >{quizTitle}</Box>}
 
           {search && (
             <Flex

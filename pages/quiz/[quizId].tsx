@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
-import { Box, Button, Center, Flex, Spinner } from '@chakra-ui/react';
+import { Center, Flex, Spinner } from '@chakra-ui/react';
 
 export default function Quiz() {
   const quizId = useRouter().query.quizId as string;
@@ -30,6 +30,8 @@ export default function Quiz() {
     isLoading: boolean;
     isError: boolean;
   };
+
+  const va_ = va;
 
   const refreshQuestions = async () => {
     if (!selectedTopic) return;
@@ -82,7 +84,7 @@ export default function Quiz() {
   //track quiz views
   useEffect(() => {
     if (quizId) {
-      va.track('quiz-view');
+      va_.track('quiz-view');
     }
   }, [quizId]);
 
@@ -91,12 +93,19 @@ export default function Quiz() {
     setCurrentQuestionIndex(0);
     setSubmitted(false);
     setFeedback(null);
-  }
+  };
 
   return (
-    <Flex bg={'#0C0D0F'} w={"100vw"} h="100vh" flexDir={"column"} justifyContent={"center"}>
+    <Flex
+      bg={'#0C0D0F'}
+      w={'100vw'}
+      h="100vh"
+      flexDir={'column'}
+      justifyContent={'center'}
+    >
       {!isQuizLoading ? (
         <Preview
+          quizId={quizId}
           topics={topics}
           title={title || 'Untitled'}
           selectedTopic={selectedTopic || topics[0]?.id}
@@ -113,10 +122,11 @@ export default function Quiz() {
           feedback={feedback}
           setFeedback={setFeedback}
           isQuestionLoading={isQuestionLoading}
+          va={va_}
         />
       ) : (
         <Center mt={5}>
-          <Spinner color='white' />
+          <Spinner color="white" />
         </Center>
       )}
     </Flex>

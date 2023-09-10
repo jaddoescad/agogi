@@ -39,6 +39,7 @@ export type QuestionNavigationProps = {
 };
 
 export type PreviewQuizProps = {
+  quizId?: string;
   topics: any[]; // You might want to define a more specific type here.
   title: string;
   selectedTopic: string ;
@@ -55,6 +56,7 @@ export type PreviewQuizProps = {
   submitted: boolean;
   setSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
   isQuestionLoading: boolean;
+  va?: any
 };
 
 export interface Product {

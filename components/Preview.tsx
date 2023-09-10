@@ -23,6 +23,7 @@ import {
 import { Spinner } from '@chakra-ui/react';
 
 export default function PreviewQuiz({
+  quizId,
   topics,
   title,
   selectedTopic,
@@ -38,7 +39,8 @@ export default function PreviewQuiz({
   setSubmitted,
   currentQuestionIndex,
   setCurrentQuestionIndex,
-  isQuestionLoading
+  isQuestionLoading,
+  va
 }: PreviewQuizProps) {
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -57,6 +59,7 @@ export default function PreviewQuiz({
   };
 
   const goToNextTopic = () => {
+    if (va && quizId) va.track('Next Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex < topicsOrder.length - 1) {
       setSelectedTopic(topicsOrder[currentIndex + 1]);
@@ -64,6 +67,7 @@ export default function PreviewQuiz({
   };
 
   const goToPreviousTopic = () => {
+    if (va && quizId) va.track('Previous Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex > 0) {
       setSelectedTopic(topicsOrder[currentIndex - 1]);
@@ -71,6 +75,7 @@ export default function PreviewQuiz({
   };
 
   const handlePreviousQuestion = () => {
+    if (va && quizId) va.track('Previous Question', { quizId: quizId });
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
@@ -79,6 +84,7 @@ export default function PreviewQuiz({
   };
 
   const handleNextQuestion = () => {
+    if (va && quizId) va.track('Next Question', { quizId: quizId });
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -88,9 +94,9 @@ export default function PreviewQuiz({
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   const handleReset = () => {
-    setAnswers(Array(questions.length).fill(null));
+    setAnswers([]);
     setSubmitted(false);
-    setFeedback(null); // reset feedback
+    setFeedback(null); //
   };
 
   useEffect(() => {
@@ -112,6 +118,8 @@ export default function PreviewQuiz({
             onTopicClick={setSelectedTopic}
             selectedTopic={selectedTopic}
             onClose={onClose}
+            va={va}
+            quizId={quizId}
           />
         </Box>
       )}
@@ -196,11 +204,14 @@ export const SideBar: React.FC<SideBarProps> = ({
   topics,
   onTopicClick,
   selectedTopic,
-  onClose
+  onClose,
+  va,
+  quizId
 }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const handleTopicClick = (id: string) => {
+    if (va && quizId) va.track('Topic Click', { quizId: quizId });
     onTopicClick(id);
     if (isSmallerThan768 === true) onClose();
   };
@@ -311,6 +322,8 @@ type SideBarProps = {
   onTopicClick: (id: string) => void;
   selectedTopic: string | number;
   onClose: () => void;
+  va?: any;
+  quizId?: string;
 };
 
 export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
