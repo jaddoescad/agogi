@@ -31,6 +31,7 @@ export const QuizCard = ({
         bg="#162457"
         as="div"
         w="12rem"
+        h="20rem"
       >
         <Image
           src={quiz.image_url ?? default_unpublished_img}
