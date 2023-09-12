@@ -51,7 +51,7 @@ export default function Quiz({
   useEffect(() => {
     if (!data) return;
     resetQuiz();
-    console.log("hello", data)
+    console.log('hello', data);
 
     if (data.title) {
       setTitle(data.title);
@@ -84,8 +84,7 @@ export default function Quiz({
     resetQuiz();
     refreshQuestions();
     setSelectedTopic(topicId);
-    console.log("ding dong", topics)
-    console.log("yo mama",topics.find((topic) => topic.id === topicId)?.title)
+
     setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
   }, [topicId, topics]);
 
@@ -116,26 +115,19 @@ export default function Quiz({
           <title>{title}</title>
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
-          <meta content={topicTitle || 'Untitled'} name="description" />
+          <meta content={data.title} name="description" />
           <meta property="og:type" content="website" />
-          <meta property="og:site_name" content={title || 'Untitled'} />
+          <meta property="og:site_name" content={data.title} />
           <meta property="og:description" content={topicTitle || 'Untitled'} />
           <meta
             property="og:title"
-            content={
-              topicTitle ? `${topicTitle} - ${title}` : title || 'Untitled'
-            }
+            content={topics.find((topic) => topic.id === topicId)?.title}
           />
           <meta name="twitter:site" content="@vercel" />
           <meta name="twitter:title" content={title ?? 'Untitled'} />
           <meta name="twitter:description" content={topicTitle ?? 'Untitled'} />
-
-          {image && (
-            <>
-              <meta property="og:image" content={image} />
-              <meta name="twitter:image" content={image} />
-            </>
-          )}
+          <meta property="og:image" content={data.image_url} />
+          <meta name="twitter:image" content={data.image_url} />
         </Head>
         <Preview
           quizId={quizId}
@@ -162,12 +154,11 @@ export default function Quiz({
   );
 }
 
-
 export async function getServerSideProps(context: any) {
   const quizId = context.query.quizId;
   const topicId = context.query.topicId;
 
-  let initialData = {};
+  let initialData;
 
   // Fetch the data required for the quiz
   try {
@@ -181,6 +172,7 @@ export async function getServerSideProps(context: any) {
       supabaseServerClient
     );
     initialData = data;
+
     // ... [Fetch other required data and populate initialData]
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -192,7 +184,6 @@ export async function getServerSideProps(context: any) {
       initialData,
       quizId,
       topicId
-      // ... [Pass other required data as props]
     }
   };
 }

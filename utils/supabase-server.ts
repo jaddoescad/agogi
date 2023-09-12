@@ -251,6 +251,7 @@ export const getPublishedQuizAndTopicsServer = async (quizId: string, supabase: 
       `
         id,
         title,
+        image_url,
         quizzes_snapshot!quizzes_snapshot_original_quiz_id_fkey(
         topics_order,
         topics_snapshot!fk_topic_to_quiz_snapshot (
