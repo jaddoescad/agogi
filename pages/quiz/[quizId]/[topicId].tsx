@@ -51,6 +51,8 @@ export default function Quiz({
   useEffect(() => {
     if (!data) return;
     resetQuiz();
+    console.log("hello", data)
+
     if (data.title) {
       setTitle(data.title);
     }
@@ -80,12 +82,12 @@ export default function Quiz({
 
   useEffect(() => {
     resetQuiz();
-    console.log('yooooo', selectedTopic);
-
     refreshQuestions();
     setSelectedTopic(topicId);
+    console.log("ding dong", topics)
+    console.log("yo mama",topics.find((topic) => topic.id === topicId)?.title)
     setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
-  }, [topicId]);
+  }, [topicId, topics]);
 
   //track quiz views
   useEffect(() => {
