@@ -115,7 +115,7 @@ export default function Quiz({
           <title>{title}</title>
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
-          <meta content={`Quiz on ${data.title}`} name="description" />
+          <meta content={topics.find((topic) => topic.id === topicId)?.title} name="description" />
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content={`Quiz on ${data.title}`} />
           <meta
