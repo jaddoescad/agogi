@@ -49,8 +49,6 @@ const Home: React.FC = () => {
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
           <meta content={"Quizzes for Books"} name="description" />
-          <meta property="og:url" content={`${getURL()}${router.asPath}`} />
-
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content={
             "Agogi"
