@@ -6,9 +6,12 @@ import { useEffect, useState } from 'react';
 import { Question } from 'types/types';
 import va from '@vercel/analytics';
 import { Center, Flex, Spinner } from '@chakra-ui/react';
+import Head from 'next/head';
 
 export default function Quiz() {
-  const quizId = useRouter().query.quizId as string;
+  const router = useRouter();
+  const quizId = router.query.quizId as string;
+  const topicId = router.query.topicId as string;
   const [title, setTitle] = useState<string | null>('Untitled');
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -20,6 +23,7 @@ export default function Quiz() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
+  const [image, setImage] = useState<string | null>(null);
 
   const {
     data,
@@ -31,14 +35,18 @@ export default function Quiz() {
     isError: boolean;
   };
 
+  useEffect(() => {
+    console.log('hello');
+    console.log('quizId', quizId);
+  }, [router]);
+
   const va_ = va;
 
   const refreshQuestions = async () => {
-    if (!selectedTopic) return;
-
+    if (!topicId) return;
     try {
       setIsQuestionLoading(true);
-      const refreshedQuestions = await getPublishedQuestions(selectedTopic);
+      const refreshedQuestions = await getPublishedQuestions(topicId);
       setCurrentQuestionIndex(0);
       setQuestions(refreshedQuestions as Question[]);
     } catch (error) {
@@ -53,6 +61,9 @@ export default function Quiz() {
     resetQuiz();
     if (data.title) {
       setTitle(data.title);
+    }
+    if (data.image_url) {
+      setImage(data.image_url);
     }
     const quizzes_snapshot = data?.quizzes_snapshot?.[0];
     const topics_order = quizzes_snapshot?.topics_order;
@@ -77,9 +88,12 @@ export default function Quiz() {
 
   useEffect(() => {
     resetQuiz();
+    console.log('yooooo', selectedTopic);
+
     refreshQuestions();
-    setTopicTitle(topics.find((topic) => topic.id === selectedTopic)?.title);
-  }, [selectedTopic]);
+    setSelectedTopic(topicId);
+    setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
+  }, [topicId]);
 
   //track quiz views
   useEffect(() => {
@@ -104,26 +118,59 @@ export default function Quiz() {
       justifyContent={'center'}
     >
       {!isQuizLoading ? (
-        <Preview
-          quizId={quizId}
-          topics={topics}
-          title={title || 'Untitled'}
-          selectedTopic={selectedTopic || topics[0]?.id}
-          setSelectedTopic={setSelectedTopic}
-          questions={questions}
-          topicTitle={topicTitle || 'Untitled'}
-          topicsOrder={topicsOrder}
-          currentQuestionIndex={currentQuestionIndex}
-          setCurrentQuestionIndex={setCurrentQuestionIndex}
-          answers={answers}
-          setAnswers={setAnswers}
-          submitted={submitted}
-          setSubmitted={setSubmitted}
-          feedback={feedback}
-          setFeedback={setFeedback}
-          isQuestionLoading={isQuestionLoading}
-          va={va_}
-        />
+        <>
+          <Head>
+            <title>{title}</title>
+            <meta name="robots" content="follow, index" />
+            <link href="/favicon.ico" rel="shortcut icon" />
+            <meta content={topicTitle || 'Untitled'} name="description" />
+            <meta property="og:type" content="website" />
+            <meta property="og:site_name" content={title || 'Untitled'} />
+            <meta
+              property="og:description"
+              content={topicTitle || 'Untitled'}
+            />
+            <meta
+              property="og:title"
+              content={
+                topicTitle ? `${topicTitle} - ${title}` : title || 'Untitled'
+              }
+            />
+            <meta name="twitter:site" content="@vercel" />
+            <meta name="twitter:title" content={title ?? 'Untitled'} />
+            <meta
+              name="twitter:description"
+              content={topicTitle ?? 'Untitled'}
+            />
+
+            {image && (
+              <>
+                <meta property="og:image" content={image} />
+                <meta name="twitter:image" content={image} />
+              </>
+            )}
+          </Head>
+          <Preview
+            quizId={quizId}
+            topics={topics}
+            title={title || 'Untitled'}
+            selectedTopic={selectedTopic || topics[0]?.id}
+            setSelectedTopic={setSelectedTopic}
+            questions={questions}
+            topicTitle={topicTitle || 'Untitled'}
+            topicsOrder={topicsOrder}
+            currentQuestionIndex={currentQuestionIndex}
+            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            answers={answers}
+            setAnswers={setAnswers}
+            submitted={submitted}
+            setSubmitted={setSubmitted}
+            feedback={feedback}
+            setFeedback={setFeedback}
+            isQuestionLoading={isQuestionLoading}
+            va={va_}
+          />
+        </>
       ) : (
         <Center mt={5}>
           <Spinner color="white" />

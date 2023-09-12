@@ -20,6 +20,7 @@ import { QuizCard } from 'components/QuizCards/QuizCard';
 type Quiz = {
   id: string;
   title: string | null;
+  topics_order: string[];
 };
 
 const Home: React.FC = () => {
@@ -66,7 +67,10 @@ const Home: React.FC = () => {
                 justifyContent="center"
               >
                 {quizzes.map((quiz) => (
-                  <Link href={`/quiz/${quiz.id}`}>
+                  <Link
+                    href={`/quiz/${quiz.id}/${quiz.topics_order[0]}
+                  `}
+                  >
                     <Box>
                       <QuizCard quiz={quiz} key={quiz.id} />
                     </Box>

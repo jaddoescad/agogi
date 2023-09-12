@@ -84,7 +84,8 @@ export const getHomePageQuizzes = async () => {
       `
     id,
     title,
-    image_url
+    image_url,
+    topics_order
     `
     )
     .eq('published', true)

@@ -21,6 +21,7 @@ import {
   ControlButtonsProps
 } from 'types/types';
 import { Spinner } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 
 export default function PreviewQuiz({
   quizId,
@@ -46,6 +47,8 @@ export default function PreviewQuiz({
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const displayValue = useBreakpointValue({ base: 'none', md: 'block' });
+
+
 
   const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -209,11 +212,12 @@ export const SideBar: React.FC<SideBarProps> = ({
   quizId
 }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const router = useRouter();
 
   const handleTopicClick = (id: string) => {
     if (va && quizId) va.track('Topic Click', { quizId: quizId });
-    onTopicClick(id);
     if (isSmallerThan768 === true) onClose();
+    router.push(`/quiz/${quizId}/${id}`);
   };
 
   return (
