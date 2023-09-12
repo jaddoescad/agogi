@@ -17,89 +17,91 @@ import {
 } from 'prompts/book-generator/subprompts/check-message-type';
 
 const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === 'POST') {
-    try {
-      const supabaseServerClient = createServerSupabaseClient({ req, res });
+  console.log("gejjnefnrjnrjfnrfjnrfjnrjfnrfjnrj")
+  res.status(200).json({ name: 'John Doe' });
 
-      const { message, quizId, quizType, topicId } =
-        (await req.body) as RequestData;
+  // if (req.method === 'POST') {
+  //   try {
+  //     const supabaseServerClient = createServerSupabaseClient({ req, res });
 
-      await saveMessage(supabaseServerClient, message, topicId, 'user');
+  //     const { message, quizId, quizType, topicId } =
+  //       (await req.body) as RequestData;
 
-      const llmGpt4 = new OpenAI({
-        openAIApiKey: process.env.OPENAI_API_KEY,
-        temperature: 0.7,
-        modelName: 'gpt-3.5-turbo-16k'
-      });
+  //     await saveMessage(supabaseServerClient, message, topicId, 'user');
 
-      const prompt = quizIntentionPrompt(message);
-      const result = await llmGpt4.predict(prompt);
+  //     const llmGpt4 = new OpenAI({
+  //       openAIApiKey: process.env.OPENAI_API_KEY,
+  //       temperature: 0.7,
+  //       modelName: 'gpt-3.5-turbo-16k'
+  //     });
 
-      console.log("result",result)
-
-      // Parsing the response
-      const parsedResponse = JSON.parse(result);
-
-      const aiResponse = parsedResponse.ai_response;
-      const promptQuestions = parsedResponse.questions;
+  //     const prompt = quizIntentionPrompt(message);
+  //     const result = await llmGpt4.predict(prompt);
 
 
-      const questionsPromises: Promise<any>[] = [];
+  //     // Parsing the response
+  //     const parsedResponse = JSON.parse(result);
 
-      // Looping through the questions to get answers from AI and store them in questionsArray
-      for (const question of promptQuestions) {
-        const questionPrompt_ = questionPrompt(question);
-        const questionPromise = llmGpt4
-          .predict(questionPrompt_)
-          .then((result) => {
-            const questionResponse = JSON.parse(result); // Assuming your questionPrompt expects a structured JSON response
-            return questionResponse; // You might need to adjust this if the structure is nested
-          });
-        questionsPromises.push(questionPromise);
-      }
-
-      // Wait for all the questions to be processed
-      const questionsArray = await Promise.all(questionsPromises);
-
-      //LOOP THROU
-        await insertQuestions(
-          supabaseServerClient,
-          questionsArray,
-          topicId,
-          quizType
-        );
+  //     const aiResponse = parsedResponse.ai_response;
+  //     const promptQuestions = parsedResponse.questions;
 
 
-      if (aiResponse) {
-        await saveMessage(
-          supabaseServerClient,
-          aiResponse,
-          topicId,
-          'ai'
-        );
-      }
+  //     const questionsPromises: Promise<any>[] = [];
+
+  //     // Looping through the questions to get answers from AI and store them in questionsArray
+  //     for (const question of promptQuestions) {
+  //       const questionPrompt_ = questionPrompt(question);
+  //       const questionPromise = llmGpt4
+  //         .predict(questionPrompt_)
+  //         .then((result) => {
+  //           const questionResponse = JSON.parse(result); // Assuming your questionPrompt expects a structured JSON response
+  //           return questionResponse; // You might need to adjust this if the structure is nested
+  //         });
+  //       questionsPromises.push(questionPromise);
+  //     }
+
+  //     // Wait for all the questions to be processed
+  //     const questionsArray = await Promise.all(questionsPromises);
+
+  //     //LOOP THROU
+  //       await insertQuestions(
+  //         supabaseServerClient,
+  //         questionsArray,
+  //         topicId,
+  //         quizType
+  //       );
+
+
+  //     if (aiResponse) {
+  //       await saveMessage(
+  //         supabaseServerClient,
+  //         aiResponse,
+  //         topicId,
+  //         'ai'
+  //       );
+  //     }
 
 
 
-      // Structuring the final response
-      const response = {
-        message: aiResponse,
-        questions: questionsArray
-      };
+  //     // Structuring the final response
+  //     const response = {
+  //       message: aiResponse,
+  //       questions: questionsArray
+  //     };
 
-      return res.status(200).json(response);
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        error: {
-          message: error?.message ?? 'Internal Server Error'
-        }
-      });
-    }
-  } else {
-    res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
-  }
+  //     return res.status(200).json(response);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     res.status(500).json({
+  //       error: {
+  //         message: error?.message ?? 'Internal Server Error'
+  //       }
+  //     });
+  //   }
+  // } else {
+  //   res.setHeader('Allow', 'POST');
+  //   res.status(405).end('Method Not Allowed');
+  // }
 };
 
 export default apiHandler;
