@@ -115,19 +115,16 @@ export default function Quiz({
           <title>{title}</title>
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
-          <meta content={data.title} name="description" />
+          <meta content={`Quiz on ${data.title}`} name="description" />
           <meta property="og:type" content="website" />
-          <meta property="og:site_name" content={data.title} />
+          <meta property="og:site_name" content={`Quiz on ${data.title}`} />
           <meta
             property="og:description"
             content={topics.find((topic) => topic.id === topicId)?.title}
           />
-          <meta
-            property="og:title"
-            content={topics.find((topic) => topic.id === topicId)?.title}
-          />
+          <meta property="og:title" content={`Quiz on ${data.title}`} />
           <meta name="twitter:site" content="@vercel" />
-          <meta name="twitter:title" content={data.title} />
+          <meta name="twitter:title" content={`Quiz on ${data.title}`} />
           <meta
             name="twitter:description"
             content={topics.find((topic) => topic.id === topicId)?.title}
