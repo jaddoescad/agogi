@@ -17,8 +17,6 @@ import {
 } from 'prompts/book-generator/subprompts/check-message-type';
 
 const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  res.status(200).json({ name: 'John Doe' });
-
   if (req.method === 'POST') {
     try {
       const supabaseServerClient = createServerSupabaseClient({ req, res });
