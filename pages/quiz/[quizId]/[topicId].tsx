@@ -118,14 +118,20 @@ export default function Quiz({
           <meta content={data.title} name="description" />
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content={data.title} />
-          <meta property="og:description" content={topicTitle || 'Untitled'} />
+          <meta
+            property="og:description"
+            content={topics.find((topic) => topic.id === topicId)?.title}
+          />
           <meta
             property="og:title"
             content={topics.find((topic) => topic.id === topicId)?.title}
           />
           <meta name="twitter:site" content="@vercel" />
-          <meta name="twitter:title" content={title ?? 'Untitled'} />
-          <meta name="twitter:description" content={topicTitle ?? 'Untitled'} />
+          <meta name="twitter:title" content={data.title} />
+          <meta
+            name="twitter:description"
+            content={topics.find((topic) => topic.id === topicId)?.title}
+          />
           <meta property="og:image" content={data.image_url} />
           <meta name="twitter:image" content={data.image_url} />
         </Head>
