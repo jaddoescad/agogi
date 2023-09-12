@@ -13,17 +13,18 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 export default function Quiz({
   quizId,
   topicId,
-  initialData: data
+  initialData: data,
+  topicTitle
 }: {
   quizId: string;
   topicId: string;
   initialData: any;
+  topicTitle: string;
 }) {
   const [title, setTitle] = useState<string | null>('Untitled');
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [topicTitle, setTopicTitle] = useState<string | null>('');
   const [topicsOrder, setTopicsOrder] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -51,7 +52,6 @@ export default function Quiz({
   useEffect(() => {
     if (!data) return;
     resetQuiz();
-    console.log('hello', data);
 
     if (data.title) {
       setTitle(data.title);
@@ -85,7 +85,7 @@ export default function Quiz({
     refreshQuestions();
     setSelectedTopic(topicId);
 
-    setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
+    // setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
   }, [topicId, topics]);
 
   //track quiz views
@@ -115,19 +115,19 @@ export default function Quiz({
           <title>{title}</title>
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
-          <meta content={topics.find((topic) => topic.id === topicId)?.title} name="description" />
+          <meta content={topicTitle} name="description" />
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content={`Quiz on ${data.title}`} />
           <meta
             property="og:description"
-            content={topics.find((topic) => topic.id === topicId)?.title}
+            content={topicTitle}
           />
           <meta property="og:title" content={`Quiz on ${data.title}`} />
           <meta name="twitter:site" content="@vercel" />
           <meta name="twitter:title" content={`Quiz on ${data.title}`} />
           <meta
             name="twitter:description"
-            content={topics.find((topic) => topic.id === topicId)?.title}
+            content={topicTitle}
           />
           <meta property="og:image" content={data.image_url} />
           <meta name="twitter:image" content={data.image_url} />
@@ -162,6 +162,7 @@ export async function getServerSideProps(context: any) {
   const topicId = context.query.topicId;
 
   let initialData;
+  let topicTitle;
 
   // Fetch the data required for the quiz
   try {
@@ -176,6 +177,12 @@ export async function getServerSideProps(context: any) {
     );
     initialData = data;
 
+    const topics = initialData?.quizzes_snapshot?.[0]?.topics_snapshot;
+    if (topics) {
+      const matchedTopic = topics.find((topic) => topic.id === topicId);
+      topicTitle = matchedTopic?.title;
+    }
+
     // ... [Fetch other required data and populate initialData]
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -186,7 +193,8 @@ export async function getServerSideProps(context: any) {
     props: {
       initialData,
       quizId,
-      topicId
+      topicId,
+      topicTitle // pass the derived topicTitle to your component
     }
   };
 }
