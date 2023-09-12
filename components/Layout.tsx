@@ -12,12 +12,11 @@ import { getURL } from '@/utils/helpers';
 
 interface Props {
   children: ReactNode;
-  meta?: PageMeta;
 }
 
 
 
-export default function Layout({ children, meta: pageMeta }: Props) {
+export default function Layout({ children }: Props) {
   const router = useRouter();
 
   return (

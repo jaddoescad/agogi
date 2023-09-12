@@ -37,27 +37,29 @@ const Home: React.FC = () => {
 
   const meta = {
     title: 'Agogi',
-    description: 'AI powered quiz platform',
-    ...pageMeta
+    description: 'AI powered quiz platform'
   };
 
   return (
     <Box pb={10}>
       <Box minH="screen" alignItems="center">
         <Head>
-          <title>{meta.title}</title>
+          <title>{"Agogi"}</title>
           <meta name="robots" content="follow, index" />
           <link href="/favicon.ico" rel="shortcut icon" />
-          <meta content={meta.description} name="description" />
+          <meta content={"Quizzes for Books"} name="description" />
           <meta property="og:url" content={`${getURL()}${router.asPath}`} />
 
           <meta property="og:type" content="website" />
-          <meta property="og:site_name" content={meta.title} />
-          <meta property="og:description" content={meta.description} />
-          <meta property="og:title" content={meta.title} />
-          <meta name="twitter:site" content="@vercel" />
-          <meta name="twitter:title" content={meta.title} />
-          <meta name="twitter:description" content={meta.description} />
+          <meta property="og:site_name" content={
+            "Agogi"
+          } />
+          <meta property="og:description" content={
+            "Quizzes for Books"
+          } />
+          <meta property="og:title" content={
+            "Agogi"
+          } />
         </Head>
 
         <Navbar logo />
