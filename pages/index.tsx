@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { generateQuizID } from '../utils/generate-quiz-id';
 import Navbar from 'components/ui/Navbar';
 import { QuizCard } from 'components/QuizCards/QuizCard';
+import { getURL } from 'next/dist/shared/lib/utils';
 
 type Quiz = {
   id: string;
