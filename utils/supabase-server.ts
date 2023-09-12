@@ -242,3 +242,31 @@ export const checkQuizAndTopicExist = async (quizId: string,  supabase: Supabase
   }
   return data ?? [];
 }
+
+
+export const getPublishedQuizAndTopicsServer = async (quizId: string, supabase: SupabaseClient<any>) => {
+  const { data, error } = await supabase
+    .from('quizzes')
+    .select(
+      `
+        id,
+        title,
+        quizzes_snapshot!quizzes_snapshot_original_quiz_id_fkey(
+        topics_order,
+        topics_snapshot!fk_topic_to_quiz_snapshot (
+          id,
+          title
+        )
+      )
+      `
+    )
+    .eq('id', quizId)
+    .single();
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+};

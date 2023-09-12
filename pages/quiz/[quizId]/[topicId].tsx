@@ -7,11 +7,18 @@ import { Question } from 'types/types';
 import va from '@vercel/analytics';
 import { Center, Flex, Spinner } from '@chakra-ui/react';
 import Head from 'next/head';
+import { getPublishedQuizAndTopicsServer } from 'utils/supabase-server';
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
-export default function Quiz() {
-  const router = useRouter();
-  const quizId = router.query.quizId as string;
-  const topicId = router.query.topicId as string;
+export default function Quiz({
+  quizId,
+  topicId,
+  initialData: data
+}: {
+  quizId: string;
+  topicId: string;
+  initialData: any;
+}) {
   const [title, setTitle] = useState<string | null>('Untitled');
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -24,21 +31,6 @@ export default function Quiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
   const [image, setImage] = useState<string | null>(null);
-
-  const {
-    data,
-    isLoading: isQuizLoading,
-    isError
-  } = useGetPublishedQuizAndTopics(quizId) as {
-    data: any;
-    isLoading: boolean;
-    isError: boolean;
-  };
-
-  useEffect(() => {
-    console.log('hello');
-    console.log('quizId', quizId);
-  }, [router]);
 
   const va_ = va;
 
@@ -117,65 +109,88 @@ export default function Quiz() {
       flexDir={'column'}
       justifyContent={'center'}
     >
-      {!isQuizLoading ? (
-        <>
-          <Head>
-            <title>{title}</title>
-            <meta name="robots" content="follow, index" />
-            <link href="/favicon.ico" rel="shortcut icon" />
-            <meta content={topicTitle || 'Untitled'} name="description" />
-            <meta property="og:type" content="website" />
-            <meta property="og:site_name" content={title || 'Untitled'} />
-            <meta
-              property="og:description"
-              content={topicTitle || 'Untitled'}
-            />
-            <meta
-              property="og:title"
-              content={
-                topicTitle ? `${topicTitle} - ${title}` : title || 'Untitled'
-              }
-            />
-            <meta name="twitter:site" content="@vercel" />
-            <meta name="twitter:title" content={title ?? 'Untitled'} />
-            <meta
-              name="twitter:description"
-              content={topicTitle ?? 'Untitled'}
-            />
-
-            {image && (
-              <>
-                <meta property="og:image" content={image} />
-                <meta name="twitter:image" content={image} />
-              </>
-            )}
-          </Head>
-          <Preview
-            quizId={quizId}
-            topics={topics}
-            title={title || 'Untitled'}
-            selectedTopic={selectedTopic || topics[0]?.id}
-            setSelectedTopic={setSelectedTopic}
-            questions={questions}
-            topicTitle={topicTitle || 'Untitled'}
-            topicsOrder={topicsOrder}
-            currentQuestionIndex={currentQuestionIndex}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
-            answers={answers}
-            setAnswers={setAnswers}
-            submitted={submitted}
-            setSubmitted={setSubmitted}
-            feedback={feedback}
-            setFeedback={setFeedback}
-            isQuestionLoading={isQuestionLoading}
-            va={va_}
+      <>
+        <Head>
+          <title>{title}</title>
+          <meta name="robots" content="follow, index" />
+          <link href="/favicon.ico" rel="shortcut icon" />
+          <meta content={topicTitle || 'Untitled'} name="description" />
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content={title || 'Untitled'} />
+          <meta property="og:description" content={topicTitle || 'Untitled'} />
+          <meta
+            property="og:title"
+            content={
+              topicTitle ? `${topicTitle} - ${title}` : title || 'Untitled'
+            }
           />
-        </>
-      ) : (
-        <Center mt={5}>
-          <Spinner color="white" />
-        </Center>
-      )}
+          <meta name="twitter:site" content="@vercel" />
+          <meta name="twitter:title" content={title ?? 'Untitled'} />
+          <meta name="twitter:description" content={topicTitle ?? 'Untitled'} />
+
+          {image && (
+            <>
+              <meta property="og:image" content={image} />
+              <meta name="twitter:image" content={image} />
+            </>
+          )}
+        </Head>
+        <Preview
+          quizId={quizId}
+          topics={topics}
+          title={title || 'Untitled'}
+          selectedTopic={selectedTopic || topics[0]?.id}
+          setSelectedTopic={setSelectedTopic}
+          questions={questions}
+          topicTitle={topicTitle || 'Untitled'}
+          topicsOrder={topicsOrder}
+          currentQuestionIndex={currentQuestionIndex}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          answers={answers}
+          setAnswers={setAnswers}
+          submitted={submitted}
+          setSubmitted={setSubmitted}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          isQuestionLoading={isQuestionLoading}
+          va={va_}
+        />
+      </>
     </Flex>
   );
+}
+
+
+export async function getServerSideProps(context: any) {
+  const quizId = context.query.quizId;
+  const topicId = context.query.topicId;
+
+  let initialData = {};
+
+  // Fetch the data required for the quiz
+  try {
+    const supabaseServerClient = createServerSupabaseClient({
+      res: context.res,
+      req: context.req
+    });
+
+    const data = await getPublishedQuizAndTopicsServer(
+      quizId,
+      supabaseServerClient
+    );
+    initialData = data;
+    // ... [Fetch other required data and populate initialData]
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    // Handle error appropriately
+  }
+
+  return {
+    props: {
+      initialData,
+      quizId,
+      topicId
+      // ... [Pass other required data as props]
+    }
+  };
 }
