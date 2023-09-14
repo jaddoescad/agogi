@@ -88,9 +88,9 @@ export default function QuizPage({
         w="100%"
         display="flex"
         color="white"
-        h={'100%'}
         justifyContent="center"
         alignItems="center"
+        flex={1}
       >
         <Text fontWeight={'bold'} fontSize="3xl">
           Please chat to generate quizzes
@@ -102,11 +102,12 @@ export default function QuizPage({
   return (
     <Box
       w="100%"
-      h={'100%'}
       color="white"
       overflowY={'scroll'}
       css={css_scroll}
       paddingBottom={'100px'}
+      overflow={'auto'}
+      flex={1}
       // marginTop={'100px'}
     >
       <Box margin={'auto'} maxW={'600px'} w={'100%'}>

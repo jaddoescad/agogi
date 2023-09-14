@@ -2,13 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { generateMultipleChoiceFullPrompt } from '../../prompts/quiz-generator/multiple-choice-sys-mes';
 import { generateTrueAndFalsePrompt } from '../../prompts/true-false-sys-mes';
 import {
-  saveMessage,
   insertQuizOrDonothing,
   insertQuestions
 } from '../../utils/supabase-server';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { RequestData } from 'types/types';
-import { fetchQuestions, fetchMessages } from '../../utils/supabase-server';
+import { fetchQuestions } from '../../utils/supabase-server';
 import { OpenAI } from 'langchain/llms/openai';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -27,7 +26,6 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
       await insertQuizOrDonothing(supabaseServerClient, quizId);
-      await saveMessage(supabaseServerClient, message, topicId, 'user');
       const questions = await fetchQuestions(supabaseServerClient, topicId);
 
       const past_questions = JSON.stringify(questions);
@@ -51,15 +49,6 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           result_json.quiz_response.questions,
           topicId,
           quizType
-        );
-      }
-
-      if (result_json.ai_response) {
-        await saveMessage(
-          supabaseServerClient,
-          result_json.ai_response.message,
-          topicId,
-          'ai'
         );
       }
 

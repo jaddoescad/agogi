@@ -133,10 +133,7 @@ export interface ShownAnswers {
   [key: number]: boolean;
 }
 
-export type Message = {
-  message: string;
-  type: string;
-};
+
 
 export type RequestData = {
   quizType: string;

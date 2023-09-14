@@ -20,26 +20,6 @@ export const addQuizAndQuestions = async (
   return id ?? [];
 };
 
-export const saveMessage = async (
-  supabase: SupabaseClient<any, 'public', any>,
-  message: string,
-  topicId: string,
-  type: string
-) => {
-  const { data, error } = await supabase.from('messages').insert([
-    {
-      topic_id: topicId,
-      message: message,
-      type: type
-    }
-  ]);
-
-  if (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-  return data ?? [];
-};
 
 export const insertQuizOrDonothing = async (
   supabase: SupabaseClient<any, 'public', any>,
@@ -94,29 +74,6 @@ export const fetchQuestions = async (
     )
     .eq('topic_id', topicId)
     .limit(20)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-  return data ?? [];
-};
-
-export const fetchMessages = async (
-  supabase: SupabaseClient<any, 'public', any>,
-  topicId: string
-) => {
-  const { data, error } = await supabase
-    .from('messages')
-    .select(
-      `
-      message,
-      type
-    `
-    )
-    .eq('topic_id', topicId)
-    .limit(10)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -271,3 +228,23 @@ export const getPublishedQuizAndTopicsServer = async (quizId: string, supabase: 
 
   return data ?? [];
 };
+
+export const saveTopicPrompt = async (
+  topicId: string,
+  prompt: string,
+  supabase: SupabaseClient<any, 'public', any>
+) => {
+  const { data, error } = await supabase
+    .from('topics')
+    .update({
+      prompt
+    })
+    .eq('id', topicId);
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+}

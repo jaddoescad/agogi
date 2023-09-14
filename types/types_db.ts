@@ -27,37 +27,6 @@ export interface Database {
         }
         Relationships: []
       }
-      messages: {
-        Row: {
-          created_at: string
-          id: string
-          message: string
-          topic_id: string
-          type: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          message: string
-          topic_id: string
-          type: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          message?: string
-          topic_id?: string
-          type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_topic_id_fkey"
-            columns: ["topic_id"]
-            referencedRelation: "topics"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       prices: {
         Row: {
           active: boolean | null
@@ -144,7 +113,6 @@ export interface Database {
         Row: {
           created_at: string
           id: string
-          message_id: string | null
           question_data: Json | null
           topic_id: string | null
           type: string | null
@@ -152,7 +120,6 @@ export interface Database {
         Insert: {
           created_at?: string
           id?: string
-          message_id?: string | null
           question_data?: Json | null
           topic_id?: string | null
           type?: string | null
@@ -160,18 +127,11 @@ export interface Database {
         Update: {
           created_at?: string
           id?: string
-          message_id?: string | null
           question_data?: Json | null
           topic_id?: string | null
           type?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "questions_message_id_fkey"
-            columns: ["message_id"]
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "questions_topic_id_fkey"
             columns: ["topic_id"]
@@ -256,12 +216,6 @@ export interface Database {
             foreignKeyName: "quizzes_creator_id_fkey"
             columns: ["creator_id"]
             referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quizzes_published_quiz_id_fkey"
-            columns: ["published_quiz_id"]
-            referencedRelation: "quizzes_snapshot"
             referencedColumns: ["id"]
           }
         ]
@@ -365,18 +319,21 @@ export interface Database {
         Row: {
           created_at: string
           id: string
+          prompt: string | null
           quiz_id: string | null
           title: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          prompt?: string | null
           quiz_id?: string | null
           title?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          prompt?: string | null
           quiz_id?: string | null
           title?: string | null
         }

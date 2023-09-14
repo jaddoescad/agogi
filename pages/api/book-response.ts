@@ -2,13 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { generateMultipleChoiceFullPrompt } from '../../prompts/quiz-generator/multiple-choice-sys-mes';
 import { generateTrueAndFalsePrompt } from '../../prompts/true-false-sys-mes';
 import {
-  saveMessage,
   insertQuizOrDonothing,
   insertQuestions
 } from '../../utils/supabase-server';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { RequestData } from 'types/types';
-import { fetchQuestions, fetchMessages } from '../../utils/supabase-server';
+import { fetchQuestions, saveTopicPrompt } from '../../utils/supabase-server';
 import { OpenAI } from 'langchain/llms/openai';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -25,7 +24,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { message, quizId, quizType, topicId } =
         (await req.body) as RequestData;
 
-      await saveMessage(supabaseServerClient, message, topicId, 'user');
+      saveTopicPrompt(topicId, message, supabaseServerClient);
 
       console.log('message saved');
 
@@ -38,7 +37,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const prompt = quizIntentionPrompt(message);
       const result = await llmGpt4.predict(prompt);
 
-      console.log('result', result);
+      // console.log('result', result);
 
 
       // Parsing the response
@@ -65,7 +64,7 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       // Wait for all the questions to be processed
       const questionsArray = await Promise.all(questionsPromises);
 
-      console.log('questionsArray', questionsArray);
+      // console.log('questionsArray', questionsArray);
 
       //LOOP THROU
         await insertQuestions(
@@ -75,29 +74,12 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           quizType
         );
 
-        console.log('questions inserted');
-
-
-      if (aiResponse) {
-        await saveMessage(
-          supabaseServerClient,
-          aiResponse,
-          topicId,
-          'ai'
-        );
-      }
-
-      console.log('ai response saved');
-
-
-
-      // Structuring the final response
       const response = {
         message: aiResponse,
         questions: questionsArray
       };
 
-      console.log('response', response);
+      // console.log('response', response);
 
       return res.status(200).json(response);
     } catch (error: any) {

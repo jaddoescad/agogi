@@ -5,12 +5,11 @@ import { Box, Button, Flex } from '@chakra-ui/react';
 import Router, { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import {
-  getMessages,
   getQuestions,
   getQuizAndTopics,
   deleteAllQuestionsOfTopic
 } from 'utils/supabase-client';
-import { Question, Message, MultipleChoiceQuestion } from 'types/types';
+import { Question, MultipleChoiceQuestion } from 'types/types';
 import Navbar from 'components/ui/Navbar';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
@@ -19,13 +18,13 @@ import { getURL } from '@/utils/helpers';
 import { SideBar } from '../../components/Topics/Vertical';
 import { useGetQuizAndTopics } from 'hooks/useGetQuizAndTopics';
 import { checkQuizAndTopicExist } from 'utils/supabase-server';
+import { getTopicPrompt } from '../../utils/supabase-client';
 
 const init_message = {
   message: 'Hello! What type of quiz topic would you like to generate?',
   type: 'ai'
 };
 export default function GenerateQuiz() {
-  const [history, setHistory] = useState<Message[]>([{ ...init_message }]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentModel, setCurrentModel] = useState<string>('gpt-4');
   const quizId = useRouter().query.quizId as string;
@@ -34,6 +33,7 @@ export default function GenerateQuiz() {
   const [currentPage, setCurrentPage] = useState(1);
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState<string | null>(null);
   const {
     data,
     isLoading: isQuizLoading,
@@ -47,12 +47,13 @@ export default function GenerateQuiz() {
   useEffect(() => {
     if (!quizId) return;
     if (!selectedTopic) return;
-    getMessages(selectedTopic).then((messages) => {
-      setHistory([init_message, ...messages]);
-    });
 
     getQuestions(selectedTopic).then((questions) => {
       setQuestions(questions as MultipleChoiceQuestion[]);
+    });
+
+    getTopicPrompt(selectedTopic).then((data) => {
+      setPrompt(data.prompt);
     });
   }, [selectedTopic]);
 
@@ -65,6 +66,10 @@ export default function GenerateQuiz() {
 
     if (data.title) {
       setTitle(data.title);
+    }
+
+    if (data.prompt) {
+      setPrompt(data.prompt);
     }
 
     if (data.topics_order && data.topics) {
@@ -108,13 +113,12 @@ export default function GenerateQuiz() {
             <Form
               isLoading={isLoading}
               setIsLoading={setIsLoading}
-              history={history}
-              setHistory={setHistory}
               quizId={quizId}
               quiz={questions}
               setQuiz={setQuestions}
               setCurrentPage={setCurrentPage}
               topicId={selectedTopic as string}
+              prompt={prompt}
             />
           </Flex>
 
@@ -125,8 +129,10 @@ export default function GenerateQuiz() {
             justifyContent="center"
             h={'100%'}
           >
-            <Box w="100%" color="white" h={'100%'}>
+            <Flex w="100%" color="white" h={'100%'} flexDir={'column'}>
               <Button
+                w={'200px'}
+                mx={'auto'}
                 onClick={async () => {
                   try {
                     if (!selectedTopic) return;
@@ -146,7 +152,7 @@ export default function GenerateQuiz() {
                 setTitle={setTitle}
                 setQuestions={setQuestions}
               />
-            </Box>
+            </Flex>
           </Flex>
         </Flex>
       </Box>

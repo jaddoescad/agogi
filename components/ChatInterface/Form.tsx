@@ -9,8 +9,7 @@ import {
   useToast,
   Select
 } from '@chakra-ui/react';
-import { clearChatMessages } from 'utils/supabase-client';
-import { Question, Message } from 'types/types';
+import { Question } from 'types/types';
 import { css_scroll } from 'styles/chakra-css-styles.js';
 import {HUMAN_USER} from '../../utils/constants'
 import { useEffect } from 'react';
@@ -18,23 +17,21 @@ import { useEffect } from 'react';
 const Form = ({
   isLoading,
   setIsLoading,
-  history,
-  setHistory,
   quizId,
   topicId,
   quiz,
   setQuiz,
-  setCurrentPage
+  setCurrentPage,
+  prompt
 }: {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  history: Message[];
-  setHistory: React.Dispatch<React.SetStateAction<Message[]>>;
   quizId: string;
   quiz: any | null;
   setQuiz: React.Dispatch<React.SetStateAction<Question[] | null>>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   topicId: string;
+  prompt: string | null;
 }) => {
   const messageInput = useRef<HTMLTextAreaElement | null>(null);
   const handleEnter = (
@@ -51,23 +48,13 @@ const Form = ({
   const [quizType, setQuizType] = useState<string>('multiple-choice');
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (chatBoxRef.current) {
-      const chatBox = chatBoxRef.current;
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  }, [history]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default behavior of form submission
     e.preventDefault();
     setIsLoading(true);
     const message = messageInput.current?.value;
-    if (message !== undefined) {
-      setHistory((prev) => [...prev, { message: message, type: HUMAN_USER }]);
-      messageInput.current!.value = '';
-    }
-
+    
     if (!message) {
       return;
     }
@@ -83,11 +70,6 @@ const Form = ({
         }
       });
       if (response !== undefined) {
-        setHistory((prev) => [
-          ...prev,
-          { message: response['message'], type: 'ai' }
-        ]);
-
         if (response.questions) {
           const newQuestions = quiz
             ? [...quiz, ...response.questions]
@@ -132,58 +114,16 @@ const Form = ({
           <option value="multiple-choice">Multiple Choice</option>
           <option value="true/false">True/False</option>
         </Select>
-        <Button
-          type="reset"
-          p={4}
-          rounded="md"
-          bg="white"
-          colorScheme="gray"
-          variant="outline"
-          _hover={{ bg: 'gray.700' }}
-          isDisabled={isLoading}
-          onClick={async () => {
-            await clearChatMessages(quizId);
-            setHistory([]);
-          }}
-        >
-          Clear History
-        </Button>
       </Flex>
 
-      <Box
-        w="full"
-        alignItems="flex-start"
-        mb={6}
-        h="500"
-        p={4}
-        flex={"1"}
-        overflowY="scroll"
-        css={css_scroll}
-        ref={chatBoxRef}  
 
-      >
-        {history?.map((item, index) => (
-          <Flex
-            key={index}
-            justify={item.type === 'ai' ? 'flex-start' : 'flex-end'}
-            w="100%"
-            mt={2}
-          >
-            <Box
-              p={3}
-              rounded="lg"
-              bg={item.type === 'ai' ? 'blue.500' : 'gray.500'}
-              color="white"
-              w="50%"
-            >
-              <Text>{item.message}</Text>
-            </Box>
-          </Flex>
-        ))}
-      </Box>
-
-      <form onSubmit={handleSubmit}>
-        <Box bg="gray.700" rounded="md" p={4} boxShadow="md" color={'white'}>
+      <form onSubmit={handleSubmit} style={
+        {
+          ...css_scroll,
+          height: '100%'
+        }
+      }>
+        <Flex bg="gray.700" rounded="md" p={4} boxShadow="md" color={'white'} h="100%" flexDir={"column"}>
           <Textarea
             name="Message"
             placeholder="Type your query"
@@ -191,14 +131,16 @@ const Form = ({
             onKeyDown={handleEnter}
             resize="none"
             bg="transparent"
+            flex={1}
             border="none"
             focusBorderColor="blue.500"
             mb={3}
+            defaultValue={prompt || ''}
           />
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
             Send
           </Button>
-        </Box>
+        </Flex>
       </form>
     </>
   );

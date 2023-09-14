@@ -220,27 +220,7 @@ export const getQuiz = async (quizId: string) => {
   return data ?? [];
 };
 
-export const getMessages = async (topicId: string) => {
-  const { data, error } = await supabase
-    .from('messages')
-    .select(
-      `
-      message,
-      type
-    `
-    )
-    .eq('topic_id', topicId);
 
-  if (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-  return data ?? [];
-};
-
-export const clearChatMessages = async (quizId: string) => {
-  await supabase.from('messages').delete().eq('quiz_id', quizId);
-};
 
 //use rpc
 export const getQuestions = async (topicId: string) => {
@@ -467,3 +447,18 @@ export const deleteAllQuestionsOfTopic = async (topicId: string) => {
 
 }
   
+
+export const getTopicPrompt = async (topicId: string) => {
+  const { data, error } = await supabase
+    .from('topics')
+    .select('prompt')
+    .eq('id', topicId)
+    .single();
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  return data ?? [];
+}
