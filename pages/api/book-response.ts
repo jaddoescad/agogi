@@ -24,9 +24,9 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { message, quizId, quizType, topicId } =
         (await req.body) as RequestData;
 
-      saveTopicPrompt(topicId, message, supabaseServerClient);
+        console.log('message', message)
 
-      console.log('message saved');
+      saveTopicPrompt(topicId, message, supabaseServerClient);
 
       const llmGpt4 = new OpenAI({
         openAIApiKey: process.env.OPENAI_API_KEY,
@@ -36,12 +36,12 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const prompt = quizIntentionPrompt(message);
       const result = await llmGpt4.predict(prompt);
-
-      // console.log('result', result);
+      console.log('result', result)
 
 
       // Parsing the response
       const parsedResponse = JSON.parse(result);
+      console.log('parsedResponse', parsedResponse);
 
       const aiResponse = parsedResponse.ai_response;
       const promptQuestions = parsedResponse.questions;

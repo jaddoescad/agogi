@@ -248,3 +248,15 @@ export const saveTopicPrompt = async (
 
   return data ?? [];
 }
+
+export const editTopicTitle = async (topicId: string, title: string,   supabase: SupabaseClient<any, 'public', any>) => {
+  const { data, error } = await supabase
+    .from('topics')
+    .update({ title })
+    .eq('id', topicId);
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+  return data ?? [];
+};

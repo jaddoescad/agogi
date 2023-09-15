@@ -45,9 +45,9 @@ export default function GenerateQuiz() {
   };
 
   useEffect(() => {
+    console.log('quizId', quizId);
     if (!quizId) return;
     if (!selectedTopic) return;
-
     getQuestions(selectedTopic).then((questions) => {
       setQuestions(questions as MultipleChoiceQuestion[]);
     });
@@ -110,6 +110,7 @@ export default function GenerateQuiz() {
             maxW={'500px'}
             flex={1}
           >
+  
             <Form
               isLoading={isLoading}
               setIsLoading={setIsLoading}
@@ -119,6 +120,8 @@ export default function GenerateQuiz() {
               setCurrentPage={setCurrentPage}
               topicId={selectedTopic as string}
               prompt={prompt}
+              setTopics={setTopics}
+              topics={topics}
             />
           </Flex>
 

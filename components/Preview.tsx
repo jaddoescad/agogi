@@ -47,6 +47,7 @@ export default function PreviewQuiz({
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const displayValue = useBreakpointValue({ base: 'none', md: 'block' });
+  const router = useRouter();
 
 
 
@@ -65,7 +66,7 @@ export default function PreviewQuiz({
     if (va && quizId) va.track('Next Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex < topicsOrder.length - 1) {
-      setSelectedTopic(topicsOrder[currentIndex + 1]);
+      router.push(`/quiz/${quizId}/${topicsOrder[currentIndex + 1]}`);
     }
   };
 
@@ -73,7 +74,7 @@ export default function PreviewQuiz({
     if (va && quizId) va.track('Previous Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex > 0) {
-      setSelectedTopic(topicsOrder[currentIndex - 1]);
+      router.push(`/quiz/${quizId}/${topicsOrder[currentIndex - 1]}`);
     }
   };
 

@@ -51,8 +51,6 @@ export default function QuizPage({
     null
   );
 
-
-
   useEffect(() => {
     if (quizId) {
       va.track('quiz-view');
@@ -108,7 +106,6 @@ export default function QuizPage({
       paddingBottom={'100px'}
       overflow={'auto'}
       flex={1}
-      // marginTop={'100px'}
     >
       <Box margin={'auto'} maxW={'600px'} w={'100%'}>
 

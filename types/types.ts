@@ -138,6 +138,7 @@ export interface ShownAnswers {
 export type RequestData = {
   quizType: string;
   message: string;
+  prompt: string;
   quizId: string;
   topicId: string;
 };

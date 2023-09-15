@@ -22,7 +22,9 @@ const Form = ({
   quiz,
   setQuiz,
   setCurrentPage,
-  prompt
+  prompt,
+  topics,
+  setTopics
 }: {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,7 +34,20 @@ const Form = ({
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   topicId: string;
   prompt: string | null;
+  topics: any[];
+  setTopics: React.Dispatch<React.SetStateAction<any[]>>;
 }) => {
+  const modifyTitleById = (id: string, newTitle: string) => {
+    const sanitizedTitle = newTitle.replace(/['"]/g, '');
+
+    const index = topics.findIndex((topic) => topic.id === id);
+    if (index !== -1) {
+      const newTopics = [...topics];
+      newTopics[index].title = sanitizedTitle;
+      setTopics(newTopics);
+    }
+  };
+
   const messageInput = useRef<HTMLTextAreaElement | null>(null);
   const handleEnter = (
     e: React.KeyboardEvent<HTMLTextAreaElement> &
@@ -48,13 +63,12 @@ const Form = ({
   const [quizType, setQuizType] = useState<string>('multiple-choice');
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default behavior of form submission
     e.preventDefault();
     setIsLoading(true);
     const message = messageInput.current?.value;
-    
+
     if (!message) {
       return;
     }
@@ -114,16 +128,41 @@ const Form = ({
           <option value="multiple-choice">Multiple Choice</option>
           <option value="true/false">True/False</option>
         </Select>
+        <Button
+          onClick={async () => {
+            let response = await postData({
+              url: '/api/generate-title',
+              data: {
+                prompt,
+                quizId,
+                quizType,
+                topicId
+              }
+            });
+
+            modifyTitleById(topicId, response);
+          }}
+        >
+          Generate Title
+        </Button>
       </Flex>
 
-
-      <form onSubmit={handleSubmit} style={
-        {
+      <form
+        onSubmit={handleSubmit}
+        style={{
           ...css_scroll,
           height: '100%'
-        }
-      }>
-        <Flex bg="gray.700" rounded="md" p={4} boxShadow="md" color={'white'} h="100%" flexDir={"column"}>
+        }}
+      >
+        <Flex
+          bg="gray.700"
+          rounded="md"
+          p={4}
+          boxShadow="md"
+          color={'white'}
+          h="100%"
+          flexDir={'column'}
+        >
           <Textarea
             name="Message"
             placeholder="Type your query"
@@ -147,3 +186,5 @@ const Form = ({
 };
 
 export default Form;
+
+

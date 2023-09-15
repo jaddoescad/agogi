@@ -6,6 +6,7 @@ import { ProductWithPrice } from 'types/types';
 import type { Database } from 'types/types_db';
 import { isQuestion } from 'types/type_guards';
 import { Question } from 'types/types';
+import { postData } from './helpers';
 
 export const supabase = createBrowserSupabaseClient<Database>();
 
@@ -220,8 +221,6 @@ export const getQuiz = async (quizId: string) => {
   return data ?? [];
 };
 
-
-
 //use rpc
 export const getQuestions = async (topicId: string) => {
   const { data, error } = await supabase.rpc('get_questions', {
@@ -235,7 +234,6 @@ export const getQuestions = async (topicId: string) => {
   return data ?? [];
 };
 
-
 export const getPublishedQuestions = async (topicId: string) => {
   const { data, error } = await supabase.rpc('get_published_questions', {
     tid: topicId
@@ -247,7 +245,6 @@ export const getPublishedQuestions = async (topicId: string) => {
   }
   return data ?? [];
 };
-
 
 export const updateQuizTitle = async (quizId: string, title: string) => {
   await supabase
@@ -280,7 +277,6 @@ export const getQuizAndTopics = async (quizId: string) => {
     console.log(error.message);
     throw error;
   }
-
 
   return data ?? [];
 };
@@ -434,9 +430,11 @@ export const uploadImageUrl = async (quizId: string, url: string) => {
   return data ?? [];
 };
 
-
 export const deleteAllQuestionsOfTopic = async (topicId: string) => {
-  const {data, error} = await supabase.from('questions').delete().eq('topic_id', topicId);
+  const { data, error } = await supabase
+    .from('questions')
+    .delete()
+    .eq('topic_id', topicId);
 
   if (error) {
     console.log(error.message);
@@ -444,9 +442,7 @@ export const deleteAllQuestionsOfTopic = async (topicId: string) => {
   }
 
   return data ?? [];
-
-}
-  
+};
 
 export const getTopicPrompt = async (topicId: string) => {
   const { data, error } = await supabase
@@ -461,4 +457,70 @@ export const getTopicPrompt = async (topicId: string) => {
   }
 
   return data ?? [];
-}
+};
+
+export const getOneQuestionFromTopic = async (topicId: string) => {
+  const { data, error } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('topic_id', topicId)
+    .limit(1);
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+
+  return data ?? [];
+};
+
+export const generateAQuizForEachTopic = async (
+  topics: string[],
+  quizId: string
+) => {
+  // Create an array of promises for each topic
+  const promises = topics.map(async (topicId) => {
+    const questions = await getOneQuestionFromTopic(topicId);
+    if (questions.length > 0) {
+      return;
+    }
+
+    const result = await getTopicPrompt(topicId);
+    return postData({
+      url: '/api/book-response',
+      data: {
+        message: result.prompt,
+        quizId,
+        topicId
+      }
+    });
+  });
+
+  // Wait for all promises to complete
+  await Promise.all(promises);
+};
+
+export const countTopicsWithNoQuestions = async (quiz_id: string) => {
+  const { data, error } = await supabase.rpc('topics_without_questions', {
+    p_quiz_id: quiz_id
+  });
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  console.log('data', data);
+
+  return data ?? [];
+};
+
+export const deleteAllQuizQuestions = async (topics: string[]) => {
+  for (const topic of topics) {
+    const { data, error } = await supabase
+      .from('questions')
+      .delete()
+      .eq('topic_id', topic);
+    console.log('data', data);
+  }
+};

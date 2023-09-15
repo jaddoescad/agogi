@@ -429,6 +429,20 @@ export interface Database {
         }
         Returns: Json
       }
+      create_topic_with_prompt: {
+        Args: {
+          quiz_id: string
+          prompt_text: string
+        }
+        Returns: undefined
+      }
+      createtopicwithprompt: {
+        Args: {
+          quiz_id: string
+          prompt_text: string
+        }
+        Returns: Json
+      }
       delete_topic: {
         Args: {
           topic_id: string
@@ -452,6 +466,12 @@ export interface Database {
           qid: string
         }
         Returns: undefined
+      }
+      topics_without_questions: {
+        Args: {
+          p_quiz_id: string
+        }
+        Returns: number
       }
     }
     Enums: {

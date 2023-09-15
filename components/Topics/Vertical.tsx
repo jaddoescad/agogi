@@ -2,10 +2,15 @@ import React from 'react';
 import { verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { Sortable } from './Sortable';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
+import { Box, Button, Flex, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { IoIosArrowBack } from 'react-icons/io';
-import { SortableProps , SideBarProps} from 'types/types';
+import { SortableProps, SideBarProps } from 'types/types';
+import {
+  generateAQuizForEachTopic,
+  deleteAllQuizQuestions,
+  countTopicsWithNoQuestions
+} from 'utils/supabase-client';
 
 export default {
   title: 'Presets/Sortable/Vertical'
@@ -14,7 +19,6 @@ export default {
 const props: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy
 };
-
 
 export const SideBar: React.FC<SideBarProps> = ({
   topicList,
@@ -47,6 +51,31 @@ export const SideBar: React.FC<SideBarProps> = ({
           </Box>
         </Flex>
       </Link>
+      <Button
+        onClick={async () => {
+          generateAQuizForEachTopic(topicsOrder, quizId);
+        }}
+      >
+        Generate quizzes
+      </Button>
+      <Button
+        onClick={
+          async () => {
+            countTopicsWithNoQuestions(quizId);
+          }
+        }
+      >
+        Count Topics with no questions
+      </Button>
+
+      <Button
+        onClick={async () => {
+          deleteAllQuizQuestions(topicsOrder);
+        }}
+      >
+        Delete ALL QUestions in Books
+      </Button>
+
       <Sortable
         {...props}
         handle
