@@ -4,7 +4,7 @@ import { useGetPublishedQuizAndTopics } from 'hooks/useGetPublishedQuizAndTopics
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Question } from 'types/types';
-import va from '@vercel/analytics';
+import { trackVercel } from '@/utils/analytics';
 import { Center, Flex, Spinner } from '@chakra-ui/react';
 import Head from 'next/head';
 import { getPublishedQuizAndTopicsServer } from 'utils/supabase-server';
@@ -33,7 +33,6 @@ export default function Quiz({
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
   const [image, setImage] = useState<string | null>(null);
 
-  const va_ = va;
 
   const refreshQuestions = async () => {
     if (!topicId) return;
@@ -91,7 +90,7 @@ export default function Quiz({
   //track quiz views
   useEffect(() => {
     if (quizId) {
-      va_.track('quiz-view');
+      trackVercel('quiz-view');
     }
   }, [quizId]);
 
@@ -150,7 +149,6 @@ export default function Quiz({
           feedback={feedback}
           setFeedback={setFeedback}
           isQuestionLoading={isQuestionLoading}
-          va={va_}
         />
       </>
     </Flex>

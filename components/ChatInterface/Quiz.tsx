@@ -10,7 +10,7 @@ import {
   Center,
   IconButton
 } from '@chakra-ui/react';
-import va from '@vercel/analytics';
+import { trackVercel } from '@/utils/analytics';
 import { Question, ShownAnswers } from 'types/types';
 import {
   VscTriangleRight,
@@ -53,7 +53,7 @@ export default function QuizPage({
 
   useEffect(() => {
     if (quizId) {
-      va.track('quiz-view');
+      trackVercel('quiz-view');
     }
   }, [quizId]);
 

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useGetPublishedQuizAndTopics } from 'hooks/useGetPublishedQuizAndTopics';
 import { Question } from 'types/types';
-import va from '@vercel/analytics';
+import { trackVercel } from '@/utils/analytics';
 import { getQuestions } from '@/utils/supabase-client';
 import { Box, Center, Spinner } from '@chakra-ui/react';
 
@@ -77,7 +77,7 @@ useEffect(() => {
   //track quiz views
   useEffect(() => {
     if (quizId) {
-      va.track('quiz-view');
+      trackVercel('quiz-view');
     }
   }, [quizId]);
 

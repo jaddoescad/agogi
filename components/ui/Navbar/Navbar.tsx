@@ -12,7 +12,6 @@ import {
   Input
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import va from '@vercel/analytics';
 import { publishQuiz } from 'utils/supabase-client';
 import { useState } from 'react';
 import SearchBar from './SearchBar';
@@ -24,6 +23,7 @@ import { useClipboard } from '@chakra-ui/react';
 import { FiEdit, FiSave } from 'react-icons/fi';
 import { updateQuizTitle } from 'utils/supabase-client';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { trackVercel } from '@/utils/analytics';
 
 export default function WithSubnavigation({
   search = false,
@@ -203,7 +203,7 @@ export default function WithSubnavigation({
               _hover={{ bg: 'gray.700' }}
               onClick={() => {
                 router.push(`/preview/${quizId}`);
-                va.track('preview-quiz');
+                trackVercel('preview-quiz');
               }}
             />
           )}
@@ -219,7 +219,7 @@ export default function WithSubnavigation({
               color={'white'}
               onClick={() => {
                 router.push('/generate');
-                va.track('generate-quiz-clicked');
+                trackVercel('generate-quiz-clicked');
               }}
               display={{ base: 'none', md: 'inline-flex' }}
             >
@@ -240,7 +240,7 @@ export default function WithSubnavigation({
                 color={'white'}
                 disabled={share_disabled}
                 onClick={() => {
-                  va.track('publish-quiz');
+                  trackVercel('publish-quiz');
                   console.log('publishing quiz');
                   // handlePublish();
                   router.push(`/settings/${quizId}`);

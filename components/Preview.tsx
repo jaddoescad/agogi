@@ -22,6 +22,7 @@ import {
 } from 'types/types';
 import { Spinner } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import { trackVercel } from '@/utils/analytics';
 
 export default function PreviewQuiz({
   quizId,
@@ -40,8 +41,7 @@ export default function PreviewQuiz({
   setSubmitted,
   currentQuestionIndex,
   setCurrentQuestionIndex,
-  isQuestionLoading,
-  va
+  isQuestionLoading
 }: PreviewQuizProps) {
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -63,7 +63,7 @@ export default function PreviewQuiz({
   };
 
   const goToNextTopic = () => {
-    if (va && quizId) va.track('Next Chapter', { quizId: quizId });
+    if (quizId) trackVercel('Next Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex < topicsOrder.length - 1) {
       router.push(`/quiz/${quizId}/${topicsOrder[currentIndex + 1]}`);
@@ -71,7 +71,7 @@ export default function PreviewQuiz({
   };
 
   const goToPreviousTopic = () => {
-    if (va && quizId) va.track('Previous Chapter', { quizId: quizId });
+    if (quizId) trackVercel('Previous Chapter', { quizId: quizId });
     const currentIndex = topicsOrder.indexOf(selectedTopic);
     if (currentIndex > 0) {
       router.push(`/quiz/${quizId}/${topicsOrder[currentIndex - 1]}`);
@@ -79,7 +79,7 @@ export default function PreviewQuiz({
   };
 
   const handlePreviousQuestion = () => {
-    if (va && quizId) va.track('Previous Question', { quizId: quizId });
+    if (quizId) trackVercel('Previous Question', { quizId: quizId });
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
@@ -88,7 +88,7 @@ export default function PreviewQuiz({
   };
 
   const handleNextQuestion = () => {
-    if (va && quizId) va.track('Next Question', { quizId: quizId });
+    if (quizId) trackVercel('Next Question', { quizId: quizId });
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -122,7 +122,6 @@ export default function PreviewQuiz({
             onTopicClick={setSelectedTopic}
             selectedTopic={selectedTopic}
             onClose={onClose}
-            va={va}
             quizId={quizId}
           />
         </Box>
@@ -209,14 +208,13 @@ export const SideBar: React.FC<SideBarProps> = ({
   onTopicClick,
   selectedTopic,
   onClose,
-  va,
   quizId
 }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const router = useRouter();
 
   const handleTopicClick = (id: string) => {
-    if (va && quizId) va.track('Topic Click', { quizId: quizId });
+    if (quizId) trackVercel('Topic Click', { quizId: quizId });
     if (isSmallerThan768 === true) onClose();
     router.push(`/quiz/${quizId}/${id}`);
   };

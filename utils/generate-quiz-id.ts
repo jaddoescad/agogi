@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import va from '@vercel/analytics';
+import { trackVercel } from '@/utils/analytics';
 
 export const generateQuizID = () => {
   const quizUUID = uuidv4();
-  va.track('generate-quiz-clicked');
+  trackVercel('generate-quiz-clicked');
   return `/${quizUUID}`;
 };
