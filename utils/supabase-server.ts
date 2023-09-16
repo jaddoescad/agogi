@@ -250,6 +250,7 @@ export const saveTopicPrompt = async (
 }
 
 export const editTopicTitle = async (topicId: string, title: string,   supabase: SupabaseClient<any, 'public', any>) => {
+  title = title.replace(/^['"]+|['"]+$/g, '');
   const { data, error } = await supabase
     .from('topics')
     .update({ title })
