@@ -9,7 +9,8 @@ import { SortableProps, SideBarProps } from 'types/types';
 import {
   generateAQuizForEachTopic,
   deleteAllQuizQuestions,
-  countTopicsWithNoQuestions
+  countTopicsWithNoQuestions,
+  deleteAllTopics
 } from 'utils/supabase-client';
 
 export default {
@@ -27,6 +28,8 @@ export const SideBar: React.FC<SideBarProps> = ({
   selectedTopic,
   setSelectedTopic
 }) => {
+  const [loading, setLoading] = React.useState(false);
+
   return (
     <Box h={'100vh'} w={'350px'} overflow={'auto'} bg={'#0C0D0F'}>
       <Link href="/quizzes" aria-label="Back to Quizzes" color="white">
@@ -52,18 +55,23 @@ export const SideBar: React.FC<SideBarProps> = ({
         </Flex>
       </Link>
       <Button
+        isLoading={loading}
         onClick={async () => {
-          generateAQuizForEachTopic(topicsOrder, quizId);
+          setLoading(true); // Start loading
+          await generateAQuizForEachTopic(topicsOrder, 'multiple-choice', quizId);
+          setLoading(false);
         }}
       >
         Generate quizzes
       </Button>
+      <Button onClick={async () => deleteAllTopics(quizId)}>
+        Delete All Topics
+      </Button>
       <Button
-        onClick={
-          async () => {
-            countTopicsWithNoQuestions(quizId);
-          }
-        }
+      
+        onClick={async () => {
+          countTopicsWithNoQuestions(quizId);
+        }}
       >
         Count Topics with no questions
       </Button>

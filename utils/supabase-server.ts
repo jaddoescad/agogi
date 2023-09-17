@@ -191,7 +191,6 @@ export const getQuiz = async (
 
 export const checkQuizAndTopicExist = async (quizId: string,  supabase: SupabaseClient<any, 'public', any>) => {
   const {data, error} = await supabase.from('topics').select('*').eq('quiz_id', quizId);
-  console.log('data', data);
 
   if (error) {
     console.log(error.message);
@@ -209,9 +208,9 @@ export const getPublishedQuizAndTopicsServer = async (quizId: string, supabase: 
         id,
         title,
         image_url,
-        quizzes_snapshot!quizzes_snapshot_original_quiz_id_fkey(
+        quizzes_snapshot(
         topics_order,
-        topics_snapshot!fk_topic_to_quiz_snapshot (
+        topics_snapshot (
           id,
           title
         )
@@ -220,6 +219,7 @@ export const getPublishedQuizAndTopicsServer = async (quizId: string, supabase: 
     )
     .eq('id', quizId)
     .single();
+
 
   if (error) {
     console.log(error.message);

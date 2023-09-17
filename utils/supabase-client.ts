@@ -86,7 +86,9 @@ export const getHomePageQuizzes = async () => {
     id,
     title,
     image_url,
-    topics_order
+    quizzes_snapshot(
+      topics_order
+    )
     `
     )
     .eq('published', true)
@@ -451,6 +453,7 @@ export const getTopicPrompt = async (topicId: string) => {
     .eq('id', topicId)
     .single();
 
+  console.log('data', data);
   if (error) {
     console.log(error.message);
     throw error;
@@ -474,30 +477,116 @@ export const getOneQuestionFromTopic = async (topicId: string) => {
   return data ?? [];
 };
 
+// export const generateAQuizForEachTopic = async (
+//   topics: string[],
+//   quizId: string
+// ) => {
+//   // Create an array of promises for each topic
+//   const promises = topics.map(async (topicId) => {
+//     const questions = await getOneQuestionFromTopic(topicId);
+//     if (questions.length > 0) {
+//       return;
+//     }
+
+//     const result = await getTopicPrompt(topicId);
+//     return postData({
+//       url: '/api/book-response',
+//       data: {
+//         message: result.prompt,
+//         quizId,
+//         topicId
+//       }
+//     });
+//   });
+
+//   // Wait for all promises to complete
+//   await Promise.all(promises);
+// };
+
+// export const generateAQuizForEachTopic = async (
+//   topics: string[],
+//   quizId: string,
+//   quizType: string
+// ) => {
+//   let count = 0;
+
+//   for (const topicId of topics) {
+//     const questions = await getOneQuestionFromTopic(topicId);
+//     if (questions.length === 0) {
+//       count++;
+//       console.log('count', count);
+
+//       const result = await getTopicPrompt(topicId);
+//       // await createQuiz(result.prompt, quizType, topicId);
+//     }
+//   }
+// };
+
+// export const generateAQuizForEachTopic = async (
+//   topics: string[],
+//   quizId: string,
+//   quizType: string
+// ) => {
+//   var count = 0;
+//   // Create an array of promises for each topic
+//   const promises = topics.map(async (topicId) => {
+//     const questions = await getOneQuestionFromTopic(topicId);
+//     if (questions.length > 0) {
+//       return;
+//     }
+//     count++;
+//     console.log('count', count);
+
+//     const result = await getTopicPrompt(topicId);
+//     const response = await createQuiz(result.prompt, quizType, topicId);
+
+//     // Return the response, or any other logic you want to execute after the quiz is created
+//     return response;
+//   });
+
+//   // Wait for all promises to complete
+//   await Promise.all(promises);
+// };
+const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
+  let index = 0;
+  const arrayLength = array.length;
+  const chunks = [];
+
+  while (index < arrayLength) {
+    chunks.push(array.slice(index, chunkSize + index));
+    index += chunkSize;
+  }
+
+  return chunks;
+};
+
 export const generateAQuizForEachTopic = async (
   topics: string[],
-  quizId: string
+  quizId: string,
+  quizType: string
 ) => {
-  // Create an array of promises for each topic
-  const promises = topics.map(async (topicId) => {
-    const questions = await getOneQuestionFromTopic(topicId);
-    if (questions.length > 0) {
-      return;
-    }
-
-    const result = await getTopicPrompt(topicId);
-    return postData({
-      url: '/api/book-response',
-      data: {
-        message: result.prompt,
-        quizId,
-        topicId
+  const processChunk = async (chunk: string[]) => {
+    var count = 0;
+    const promises = chunk.map(async (topicId) => {
+      const questions = await getOneQuestionFromTopic(topicId);
+      if (questions.length > 0) {
+        return;
       }
-    });
-  });
+      count++;
+      console.log('count', count);
 
-  // Wait for all promises to complete
-  await Promise.all(promises);
+      const result = await getTopicPrompt(topicId);
+      const response = await createQuiz(result.prompt, quizType, topicId);
+      return response;
+    });
+
+    await Promise.all(promises);
+  };
+
+  const chunks = chunkArray(topics, 5);
+  for (const chunk of chunks) {
+    await processChunk(chunk);
+  }
 };
 
 export const countTopicsWithNoQuestions = async (quiz_id: string) => {
@@ -510,7 +599,6 @@ export const countTopicsWithNoQuestions = async (quiz_id: string) => {
     throw error;
   }
 
-  console.log('data', data);
 
   return data ?? [];
 };
@@ -521,6 +609,89 @@ export const deleteAllQuizQuestions = async (topics: string[]) => {
       .from('questions')
       .delete()
       .eq('topic_id', topic);
-    console.log('data', data);
   }
+};
+
+// import { saveTopicPrompt } from '../../utils/supabase-server';
+import { OpenAI } from 'langchain/llms/openai';
+import { generateQuizAndTitle } from 'prompts/book-generator/subprompts/check-message-type';
+
+export const insertQuestions = async (
+  questions: Question[],
+  topicId: string,
+  quizType: string
+) => {
+  const { data, error } = await supabase.from('questions').insert(
+    questions.map((question) => {
+      return {
+        topic_id: topicId,
+        question_data: question,
+        type: quizType
+      };
+    })
+  );
+
+  if (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+
+  return data ?? [];
+};
+
+export const createQuiz = async (message: any, quizType: any, topicId: any) => {
+  try {
+
+
+    const llmGpt4 = new OpenAI({
+      openAIApiKey: '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', ///process.env.OPENAI_API_KEY,
+      temperature: 0.7,
+      modelName: 'gpt-4'
+    });
+
+    const prompt = generateQuizAndTitle(message);
+    const result = await llmGpt4.predict(prompt);
+
+    const parsedResponse = JSON.parse(result);
+
+    const promptQuestions = parsedResponse.questions;
+    const title = parsedResponse.title;
+
+    await editTopicTitle(topicId, title);
+    //LOOP THROU
+    await insertQuestions(promptQuestions, topicId, quizType);
+
+    const response = {
+      message: title,
+      questions: promptQuestions
+    };
+    return response;
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
+export const deleteAllTopics = async (quizId: string) => {
+  const { data, error } = await supabase
+    .from('topics')
+    .delete()
+    .eq('quiz_id', quizId);
+
+  //delete topics order
+  const { data: data2, error: error2 } = await supabase
+    .from('quizzes')
+    .update({ topics_order: [] })
+    .eq('id', quizId);
+
+  if (error) {
+    console.log(error.message);
+    throw error;
+  }
+
+  if (error2) {
+    console.log(error2.message);
+    throw error2;
+  }
+
+  return data ?? [];
 };

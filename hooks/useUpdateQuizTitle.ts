@@ -8,8 +8,6 @@ export function useUpdateQuizTitleMutation() {
 
   return useMutation(
     async (params: { quizId: string, quizTitle: string  }) => {
-        console.log(params.quizId);
-        console.log(params.quizTitle);
       return updateQuizTitle(params.quizId ,params.quizTitle).then((result) => {
         return result;
       });

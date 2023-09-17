@@ -31,16 +31,12 @@ interface Props {
 type BillingInterval = 'year' | 'month';
 
 export default function Pricing({ products }: Props ) {
-  // console.log(products[0].prices)
   const router = useRouter();
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>('month');
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
   const { user, isLoading, subscription } = useUser();
-  // useEffect(() => {
-  //   console.log("heelo")
-  //   console.log(subscription)
-  // }, [])
+
   
   const handleCheckout = async (price: Price) => {
     setPriceIdLoading(price.id);
@@ -60,7 +56,6 @@ export default function Pricing({ products }: Props ) {
       const stripe = await getStripe();
       stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
-      console.log("shit")
       return alert((error as Error)?.message);
     } finally {
       setPriceIdLoading(undefined);

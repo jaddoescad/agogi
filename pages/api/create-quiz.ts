@@ -106,7 +106,6 @@ const apiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       presence_penalty: 0
     });
 
-    // console.log(response)
 
     console.log('success getting openai message');
 

@@ -173,6 +173,7 @@ export default function PreviewQuiz({
                     feedback={feedback}
                     answers={answers}
                   />
+                  <Button>THumbs down</Button>
                   <ControlButtons
                     handlePreviousQuestion={handlePreviousQuestion}
                     handleNextQuestion={handleNextQuestion}
@@ -413,6 +414,7 @@ export const QuestionBox: React.FC<QuestionBoxProps> = ({
   feedback,
   answers
 }) => {
+
   return (
     <Box
       border="1px"
@@ -455,7 +457,7 @@ export const QuestionBox: React.FC<QuestionBoxProps> = ({
         display={'flex'}
         flexDir={'column'}
       >
-        {currentQuestion.choices.map((choice: string, index: number) => (
+        {currentQuestion?.choices.map((choice: string, index: number) => (
           <RadioButtonWrapper
             key={index}
             value={index.toString()}

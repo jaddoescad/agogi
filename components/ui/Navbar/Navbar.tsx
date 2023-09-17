@@ -241,8 +241,6 @@ export default function WithSubnavigation({
                 disabled={share_disabled}
                 onClick={() => {
                   trackVercel('publish-quiz');
-                  console.log('publishing quiz');
-                  // handlePublish();
                   router.push(`/settings/${quizId}`);
                 }}
                 display={{ base: 'none', md: 'inline-flex' }}

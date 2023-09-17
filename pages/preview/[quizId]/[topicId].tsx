@@ -71,7 +71,6 @@ useEffect(() => {
   if (!selectedTopic) return;
   refreshQuestions();
   setTopicTitle(topics.find((topic) => topic.id === selectedTopic).title);
-
 }, [selectedTopic]);
 
   //track quiz views

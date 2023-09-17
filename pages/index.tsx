@@ -40,6 +40,7 @@ const Home: React.FC = () => {
     title: 'Agogi',
     description: 'AI powered quiz platform'
   };
+  
 
   return (
     <Box pb={10}>
@@ -87,7 +88,7 @@ const Home: React.FC = () => {
               >
                 {quizzes.map((quiz) => (
                   <Link
-                    href={`/quiz/${quiz.id}/${quiz.topics_order[0]}
+                    href={`/quiz/${quiz.id}/${quiz.quizzes_snapshot[0].topics_order[0]}
                   `}
                   >
                     <Box>

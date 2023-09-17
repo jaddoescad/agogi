@@ -13,6 +13,7 @@ import { Question } from 'types/types';
 import { css_scroll } from 'styles/chakra-css-styles.js';
 import {HUMAN_USER} from '../../utils/constants'
 import { useEffect } from 'react';
+import { createQuiz } from 'utils/supabase-client';
 
 const Form = ({
   isLoading,
@@ -74,15 +75,7 @@ const Form = ({
     }
 
     try {
-      let response = await postData({
-        url: '/api/book-response',
-        data: {
-          message,
-          quizId,
-          quizType,
-          topicId
-        }
-      });
+      let response = await createQuiz(message, quizType, topicId);
       if (response !== undefined) {
         if (response.questions) {
           const newQuestions = quiz

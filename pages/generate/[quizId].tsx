@@ -45,7 +45,6 @@ export default function GenerateQuiz() {
   };
 
   useEffect(() => {
-    console.log('quizId', quizId);
     if (!quizId) return;
     if (!selectedTopic) return;
     getQuestions(selectedTopic).then((questions) => {
@@ -122,6 +121,7 @@ export default function GenerateQuiz() {
               prompt={prompt}
               setTopics={setTopics}
               topics={topics}
+              
             />
           </Flex>
 

@@ -156,9 +156,6 @@ export function Sortable({
     }
   }, [activeId]);
 
-  useEffect(() => {
-    console.log("sh",selectedTopic)
-  }, [selectedTopic])
 
   return (
     <DndContext

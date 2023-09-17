@@ -83,8 +83,6 @@ export default function Quiz({
     resetQuiz();
     refreshQuestions();
     setSelectedTopic(topicId);
-
-    // setTopicTitle(topics.find((topic) => topic.id === topicId)?.title);
   }, [topicId, topics]);
 
   //track quiz views
@@ -178,7 +176,7 @@ export async function getServerSideProps(context: any) {
     const topics = initialData?.quizzes_snapshot?.[0]?.topics_snapshot;
     if (topics) {
       const matchedTopic = topics.find((topic) => topic.id === topicId);
-      topicTitle = matchedTopic?.title;
+      topicTitle = matchedTopic?.title || 'Untitled';
     }
 
     // ... [Fetch other required data and populate initialData]
