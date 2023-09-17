@@ -28,6 +28,8 @@ export type ControlButtonsProps = {
   currentQuestionIndex: number;
   questions: any[]; // You may want to replace 'any' with a more specific type if you know the shape of your questions
   handleReset: () => void;
+  setShowFeedbackMessage: React.Dispatch<React.SetStateAction<boolean>>;
+  showFeedbackMessage: boolean;
 };
 
 export type QuestionNavigationProps = {
@@ -278,3 +280,5 @@ export type SideBarProps = {
   selectedTopic: any; // Replace any with the actual type if you know it
   setSelectedTopic: (topic: any) => void; // Replace any with the actual type if you know it
 };
+
+export type VoteType = 'thumbs_up' | 'thumbs_down';

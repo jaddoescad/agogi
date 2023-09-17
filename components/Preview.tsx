@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Heading,
@@ -23,6 +23,8 @@ import {
 import { Spinner } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { trackVercel } from '@/utils/analytics';
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { upvoteORdownvoteQuestion } from '@/utils/supabase-client';
 
 export default function PreviewQuiz({
   quizId,
@@ -46,10 +48,8 @@ export default function PreviewQuiz({
   const [isLargerThan768] = useMediaQuery('(min-width: 768px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
-  const displayValue = useBreakpointValue({ base: 'none', md: 'block' });
   const router = useRouter();
-
-
+  const [showFeedbackMessage, setShowFeedbackMessage] = useState(false);
 
   const handleChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -60,6 +60,7 @@ export default function PreviewQuiz({
     } else {
       setFeedback('Incorrect');
     }
+    handleReset();
   };
 
   const goToNextTopic = () => {
@@ -68,6 +69,7 @@ export default function PreviewQuiz({
     if (currentIndex < topicsOrder.length - 1) {
       router.push(`/quiz/${quizId}/${topicsOrder[currentIndex + 1]}`);
     }
+    handleReset();
   };
 
   const goToPreviousTopic = () => {
@@ -76,6 +78,7 @@ export default function PreviewQuiz({
     if (currentIndex > 0) {
       router.push(`/quiz/${quizId}/${topicsOrder[currentIndex - 1]}`);
     }
+    handleReset();
   };
 
   const handlePreviousQuestion = () => {
@@ -85,6 +88,7 @@ export default function PreviewQuiz({
     }
     // Reset feedback when navigating
     setFeedback(null);
+    handleReset();
   };
 
   const handleNextQuestion = () => {
@@ -93,6 +97,7 @@ export default function PreviewQuiz({
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
     setFeedback(null);
+    handleReset();
   };
 
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
@@ -100,7 +105,8 @@ export default function PreviewQuiz({
   const handleReset = () => {
     setAnswers([]);
     setSubmitted(false);
-    setFeedback(null); //
+    setFeedback(null);
+    setShowFeedbackMessage(false);
   };
 
   useEffect(() => {
@@ -173,7 +179,6 @@ export default function PreviewQuiz({
                     feedback={feedback}
                     answers={answers}
                   />
-                  <Button>THumbs down</Button>
                   <ControlButtons
                     handlePreviousQuestion={handlePreviousQuestion}
                     handleNextQuestion={handleNextQuestion}
@@ -181,6 +186,8 @@ export default function PreviewQuiz({
                     currentQuestionIndex={currentQuestionIndex}
                     questions={questions}
                     handleReset={handleReset}
+                    setShowFeedbackMessage={setShowFeedbackMessage}
+                    showFeedbackMessage={showFeedbackMessage}
                   />
                 </Box>
               ) : (
@@ -414,7 +421,6 @@ export const QuestionBox: React.FC<QuestionBoxProps> = ({
   feedback,
   answers
 }) => {
-
   return (
     <Box
       border="1px"
@@ -473,38 +479,77 @@ export const QuestionBox: React.FC<QuestionBoxProps> = ({
     </Box>
   );
 };
-
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
   handlePreviousQuestion,
   handleNextQuestion,
   submitted,
   currentQuestionIndex,
   questions,
-  handleReset
+  handleReset,
+  setShowFeedbackMessage,
+  showFeedbackMessage
 }) => {
+  useEffect(() => {
+    setShowFeedbackMessage(false);
+  }, []);
+
   return (
-    <Flex justifyContent="space-between">
-      <Button
-        mt={4}
-        mx={2}
-        bg="blue.500"
-        color="white"
-        rounded={'true'}
-        onClick={handlePreviousQuestion}
-        isDisabled={currentQuestionIndex === 0 || submitted}
-      >
-        Back
-      </Button>
-      <Button
-        mt={4}
-        mx={2}
-        bg="blue.500"
-        color="white"
-        rounded={'true'}
-        onClick={!submitted ? handleNextQuestion : handleReset}
-      >
-        {!submitted ? 'Next' : 'Try Again'}
-      </Button>
-    </Flex>
+    <Box>
+      <Flex justifyContent="space-between" alignItems="center">
+        <Button
+          mt={4}
+          mx={2}
+          bg="blue.500"
+          color="white"
+          rounded={'true'}
+          onClick={handlePreviousQuestion}
+          isDisabled={currentQuestionIndex === 0 || submitted}
+        >
+          Back
+        </Button>
+
+        <IconButton
+          aria-label="Thumbs Up"
+          icon={<FaThumbsUp />}
+          m={2}
+          colorScheme="green"
+          variant="outline"
+          onClick={() => {
+            upvoteORdownvoteQuestion(
+              questions[currentQuestionIndex].id,
+              'thumbs_up'
+            );
+            setShowFeedbackMessage(true);
+          }}
+        />
+
+        <IconButton
+          aria-label="Thumbs Down"
+          icon={<FaThumbsDown />}
+          m={2}
+          colorScheme="red"
+          variant="outline"
+          onClick={() => {
+            upvoteORdownvoteQuestion(
+              questions[currentQuestionIndex].id,
+              'thumbs_down'
+            );
+            setShowFeedbackMessage(true);
+          }}
+        />
+
+        <Button
+          mt={4}
+          mx={2}
+          bg="blue.500"
+          color="white"
+          rounded={'true'}
+          onClick={!submitted ? handleNextQuestion : handleReset}
+        >
+          {!submitted ? 'Next' : 'Try Again'}
+        </Button>
+      </Flex>
+      {showFeedbackMessage && <p>Thank you for your feedback!</p>}
+    </Box>
   );
 };

@@ -2,7 +2,7 @@ import {
   createBrowserSupabaseClient,
   User
 } from '@supabase/auth-helpers-nextjs';
-import { ProductWithPrice } from 'types/types';
+import { ProductWithPrice, VoteType } from 'types/types';
 import type { Database } from 'types/types_db';
 import { isQuestion } from 'types/type_guards';
 import { Question } from 'types/types';
@@ -599,7 +599,6 @@ export const countTopicsWithNoQuestions = async (quiz_id: string) => {
     throw error;
   }
 
-
   return data ?? [];
 };
 
@@ -641,10 +640,8 @@ export const insertQuestions = async (
 
 export const createQuiz = async (message: any, quizType: any, topicId: any) => {
   try {
-
-
     const llmGpt4 = new OpenAI({
-      openAIApiKey: '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', ///process.env.OPENAI_API_KEY,
+      openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
       temperature: 0.7,
       modelName: 'gpt-4'
     });
@@ -691,6 +688,24 @@ export const deleteAllTopics = async (quizId: string) => {
   if (error2) {
     console.log(error2.message);
     throw error2;
+  }
+
+  return data ?? [];
+};
+
+
+export const upvoteORdownvoteQuestion = async (
+  questionId: string,
+  vote: VoteType
+) => {
+  const { data, error } = await supabase.from('questions_feedback').insert({
+    question_id: questionId,
+    vote: vote
+  });
+
+  if (error) {
+    console.log(error.message);
+    throw error;
   }
 
   return data ?? [];
