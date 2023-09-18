@@ -60,7 +60,6 @@ export default function PreviewQuiz({
     } else {
       setFeedback('Incorrect');
     }
-    handleReset();
   };
 
   const goToNextTopic = () => {
